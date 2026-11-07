@@ -466,7 +466,7 @@ input,select,textarea{min-width:0;max-width:100%;}
 <div id="page-home" class="page active">
   <div class="pt-16 md:pt-20">
     <!-- Hero -->
-    <section class="relative overflow-hidden" style="background:linear-gradient(135deg,#fff5ed 0%,#fff9f5 50%,#f9f9ff 100%)">
+    <section id="home-hero" class="relative overflow-hidden" style="background:linear-gradient(135deg,#fff5ed 0%,#fff9f5 50%,#f9f9ff 100%)">
       <div class="absolute top-0 right-0 w-96 h-96 rounded-full bg-primary/5 blur-3xl -z-10 translate-x-1/3 -translate-y-1/3"></div>
       <div class="max-w-[1200px] mx-auto px-4 md:px-10 grid grid-cols-1 md:grid-cols-2 gap-8 items-center py-12 md:py-16">
         <div class="z-10 text-center md:text-left">
@@ -1201,6 +1201,27 @@ function subscribeToUserOrders(uid) {
 }
 
 // ─────────────── NAVIGATION ───────────────
+// ─── HOMEPAGE BACKGROUND (set from Admin → Settings) ───
+function applyHomeBg(cfg){
+  const el=document.getElementById('home-hero');if(!el)return;
+  const base='linear-gradient(135deg,#fff5ed 0%,#fff9f5 50%,#f9f9ff 100%)';
+  const url=((cfg&&cfg.bgUrl)||'').trim();
+  if(!url||!(/^https?:\/\//i.test(url)||/^data:image\//i.test(url))){el.style.background=base;return;}
+  const n=Math.min(Math.max(Number(cfg.overlay),0),90);const a=(isNaN(n)?45:n)/100;
+  const safe=url.replace(/["'()\\\s]/g,c=>encodeURIComponent(c));
+  el.style.background=`linear-gradient(rgba(255,255,255,${a}),rgba(255,255,255,${a})), url("${safe}") center/cover no-repeat, ${base}`;
+}
+async function loadHomeBg(){
+  try{
+    const{db,doc,getDoc}=window._fb;
+    const s=await getDoc(doc(db,'settings','homepage'));
+    const cfg=s.exists()?s.data():{};
+    applyHomeBg(cfg);
+    try{localStorage.setItem('homeBgCfg',JSON.stringify(cfg));}catch(_){}
+  }catch(e){}
+}
+try{applyHomeBg(JSON.parse(localStorage.getItem('homeBgCfg')||'null'));}catch(_){}
+
 function nav(page) {
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById('page-'+page)?.classList.add('active');
@@ -1920,7 +1941,7 @@ window._onAuthChange = async function(user) {
 
 // ─────────────── INIT ───────────────
 nav('home');
-setTimeout(() => { if (window._fb) { loadPickupPoints(); loadCMSBanners(); subscribeRoomDeliverySettings(); subscribeCategories(); subscribeProducts(); } }, 600);
+setTimeout(() => { if (window._fb) { loadPickupPoints(); loadHomeBg(); loadCMSBanners(); subscribeRoomDeliverySettings(); subscribeCategories(); subscribeProducts(); } }, 600);
 </script>
 
 <script>
