@@ -438,17 +438,7 @@ tailwind.config = {
       </div>
       <!-- Category pills -->
       <div class="px-4 md:px-10 pb-5 max-w-[1200px] mx-auto">
-        <div class="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
-          <button onclick="filterAndBrowse('All')" class="flex-shrink-0 px-4 py-2 rounded-full bg-primary-container text-white text-xs font-bold btn shadow-sm">All</button>
-          <button onclick="filterAndBrowse('Fruits')" class="flex-shrink-0 px-4 py-2 rounded-full bg-white border border-outline-variant/25 text-on-surface text-xs font-bold btn hover:bg-surface-container">🍎 Fruits</button>
-          <button onclick="filterAndBrowse('Vegetables')" class="flex-shrink-0 px-4 py-2 rounded-full bg-white border border-outline-variant/25 text-on-surface text-xs font-bold btn hover:bg-surface-container">🥦 Vegetables</button>
-          <button onclick="filterAndBrowse('Groceries')" class="flex-shrink-0 px-4 py-2 rounded-full bg-white border border-outline-variant/25 text-on-surface text-xs font-bold btn hover:bg-surface-container">🛒 Groceries</button>
-          <button onclick="filterAndBrowse('Rice & Grains')" class="flex-shrink-0 px-4 py-2 rounded-full bg-white border border-outline-variant/25 text-on-surface text-xs font-bold btn hover:bg-surface-container">🌾 Rice &amp; Grains</button>
-          <button onclick="filterAndBrowse('Dairy Products')" class="flex-shrink-0 px-4 py-2 rounded-full bg-white border border-outline-variant/25 text-on-surface text-xs font-bold btn hover:bg-surface-container">🥛 Dairy</button>
-          <button onclick="filterAndBrowse('Snacks')" class="flex-shrink-0 px-4 py-2 rounded-full bg-white border border-outline-variant/25 text-on-surface text-xs font-bold btn hover:bg-surface-container">🍿 Snacks</button>
-          <button onclick="filterAndBrowse('Household Essentials')" class="flex-shrink-0 px-4 py-2 rounded-full bg-white border border-outline-variant/25 text-on-surface text-xs font-bold btn hover:bg-surface-container">🏠 Household</button>
-          <button onclick="filterAndBrowse('Personal Care')" class="flex-shrink-0 px-4 py-2 rounded-full bg-white border border-outline-variant/25 text-on-surface text-xs font-bold btn hover:bg-surface-container">🧴 Personal Care</button>
-        </div>
+        <div class="flex gap-2 overflow-x-auto scrollbar-hide pb-1" id="home-cat-pills"></div>
       </div>
     </section>
 
@@ -499,16 +489,8 @@ tailwind.config = {
     <!-- Categories grid -->
     <section class="pb-8 max-w-[1200px] mx-auto px-4 md:px-10">
       <h2 class="text-xl md:text-2xl font-bold mb-5">Shop by Category</h2>
-      <div class="grid grid-cols-4 sm:grid-cols-4 md:grid-cols-9 gap-2 md:gap-3">
-        <div onclick="filterAndBrowse('Fruits')" class="cursor-pointer btn"><div class="relative h-20 md:h-24 rounded-2xl overflow-hidden card shadow-sm"><img src="https://images.unsplash.com/photo-1610832958506-aa56368176cf?w=200&h=200&fit=crop&q=80" alt="Fruits" class="w-full h-full object-cover"><div class="absolute inset-0" style="background:linear-gradient(to top,rgba(0,0,0,0.62) 0%,transparent 55%)"></div><span class="absolute bottom-1.5 left-0 right-0 text-center text-[10px] md:text-xs font-bold text-white" style="text-shadow:0 1px 3px rgba(0,0,0,0.5)">Fruits</span></div></div>
-        <div onclick="filterAndBrowse('Vegetables')" class="cursor-pointer btn"><div class="relative h-20 md:h-24 rounded-2xl overflow-hidden card shadow-sm"><img src="https://images.unsplash.com/photo-1540420773420-3366772f4999?w=200&h=200&fit=crop&q=80" alt="Vegetables" class="w-full h-full object-cover"><div class="absolute inset-0" style="background:linear-gradient(to top,rgba(0,0,0,0.62) 0%,transparent 55%)"></div><span class="absolute bottom-1.5 left-0 right-0 text-center text-[10px] md:text-xs font-bold text-white" style="text-shadow:0 1px 3px rgba(0,0,0,0.5)">Vegetables</span></div></div>
-        <div onclick="filterAndBrowse('Groceries')" class="cursor-pointer btn"><div class="relative h-20 md:h-24 rounded-2xl overflow-hidden card shadow-sm"><img src="https://images.unsplash.com/photo-1589927986089-35812388d1f4?w=200&h=200&fit=crop&q=80" alt="Groceries" class="w-full h-full object-cover"><div class="absolute inset-0" style="background:linear-gradient(to top,rgba(0,0,0,0.62) 0%,transparent 55%)"></div><span class="absolute bottom-1.5 left-0 right-0 text-center text-[10px] md:text-xs font-bold text-white" style="text-shadow:0 1px 3px rgba(0,0,0,0.5)">Groceries</span></div></div>
-        <div onclick="filterAndBrowse('Rice & Grains')" class="cursor-pointer btn"><div class="relative h-20 md:h-24 rounded-2xl overflow-hidden card shadow-sm"><img src="https://images.unsplash.com/photo-1586201375761-83865001e31c?w=200&h=200&fit=crop&q=80" alt="Rice & Grains" class="w-full h-full object-cover"><div class="absolute inset-0" style="background:linear-gradient(to top,rgba(0,0,0,0.62) 0%,transparent 55%)"></div><span class="absolute bottom-1.5 left-0 right-0 text-center text-[10px] md:text-xs font-bold text-white" style="text-shadow:0 1px 3px rgba(0,0,0,0.5)">Rice &amp; Grains</span></div></div>
-        <div onclick="filterAndBrowse('Dairy Products')" class="cursor-pointer btn"><div class="relative h-20 md:h-24 rounded-2xl overflow-hidden card shadow-sm"><img src="https://images.unsplash.com/photo-1550583724-b2692b85b150?w=200&h=200&fit=crop&q=80" alt="Dairy" class="w-full h-full object-cover"><div class="absolute inset-0" style="background:linear-gradient(to top,rgba(0,0,0,0.62) 0%,transparent 55%)"></div><span class="absolute bottom-1.5 left-0 right-0 text-center text-[10px] md:text-xs font-bold text-white" style="text-shadow:0 1px 3px rgba(0,0,0,0.5)">Dairy</span></div></div>
-        <div onclick="filterAndBrowse('Snacks')" class="cursor-pointer btn"><div class="relative h-20 md:h-24 rounded-2xl overflow-hidden card shadow-sm"><img src="https://images.unsplash.com/photo-1566478989037-eec170784d0b?w=200&h=200&fit=crop&q=80" alt="Snacks" class="w-full h-full object-cover"><div class="absolute inset-0" style="background:linear-gradient(to top,rgba(0,0,0,0.62) 0%,transparent 55%)"></div><span class="absolute bottom-1.5 left-0 right-0 text-center text-[10px] md:text-xs font-bold text-white" style="text-shadow:0 1px 3px rgba(0,0,0,0.5)">Snacks</span></div></div>
-        <div onclick="filterAndBrowse('Household Essentials')" class="cursor-pointer btn"><div class="relative h-20 md:h-24 rounded-2xl overflow-hidden card shadow-sm"><img src="https://images.unsplash.com/photo-1583947215259-38e31be8751f?w=200&h=200&fit=crop&q=80" alt="Household" class="w-full h-full object-cover"><div class="absolute inset-0" style="background:linear-gradient(to top,rgba(0,0,0,0.62) 0%,transparent 55%)"></div><span class="absolute bottom-1.5 left-0 right-0 text-center text-[10px] md:text-xs font-bold text-white" style="text-shadow:0 1px 3px rgba(0,0,0,0.5)">Household</span></div></div>
-        <div onclick="filterAndBrowse('Personal Care')" class="cursor-pointer btn"><div class="relative h-20 md:h-24 rounded-2xl overflow-hidden card shadow-sm"><img src="https://images.unsplash.com/photo-1631390660539-c0fba04f9f9e?w=200&h=200&fit=crop&q=80" alt="Personal Care" class="w-full h-full object-cover"><div class="absolute inset-0" style="background:linear-gradient(to top,rgba(0,0,0,0.62) 0%,transparent 55%)"></div><span class="absolute bottom-1.5 left-0 right-0 text-center text-[10px] md:text-xs font-bold text-white" style="text-shadow:0 1px 3px rgba(0,0,0,0.5)">Personal Care</span></div></div>
-        <div onclick="filterAndBrowse('Other Products')" class="cursor-pointer btn"><div class="relative h-20 md:h-24 rounded-2xl overflow-hidden card shadow-sm"><img src="https://images.unsplash.com/photo-1614398751058-eb2e0bf63e53?w=200&h=200&fit=crop&q=80" alt="Other" class="w-full h-full object-cover"><div class="absolute inset-0" style="background:linear-gradient(to top,rgba(0,0,0,0.62) 0%,transparent 55%)"></div><span class="absolute bottom-1.5 left-0 right-0 text-center text-[10px] md:text-xs font-bold text-white" style="text-shadow:0 1px 3px rgba(0,0,0,0.5)">Other</span></div></div>
+      <div class="grid grid-cols-4 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-9 gap-2 md:gap-3" id="home-categories-grid">
+        <div class="col-span-4 md:col-span-6 lg:col-span-9 text-center py-6 text-secondary text-sm">Loading categories...</div>
       </div>
     </section>
     <div class="bottom-spacer md:hidden"></div>
@@ -1177,6 +1159,78 @@ function nav(page) {
 
 function filterAndBrowse(cat) { currentFilter=cat; nav('browse'); }
 
+// ─────────────── CATEGORIES (live from admin: settings/categories) ───────────────
+// null = not loaded yet. Once loaded this is the single source of truth for every
+// category UI on the storefront (hero pills, Shop by Category grid, browse pills).
+let storeCategories = null;
+const DEFAULT_STORE_CATEGORIES = [
+  {id:'cat-fruits',name:'Fruits',imageUrl:'',sortOrder:0},
+  {id:'cat-vegetables',name:'Vegetables',imageUrl:'',sortOrder:1},
+  {id:'cat-groceries',name:'Groceries',imageUrl:'',sortOrder:2},
+  {id:'cat-rice',name:'Rice & Grains',imageUrl:'',sortOrder:3},
+  {id:'cat-dairy',name:'Dairy Products',imageUrl:'',sortOrder:4},
+  {id:'cat-snacks',name:'Snacks',imageUrl:'',sortOrder:5},
+  {id:'cat-household',name:'Household Essentials',imageUrl:'',sortOrder:6},
+  {id:'cat-personal',name:'Personal Care',imageUrl:'',sortOrder:7},
+  {id:'cat-other',name:'Other Products',imageUrl:'',sortOrder:99},
+];
+const catEmojis = {'fruits':'🍎','vegetables':'🥦','groceries':'🛒','rice & grains':'🌾','dairy products':'🥛','snacks':'🍿','household essentials':'🏠','personal care':'🧴'};
+function catEmoji(name){ return catEmojis[(name||'').toLowerCase()]||'🏷️'; }
+function catArg(name){ return encodeURIComponent(name); }
+function filterAndBrowseEnc(enc){ filterAndBrowse(decodeURIComponent(enc)); }
+function setCatFilter(enc){ currentFilter=decodeURIComponent(enc); renderProducts(); }
+
+function subscribeCategories() {
+  if(window._categoriesUnsub){window._categoriesUnsub();window._categoriesUnsub=null;}
+  try{
+    const{db,doc,onSnapshot}=window._fb;
+    window._categoriesUnsub=onSnapshot(
+      doc(db,'settings','categories'),
+      snap=>{
+        const list=snap.exists()?snap.data().list:null;
+        // Doc missing = admin never opened Categories yet → show the same defaults the admin seeds.
+        // Doc present with an empty list = admin deleted everything → show nothing.
+        const cats=Array.isArray(list)?list:(snap.exists()?[]:DEFAULT_STORE_CATEGORIES);
+        storeCategories=[...cats].filter(c=>c&&c.name).sort((a,b)=>(a.sortOrder??99)-(b.sortOrder??99));
+        renderCategories();
+      },
+      e=>{
+        console.error('Categories listener:',e);
+        if(!storeCategories){storeCategories=[...DEFAULT_STORE_CATEGORIES];renderCategories();}
+      }
+    );
+  }catch(e){console.error('subscribeCategories:',e);}
+}
+
+function renderCategories() {
+  const cats=storeCategories||[];
+  // If the category the customer is currently filtering by was removed, reset to All
+  if(currentFilter!=='All'&&!cats.some(c=>c.name===currentFilter))currentFilter='All';
+
+  // Hero pills
+  const pills=document.getElementById('home-cat-pills');
+  if(pills){
+    pills.innerHTML=
+      `<button onclick="filterAndBrowse('All')" class="flex-shrink-0 px-4 py-2 rounded-full bg-primary-container text-white text-xs font-bold btn shadow-sm">All</button>`+
+      cats.map(c=>`<button onclick="filterAndBrowseEnc('${catArg(c.name)}')" class="flex-shrink-0 px-4 py-2 rounded-full bg-white border border-outline-variant/25 text-on-surface text-xs font-bold btn hover:bg-surface-container">${catEmoji(c.name)} ${escapeHtml(c.name)}</button>`).join('');
+  }
+
+  // Shop by Category grid
+  const grid=document.getElementById('home-categories-grid');
+  if(grid){
+    grid.innerHTML=cats.length===0
+      ?'<div class="col-span-4 md:col-span-6 lg:col-span-9 text-center py-6 text-secondary text-sm">No categories available right now.</div>'
+      :cats.map(c=>{
+        const fb=catFallback(c.name);
+        const src=c.imageUrl||fb;
+        return `<div onclick="filterAndBrowseEnc('${catArg(c.name)}')" class="cursor-pointer btn"><div class="relative h-20 md:h-24 rounded-2xl overflow-hidden card shadow-sm"><img src="${escapeHtml(src)}" alt="${escapeHtml(c.name)}" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='${fb}'"><div class="absolute inset-0" style="background:linear-gradient(to top,rgba(0,0,0,0.62) 0%,transparent 55%)"></div><span class="absolute bottom-1.5 left-0 right-0 text-center text-[10px] md:text-xs font-bold text-white px-1 truncate" style="text-shadow:0 1px 3px rgba(0,0,0,0.5)">${escapeHtml(c.name)}</span></div></div>`;
+      }).join('');
+  }
+
+  // Browse page pills + product list (keeps filter state consistent)
+  if(currentPage==='browse')renderProducts();
+}
+
 // ─────────────── PRODUCTS ───────────────
 function productCard(p) {
   const inCart=cart.find(c=>c.id===p.id); const qty=inCart?inCart.qty:0;
@@ -1223,9 +1277,11 @@ function productCard(p) {
 
 function renderProducts() {
   const searchVal=(document.getElementById('search-input')?.value||'').toLowerCase();
-  const allCats=['All',...new Set(customProducts.map(p=>p.category))];
+  const allCats=['All',...(storeCategories?storeCategories.map(c=>c.name):[...new Set(customProducts.map(p=>p.category).filter(Boolean))])];
+  // If the active filter was removed in the admin panel, fall back to "All"
+  if(!allCats.includes(currentFilter))currentFilter='All';
   const pillsEl=document.getElementById('cat-pills');
-  if(pillsEl)pillsEl.innerHTML=allCats.map(c=>`<button onclick="currentFilter='${c}';renderProducts()" class="flex-shrink-0 px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap btn transition-all ${currentFilter===c?'bg-primary-container text-white shadow-md':'bg-white border border-outline-variant/25 text-on-surface hover:bg-surface-container'}">${c}</button>`).join('');
+  if(pillsEl)pillsEl.innerHTML=allCats.map(c=>`<button onclick="setCatFilter('${encodeURIComponent(c)}')" class="flex-shrink-0 px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap btn transition-all ${currentFilter===c?'bg-primary-container text-white shadow-md':'bg-white border border-outline-variant/25 text-on-surface hover:bg-surface-container'}">${escapeHtml(c)}</button>`).join('');
   const filtered=customProducts.filter(p=>(currentFilter==='All'||p.category===currentFilter)&&((p.name||'').toLowerCase().includes(searchVal)||(p.category||'').toLowerCase().includes(searchVal)));
   const grid=document.getElementById('products-grid'); if(!grid)return;
   if(customProducts.length===0){grid.innerHTML='<div class="col-span-2 text-center py-12 text-secondary"><div class="font-semibold">No products yet</div><div class="text-sm mt-1">Check back soon!</div></div>';return;}
@@ -1793,7 +1849,7 @@ window._onAuthChange = async function(user) {
 // ─────────────── INIT ───────────────
 nav('home');
 onPaymentChange();
-setTimeout(() => { if (window._fb) { loadPickupPoints(); loadUpiQr(); loadCMSBanners(); subscribeRoomDeliverySettings(); subscribeProducts(); } }, 600);
+setTimeout(() => { if (window._fb) { loadPickupPoints(); loadUpiQr(); loadCMSBanners(); subscribeRoomDeliverySettings(); subscribeCategories(); subscribeProducts(); } }, 600);
 </script>
 </body>
 </html>
