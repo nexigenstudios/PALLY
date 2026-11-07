@@ -2,7 +2,12 @@
 <html lang="en" class="scroll-smooth">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<meta name="theme-color" content="#ffffff">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="format-detection" content="telephone=no">
 <title>Santhom Stores – Fresh Choices. Everyday Essentials.</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -113,7 +118,7 @@ tailwind.config = {
 .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
 .fill-icon { font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
 
-.page { display: none; min-height: 100vh; }
+.page { display: none; min-height: 100vh; min-height: 100dvh; }
 .page.active { display: block; }
 
 .glass { background: rgba(255,255,255,0.55); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.35); }
@@ -173,7 +178,7 @@ tailwind.config = {
 /* Auth overlay */
 #auth-overlay { position:fixed; inset:0; z-index:700; display:none; }
 #auth-overlay.open { display:block; }
-#auth-sheet { position:absolute; bottom:0; left:0; right:0; background:white; border-radius:28px 28px 0 0; padding:24px 20px 40px; max-height:92vh; overflow-y:auto; }
+#auth-sheet { position:absolute; bottom:0; left:0; right:0; background:white; border-radius:28px 28px 0 0; padding:24px 20px calc(40px + env(safe-area-inset-bottom)); max-height:92vh; max-height:calc(var(--vh-px,100vh) * .92); overflow-y:auto; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; }
 @media(min-width:768px){
   #auth-overlay.open { display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0.4); backdrop-filter:blur(6px); }
   #auth-sheet { position:relative; bottom:auto; left:auto; right:auto; border-radius:28px; width:100%; max-width:420px; padding:32px; }
@@ -220,6 +225,79 @@ tailwind.config = {
 .msg-bubble.customer { background:#2d8a45; color:white; border-radius:18px 18px 4px 18px; align-self:flex-end; }
 .msg-bubble.admin { background:white; color:#151c27; border-radius:18px 18px 18px 4px; align-self:flex-start; border:1px solid #e0c0af40; box-shadow:0 1px 4px rgba(0,0,0,0.06); }
 .msg-time { font-size:10px; opacity:0.5; margin-top:3px; }
+
+/* ===== UNIVERSAL MOBILE FIT (v3) ===== */
+:root{--vh-px:100vh;--vv-top:0px;--safe-t:env(safe-area-inset-top,0px);--safe-b:env(safe-area-inset-bottom,0px);}
+@supports (height:100dvh){:root{--vh-px:100dvh;}}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
+body{margin:0;-webkit-tap-highlight-color:transparent;}
+button,a,select,.btn,[onclick]{touch-action:manipulation;}
+img,video,svg{max-width:100%;}
+/* notch / status bar: fixed header + page content stay clear */
+#main-header{padding-top:var(--safe-t);padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right);}
+.page{padding-top:var(--safe-t);padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right);}
+/* bottom nav / chat button / toast clear the iPhone home bar and Android gesture bar */
+#mobile-nav{bottom:calc(16px + var(--safe-b)) !important;}
+#chat-fab{bottom:calc(90px + var(--safe-b));}
+#toast{bottom:calc(96px + var(--safe-b));white-space:normal;width:max-content;}
+.bottom-spacer{height:calc(88px + var(--safe-b));}
+@media(min-width:768px){#chat-fab{bottom:24px;}#toast{bottom:32px;}}
+/* full-screen overlays track the real visible height (address bar + keyboard) */
+#chat-overlay,#cms-page{top:var(--vv-top);bottom:auto;height:var(--vh-px);}
+#chat-overlay > div:first-child,#cms-page-topbar{padding-top:max(14px,var(--safe-t)) !important;}
+#chat-msgs{-webkit-overflow-scrolling:touch;overscroll-behavior:contain;}
+#cms-page-body{-webkit-overflow-scrolling:touch;padding-bottom:calc(20px + var(--safe-b));}
+/* modal overlays scroll when content is taller than the screen */
+.modal-overlay{overflow-y:auto;padding:16px;padding-top:max(16px,var(--safe-t));padding-bottom:max(16px,var(--safe-b));-webkit-overflow-scrolling:touch;}
+.modal-overlay > div{margin-top:auto;margin-bottom:auto;max-width:100%;}
+#hostel-picker-list{-webkit-overflow-scrolling:touch;}
+/* bottom nav always fits the screen width, even at 320px */
+#mobile-nav{max-width:min(400px,calc(100vw - 32px));}
+#mobile-nav > div{padding-left:8px !important;padding-right:8px !important;gap:0;}
+#mobile-nav button{flex:1 1 0;min-width:0 !important;}
+#mobile-nav button span:last-of-type{white-space:nowrap;}
+/* flex rows with inputs must be allowed to shrink (promo code, search, etc.) */
+input,select,textarea{min-width:0;max-width:100%;}
+#chat-fab{max-width:calc(100vw - 24px);}
+.material-symbols-outlined{overflow-wrap:normal !important;word-break:normal !important;white-space:nowrap;}
+/* touch devices: no sticky hover lift */
+@media(hover:none){.card:hover{transform:none;box-shadow:none;}}
+@media(max-width:767px){
+  /* stop iOS auto-zoom on focus: inputs must be >=16px */
+  input,select,textarea{font-size:16px !important;}
+  input[type=radio],input[type=checkbox]{font-size:inherit !important;}
+  select,input[type=date]{-webkit-appearance:none;appearance:none;}
+  /* touch targets */
+  .btn,button{min-height:40px;}
+  #mobile-nav button{min-height:48px;}
+  #mobile-nav .text-\[9px\]{font-size:10px !important;}
+  /* header: never overflow on narrow phones */
+  #main-header > div{gap:8px;min-width:0;}
+  #main-header .brand-word{font-size:20px !important;white-space:nowrap;}
+  #main-header > div > div:first-child{min-width:0;flex:0 1 auto;}
+  #main-header > div > div:last-child{flex-shrink:0;gap:6px !important;}
+  #user-btn{padding-left:10px !important;padding-right:10px !important;}
+  #user-btn > .material-symbols-outlined{display:none;}
+  #user-label{max-width:76px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px !important;}
+  #hostel-switch-label{max-width:72px !important;}
+  /* auth + chat bubbles */
+  #auth-sheet{border-radius:24px 24px 0 0;}
+  .msg-bubble{max-width:86%;}
+  .badge{font-size:11px;}
+  p,h1,h2,h3,span{overflow-wrap:anywhere;}
+}
+@media(max-width:360px){
+  #main-header > div{padding-left:10px;padding-right:10px;}
+  #main-header .brand-word{font-size:17px !important;}
+  #main-header > div > div:first-child > div:first-child{width:38px !important;height:38px !important;}
+  #hostel-switch-btn{padding-left:8px;padding-right:8px;}
+  #hostel-switch-label{display:none;}
+}
+@media(max-height:480px) and (orientation:landscape){
+  #mobile-nav{bottom:calc(6px + var(--safe-b)) !important;}
+  #mobile-nav > div{height:52px;}
+  #chat-fab{bottom:calc(70px + var(--safe-b));width:46px;height:46px;}
+}
 </style>
 </head>
 <body class="bg-background text-on-surface overflow-x-hidden">
@@ -1875,6 +1953,33 @@ window._onAuthChange = async function(user) {
 nav('home');
 onPaymentChange();
 setTimeout(() => { if (window._fb) { loadPickupPoints(); loadUpiQr(); loadCMSBanners(); subscribeRoomDeliverySettings(); subscribeCategories(); subscribeProducts(); } }, 600);
+</script>
+
+<script>
+// ─── MOBILE FIT: real visible height (address bar / keyboard / rotation) ───
+(function(){
+  var root=document.documentElement;
+  function setVh(){
+    var vv=window.visualViewport;
+    var h=(vv&&vv.height)||window.innerHeight;
+    root.style.setProperty('--vh-px',Math.round(h)+'px');
+    root.style.setProperty('--vv-top',Math.round((vv&&vv.offsetTop)||0)+'px');
+  }
+  setVh();
+  window.addEventListener('resize',setVh);
+  window.addEventListener('orientationchange',function(){setTimeout(setVh,250);});
+  if(window.visualViewport){
+    window.visualViewport.addEventListener('resize',setVh);
+    window.visualViewport.addEventListener('scroll',setVh);
+  }
+  // keep the focused field visible above the keyboard
+  document.addEventListener('focusin',function(e){
+    var t=e.target;
+    if(window.innerWidth<768&&t&&/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)){
+      setTimeout(function(){try{t.scrollIntoView({block:'center',behavior:'smooth'});}catch(_){}},320);
+    }
+  });
+})();
 </script>
 </body>
 </html>
