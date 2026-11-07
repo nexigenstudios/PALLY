@@ -3,14 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
-<meta name="theme-color" content="#ffffff">
+<meta name="theme-color" content="#fafbf6">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="format-detection" content="telephone=no">
 <title>Santhom Stores – Fresh Choices. Everyday Essentials.</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
 
@@ -69,8 +70,8 @@ tailwind.config = {
   theme: {
     extend: {
       colors: {
-        primary: "#1a5c2a",
-        "primary-container": "#2d8a45",
+        primary: "#176b35",
+        "primary-container": "#176b35",
         "primary-fixed": "#c8ecd1",
         "primary-fixed-dim": "#8fd0a0",
         "on-primary": "#ffffff",
@@ -82,8 +83,8 @@ tailwind.config = {
         "on-secondary-container": "#3a4e40",
         tertiary: "#55605a",
         "tertiary-container": "#a8b5ac",
-        background: "#f5fbf6",
-        surface: "#f5fbf6",
+        background: "#fafbf6",
+        surface: "#fafbf6",
         "surface-bright": "#f5fbf6",
         "surface-dim": "#ccd9cf",
         "surface-variant": "#d4e8d9",
@@ -107,14 +108,14 @@ tailwind.config = {
         "surface-tint": "#1a5c2a",
         accent: "#e8a020",
       },
-      fontFamily: { sans: ["Plus Jakarta Sans", "sans-serif"] },
+      fontFamily: { sans: ["DM Sans", "system-ui", "sans-serif"] },
     },
   },
 };
 </script>
 
 <style>
-* { font-family: 'Plus Jakarta Sans', sans-serif; box-sizing: border-box; }
+* { font-family: 'DM Sans', system-ui, -apple-system, sans-serif; box-sizing: border-box; }
 .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
 .fill-icon { font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
 
@@ -199,7 +200,7 @@ tailwind.config = {
 .product-img { width:100%; height:100%; object-fit:cover; border-radius:16px; }
 
 /* Brand wordmark */
-.brand-word { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; }
+.brand-word { font-family: 'DM Sans', system-ui, sans-serif; font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; }
 .brand-word .b-navy { color: #163625; }
 .brand-word .b-teal { color: #1E5631; }
 /* Scalloped badge for offer */
@@ -213,7 +214,7 @@ tailwind.config = {
 }
 
 /* CMS Page Overlay */
-#cms-page { position:fixed; inset:0; background:#f9f9ff; z-index:400; display:none; flex-direction:column; overflow:hidden; }
+#cms-page { position:fixed; inset:0; background:#fafbf6; z-index:400; display:none; flex-direction:column; overflow:hidden; }
 #cms-page.open { display:flex; }
 #cms-page-topbar { background:white; border-bottom:1px solid #e0c0af30; padding:14px 20px; display:flex; align-items:center; gap:12px; flex-shrink:0; }
 #cms-page-body { flex:1; overflow-y:auto; padding:20px; max-width:760px; margin:0 auto; width:100%; }
@@ -227,7 +228,7 @@ tailwind.config = {
 @media(min-width:768px){ #chat-fab { bottom:24px; right:28px; } }
 #chat-overlay { position:fixed; inset:0; background:white; z-index:400; display:none; flex-direction:column; }
 #chat-overlay.open { display:flex; }
-#chat-msgs { flex:1; overflow-y:auto; padding:14px 16px; display:flex; flex-direction:column; gap:8px; background:#f9f9ff; }
+#chat-msgs { flex:1; overflow-y:auto; padding:14px 16px; display:flex; flex-direction:column; gap:8px; background:#fafbf6; }
 #chat-msgs::-webkit-scrollbar { width:3px; }
 .msg-row { display:flex; flex-direction:column; }
 .msg-bubble { max-width:76%; padding:10px 14px; border-radius:18px; font-size:13px; line-height:1.55; word-break:break-word; }
@@ -305,6 +306,126 @@ input,select,textarea{min-width:0;max-width:100%;}
   #mobile-nav > div{height:52px;}
   #chat-fab{bottom:calc(70px + var(--safe-b));width:46px;height:46px;}
 }
+
+/* ===================== SANTHOM REDESIGN ===================== */
+:root{--green:#176b35;--green-dark:#0e4424;--green-bright:#31934e;--green-pale:#edf6e9;--cream:#fafbf6;--ink:#17251b;--muted:#68736b;--ss-shadow:0 8px 28px rgba(24,55,32,.09);}
+body{background:var(--cream);color:var(--ink);}
+.material-symbols-outlined{font-family:'Material Symbols Outlined' !important;}
+
+/* Header */
+.liquid-glass-header,.liquid-glass-header.scrolled{background:rgba(255,255,255,.94);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);border-bottom:1px solid rgba(20,70,35,.06);box-shadow:none;}
+.ss-brand-mark{width:46px;height:46px;border-radius:16px;display:grid;place-items:center;background:var(--green-pale);border:1px solid #dcebd8;color:var(--green);flex-shrink:0;}
+.ss-brand-mark svg{width:30px;height:30px;}
+.ss-brand-name{font-size:clamp(19px,4.8vw,25px);line-height:1;font-weight:800;letter-spacing:-.8px;color:var(--ink);white-space:nowrap;}
+.ss-brand-name span{color:var(--green);}
+.ss-brand-sub{font-size:10px;color:var(--muted);margin-top:5px;font-weight:600;letter-spacing:.2px;white-space:nowrap;}
+.ss-icon-btn{width:43px;height:43px;border-radius:50%;display:grid;place-items:center;background:var(--green-pale);color:var(--green-dark);position:relative;border:0;}
+.ss-count{position:absolute;right:-3px;top:-4px;min-width:18px;height:18px;border-radius:20px;background:#e34b43;color:#fff;font-size:10px;font-weight:700;display:grid;place-items:center;padding:0 4px;}
+.ss-count.hidden{display:none;}
+
+/* Hero */
+.ss-hero{min-height:405px;position:relative;overflow:hidden;display:flex;align-items:center;padding:28px 22px;isolation:isolate;
+  background:linear-gradient(90deg,rgba(247,250,235,.98) 0%,rgba(247,250,235,.93) 42%,rgba(247,250,235,.12) 100%),url("https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=1500&q=85") 58% center/cover;}
+.ss-hero-copy{max-width:290px;position:relative;z-index:1;}
+.ss-eyebrow{display:inline-flex;align-items:center;gap:7px;color:var(--green);background:rgba(231,244,222,.9);padding:8px 12px;border-radius:30px;font-size:11px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;}
+.ss-hero h1{margin:19px 0 8px;color:var(--green-dark);font-size:clamp(36px,7vw,57px);line-height:1.02;letter-spacing:-2.5px;font-weight:700;}
+.ss-hero h1 span{color:#4a9a43;display:block;}
+.ss-hero p{max-width:250px;color:#48574b;font-size:13px;line-height:1.55;margin:17px 0 22px;}
+.ss-primary-btn{border:0;border-radius:50px;background:var(--green);color:#fff;font-weight:800;font-size:14px;padding:14px 23px;box-shadow:0 7px 16px rgba(23,107,53,.2);cursor:pointer;transition:background .15s;white-space:nowrap;}
+.ss-primary-btn:hover,.ss-add-btn:hover{background:var(--green-dark);}
+.ss-hero-dots{display:flex;gap:7px;margin-top:28px;}
+.ss-hero-dots i{width:8px;height:8px;border-radius:50%;background:#fff;display:block;}
+.ss-hero-dots i:first-child{width:20px;background:var(--green);border-radius:8px;}
+@media(min-width:760px){
+  .ss-hero{min-height:470px;padding:38px 6.5% 38px max(7%,calc((100% - 1050px)/2));background-position:center;}
+  .ss-hero-copy{max-width:460px;}
+  .ss-hero p{max-width:340px;font-size:15px;}
+}
+
+/* Content wrapper */
+.ss-content{width:min(1120px,100%);margin:0 auto;padding:0 15px;}
+@media(min-width:760px){.ss-content{padding:0 30px;}}
+
+/* Search */
+.ss-search-wrap{margin:18px auto 23px;position:relative;}
+.ss-search-wrap .ss-search{width:100%;border:1px solid #edf0eb !important;border-radius:50px;background:#fff;padding:17px 52px;box-shadow:var(--ss-shadow);outline:none;font-size:15px;font-weight:500;color:var(--ink);}
+.ss-search-wrap .ss-search:focus{border-color:#9bc99e !important;box-shadow:0 0 0 4px rgba(49,147,78,.1) !important;}
+.ss-search-icon,.ss-filter-icon{position:absolute;top:50%;transform:translateY(-50%);width:20px;height:20px;}
+.ss-search-icon{left:19px;color:#66736a;}
+.ss-filter-icon{right:19px;color:var(--green);background:none;border:0;padding:0;min-height:0 !important;cursor:pointer;}
+
+/* Categories */
+.ss-categories{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:0 0 24px;}
+.ss-category{min-width:0;border:1px solid transparent;border-radius:20px;background:#f0f5e9;padding:11px 4px 9px;text-align:center;color:#18251b;font-weight:700;font-size:12px;line-height:1.25;transition:.2s;cursor:pointer;}
+.ss-category:hover{border-color:#b8d8b6;background:#e4f2df;transform:translateY(-2px);}
+.ss-category .ss-emoji{display:flex;align-items:center;justify-content:center;height:36px;font-size:31px;margin-bottom:7px;}
+.ss-category .ss-emoji img{width:36px;height:36px;object-fit:contain;border-radius:8px;}
+@media(min-width:760px){
+  .ss-categories{grid-template-columns:repeat(6,minmax(0,1fr));gap:16px;}
+  .ss-category{padding:17px 8px 14px;font-size:14px;}
+  .ss-category .ss-emoji{font-size:38px;height:44px;}
+  .ss-category .ss-emoji img{width:44px;height:44px;}
+}
+
+/* Offer */
+.ss-offer{min-height:125px;border-radius:24px;overflow:hidden;padding:15px;margin:0 0 30px;display:flex;align-items:center;justify-content:space-between;gap:9px;background:linear-gradient(100deg,#d8edb9,#f1f8d9 65%,#d8edb9);position:relative;}
+.ss-offer::after{content:"🥬";position:absolute;right:12px;bottom:-14px;font-size:78px;opacity:.5;transform:rotate(-15deg);}
+.ss-offer-badge{background:var(--green-dark);color:#fff;width:70px;height:70px;border-radius:50%;display:flex;flex-direction:column;justify-content:center;align-items:center;flex-shrink:0;font-weight:800;line-height:1;font-size:11px;}
+.ss-offer-badge strong{color:#ffdf32;font-size:24px;}
+.ss-offer-copy{flex:1;z-index:1;}
+.ss-offer-copy small{color:var(--green);font-weight:800;text-transform:uppercase;letter-spacing:.7px;font-size:11px;}
+.ss-offer-copy h2{margin:5px 0 0;font-size:clamp(17px,3.5vw,25px);line-height:1.15;color:var(--green-dark);font-weight:800;}
+.ss-offer .ss-primary-btn{padding:10px 12px;font-size:11px;z-index:1;}
+@media(min-width:760px){.ss-offer{min-height:135px;padding:20px 25px;gap:12px;}.ss-offer-badge{width:88px;height:88px;font-size:13px;}.ss-offer-badge strong{font-size:29px;}.ss-offer .ss-primary-btn{padding:12px 18px;font-size:14px;}}
+
+/* Section head */
+.ss-section-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 2px 15px;}
+.ss-section-head h2{margin:0;font-size:21px;letter-spacing:-.6px;font-weight:800;color:var(--ink);}
+.ss-section-head h2 span{margin-right:7px;}
+.ss-text-link{color:var(--green);font-size:13px;font-weight:800;background:none;border:0;cursor:pointer;}
+
+/* Product card */
+.ss-product{background:#fff;border:1px solid #edf0eb;border-radius:21px;padding:9px;box-shadow:0 5px 18px rgba(20,50,25,.07);min-width:0;display:flex;flex-direction:column;}
+.ss-product.ss-oos{opacity:.75;}
+.ss-product-image{height:120px;border-radius:15px;background:#fbfcf8;overflow:hidden;position:relative;}
+.ss-product-image img{width:100%;height:100%;object-fit:contain;mix-blend-mode:multiply;}
+.ss-fresh{position:absolute;top:9px;right:8px;background:#e2f8e3;color:#21843d;border-radius:30px;padding:5px 9px;font-size:10px;font-weight:800;}
+.ss-fresh.ss-fresh-oos{background:#fef2f2;color:#dc2626;}
+.ss-product h3{font-size:13px;font-weight:700;margin:12px 2px 7px;line-height:1.3;color:var(--ink);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.ss-product-bottom{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-top:auto;}
+.ss-price{font-size:17px;font-weight:800;color:var(--green-dark);white-space:nowrap;}
+.ss-price small{color:var(--muted);font-size:12px;font-weight:500;}
+.ss-low{font-size:10px;color:#dc2626;font-weight:700;margin-top:2px;}
+.ss-add-btn{border:0;border-radius:30px;background:var(--green);color:#fff;font-size:12px;font-weight:800;padding:9px 11px;cursor:pointer;transition:background .15s;white-space:nowrap;}
+.ss-add-btn[disabled]{background:#f3f4f6;color:#9ca3af;cursor:not-allowed;}
+.ss-qty{display:flex;align-items:center;gap:6px;border-radius:30px;background:var(--green);padding:5px 9px;color:#fff;}
+.ss-qty button{color:#fff;display:flex;align-items:center;min-height:0 !important;background:none;border:0;padding:0;cursor:pointer;}
+.ss-qty span.ss-q{font-size:13px;font-weight:800;min-width:14px;text-align:center;}
+@media(min-width:760px){
+  .ss-product{padding:12px;}
+  .ss-product-image{height:165px;}
+  .ss-product h3{font-size:15px;}
+  .ss-price{font-size:19px;}
+  .ss-add-btn{min-width:88px;padding:10px 15px;}
+}
+
+/* Sunday strip */
+.ss-sunday{display:flex;align-items:center;gap:9px;margin:25px 0 20px;padding:13px;border-radius:22px;background:#e8f4d9;border:1px solid #dcebc9;}
+.ss-sunday-icon{width:48px;height:48px;flex-shrink:0;border-radius:15px;display:grid;place-items:center;background:#d2e8bd;font-size:24px;}
+.ss-sunday h3{margin:0 0 4px;color:var(--green-dark);font-size:15px;font-weight:800;}
+.ss-sunday p{margin:0;font-size:12px;color:#52634e;}
+.ss-sunday-status{margin-left:auto;padding-left:14px;border-left:1px solid #c4d9b5;color:var(--green);font-size:10px;font-weight:800;max-width:92px;}
+@media(min-width:760px){.ss-sunday{gap:14px;padding:17px;}.ss-sunday-status{font-size:12px;max-width:125px;}}
+
+/* Bottom nav */
+#mobile-nav > div{background:rgba(255,255,255,.94) !important;-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);border:1px solid #edf0eb !important;border-radius:28px !important;padding:9px 5px 7px !important;box-shadow:0 7px 28px rgba(20,45,25,.14) !important;height:auto !important;}
+#mobile-nav button{gap:3px;}
+#mobile-nav button span:last-of-type{font-weight:700;}
+
+/* Floating support, toast */
+#chat-fab{background:var(--green);box-shadow:0 7px 20px rgba(20,80,35,.25);}
+#toast{background:#183d25;font-family:'DM Sans',sans-serif;}
+.msg-bubble.customer{background:var(--green);}
 </style>
 </head>
 <body class="bg-background text-on-surface overflow-x-hidden">
@@ -438,26 +559,17 @@ input,select,textarea{min-width:0;max-width:100%;}
 
     <!-- LEFT: Logo + Brand -->
     <div class="flex items-center gap-2.5 btn flex-shrink-0" onclick="nav('home')">
-      <!-- Logo -->
-      <div style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#1E5631;">
-  <svg style="width:100%;height:100%;" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 48 48">
-    <path d="M24 4v7M21 7.5h6M24 11l-9 10h18L24 11z"/>
-    <path d="M18 21v14h12V21"/>
-    <path d="M22 35v-6a2 2 0 0 1 4 0v6"/>
-    <path d="M9 36c4 5 12 7 24 3 6-2 10-6 10-6s-3 8-11 9c-9 2-20-1-23-6z" fill="#2E7D32" stroke="none"/>
-  </svg>
-</div>
-      <div class="leading-tight">
-        <div class="brand-word" style="font-size:20px;line-height:1.1;"><div style="color:#163625;">Santhom</div><div style="color:#1E5631;">Stores</div></div>
+      <div class="ss-brand-mark" style="width:44px;height:44px;">
+        <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 48 48">
+          <path d="M24 4v7M21 7.5h6M24 11l-9 10h18L24 11z"/>
+          <path d="M18 21v14h12V21"/>
+          <path d="M22 35v-6a2 2 0 0 1 4 0v6"/>
+          <path d="M9 36c4 5 12 7 24 3 6-2 10-6 10-6s-3 8-11 9c-9 2-20-1-23-6z" fill="#31934e" stroke="none"/>
+        </svg>
       </div>
-    </div>
-
-    <!-- CENTER: Divider + Store subtitle -->
-    <div class="hidden sm:flex items-center gap-2.5 flex-shrink-0">
-      <div class="w-px h-9" style="background:#d1d5db;"></div>
-      <div class="leading-tight" style="padding-left:2px;">
-        <div style="font-size:11px;color:#6b7280;font-weight:500;font-style:italic;line-height:1.3;">Thomasleeha Pally</div>
-        <div style="font-size:11px;color:#6b7280;font-weight:500;font-style:italic;line-height:1.3;">Church Store</div>
+      <div class="leading-tight">
+        <div class="brand-word ss-brand-name">Santhom <span>Stores</span></div>
+        <div class="ss-brand-sub">THOMASLEEHA PALLY CHURCH STORE</div>
       </div>
     </div>
 
@@ -469,157 +581,86 @@ input,select,textarea{min-width:0;max-width:100%;}
     </div>
 
     <!-- RIGHT: Cart + User avatar -->
-    <div class="flex items-center gap-2 flex-shrink-0 ml-auto">
+    <div class="flex items-center gap-2.5 flex-shrink-0 ml-auto">
       <!-- Branch switcher (multi-branch only) -->
       <button id="hostel-switch-btn" onclick="openHostelPicker()" class="hidden items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 hover:bg-primary/15 transition-colors btn">
         <span class="material-symbols-outlined text-primary" style="font-size:16px">location_on</span>
         <span id="hostel-switch-label" class="text-xs font-bold text-primary max-w-[110px] truncate">Choose branch</span>
       </button>
 
-      <!-- Cart icon -->
-      <button class="relative btn flex items-center justify-center w-10 h-10 rounded-full" style="background:#edf9f1;" onclick="nav('cart')">
-        <span class="material-symbols-outlined text-primary" style="font-size:22px">shopping_cart</span>
-        <span id="cart-badge" class="absolute -top-0.5 -right-0.5 w-5 h-5 bg-primary-container text-white text-[10px] font-bold rounded-full flex items-center justify-center hidden">0</span>
+      <button class="ss-icon-btn btn" aria-label="Cart" onclick="nav('cart')">
+        <span class="material-symbols-outlined" style="font-size:22px">shopping_cart</span>
+        <span id="cart-badge" class="ss-count hidden">0</span>
       </button>
 
-      <!-- User avatar circle -->
-      <button onclick="handleUserBtn()" id="user-btn" class="btn flex items-center justify-center w-10 h-10 rounded-full bg-surface-container hover:bg-surface-container-high transition-colors overflow-hidden flex-shrink-0">
-        <div id="user-avatar" class="w-full h-full rounded-full bg-primary flex items-center justify-center text-white text-xs font-bold hidden"></div>
-        <span class="material-symbols-outlined fill-icon text-secondary" style="font-size:24px;" id="user-icon">person</span>
+      <button onclick="handleUserBtn()" id="user-btn" class="btn ss-icon-btn overflow-hidden flex-shrink-0" aria-label="Profile">
+        <div id="user-avatar" class="w-full h-full rounded-full bg-primary flex items-center justify-center text-white text-xs font-bold hidden" style="background:#176b35"></div>
+        <span class="material-symbols-outlined fill-icon" style="font-size:24px;" id="user-icon">person</span>
       </button>
     </div>
 
   </div>
 </header>
 
+
 <!-- PAGE: HOME -->
 <div id="page-home" class="page active">
   <div class="pt-16 md:pt-20">
 
     <!-- ── HERO BANNER ── -->
-    <section id="home-hero" class="relative mx-4 mt-2 rounded-3xl overflow-hidden" style="background:linear-gradient(135deg,#eaf4e9 0%,#e4f1e3 50%,#d6ebd3 100%);border:1px solid rgba(167,218,166,0.4);box-shadow:0 1px 4px rgba(0,0,0,0.04);">
-      <!-- Produce image on right -->
-      <div class="absolute right-[-24px] bottom-[-10px] pointer-events-none z-0" style="width:256px;height:256px;">
-        <img id="hero-bg-img" src="https://images.unsplash.com/photo-1610832958506-aa56368176cf?w=500&h=500&fit=crop&q=85" alt="" aria-hidden="true"
-          class="w-full h-full object-cover rounded-full" style="mix-blend-mode:multiply;opacity:0.95;filter:contrast(1.05);">
-      </div>
-      <!-- Content -->
-      <div class="relative z-10 p-5" style="max-width:220px;">
-        <h1 class="font-black leading-tight mb-1 opacity-0 fade-up d2" style="font-size:26px;color:#132c1c;letter-spacing:-0.02em;line-height:1.15;">
-          Fresh from<br>Our Store.
-        </h1>
-        <p class="font-extrabold mb-2 opacity-0 fade-up d2" style="font-size:17px;color:#389146;letter-spacing:-0.01em;">Everyday Essentials.</p>
-        <p class="font-medium mb-3.5 opacity-0 fade-up d3" style="font-size:11.5px;color:#4b5563;line-height:1.6;">Your trusted church store for fresh produce, groceries and daily essentials.</p>
-        <button onclick="nav('browse')" class="btn opacity-0 fade-up d4 inline-flex items-center gap-1.5 px-4 py-2 rounded-full font-bold text-white" style="font-size:12px;background:#1b4329;box-shadow:0 4px 12px rgba(27,67,41,0.35);">
-          Explore Products
-          <svg style="width:14px;height:14px;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </button>
-        <!-- Dot indicators -->
-        <div class="flex gap-1.5 mt-5 opacity-0 fade-up d4">
-          <span style="width:16px;height:6px;background:#1b4329;border-radius:3px;display:inline-block;"></span>
-          <span style="width:6px;height:6px;background:#d1d5db;border-radius:50%;display:inline-block;"></span>
-          <span style="width:6px;height:6px;background:#d1d5db;border-radius:50%;display:inline-block;"></span>
-        </div>
+    <section id="home-hero" class="ss-hero">
+      <div class="ss-hero-copy">
+        <div class="ss-eyebrow">✦ Thomasleeha Pally Church Store</div>
+        <h1>Fresh from<br>Our Store.<span>Everyday Essentials.</span></h1>
+        <p>Your trusted church store for fresh produce, groceries and daily essentials.</p>
+        <button onclick="nav('browse')" class="ss-primary-btn btn">Explore Products&nbsp; →</button>
+        <div class="ss-hero-dots"><i></i><i></i><i></i></div>
       </div>
     </section>
 
-    <!-- ── SEARCH BAR ── -->
-    <div class="px-4 mt-4 max-w-[1200px] mx-auto">
-      <div class="flex items-center bg-white border border-gray-200 rounded-full px-4 py-2.5" style="box-shadow:0 2px 8px rgba(0,0,0,0.04);">
-        <svg class="shrink-0 mr-2.5" style="width:16px;height:16px;color:#9ca3af;" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
-          <circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/>
-        </svg>
-        <input id="hero-search" type="text" placeholder="Search for tomatoes, rice, eggs..."
-          onkeydown="if(event.key==='Enter'){currentFilter='All';nav('browse')}"
-          class="w-full bg-transparent border-none p-0 focus:ring-0 focus:outline-none" style="font-size:12px;font-weight:500;color:#374151;">
-        <button onclick="nav('browse')" class="btn shrink-0 ml-2" style="color:#6b7280;">
-          <svg style="width:16px;height:16px;" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2.2" viewBox="0 0 24 24">
+    <main class="ss-content">
+
+      <!-- ── SEARCH BAR ── -->
+      <div class="ss-search-wrap">
+        <svg class="ss-search-icon" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35" stroke-linecap="round"/></svg>
+        <input id="hero-search" class="ss-search" type="text" placeholder="Search for tomatoes, rice, eggs..." aria-label="Search products"
+          onkeydown="if(event.key==='Enter'){currentFilter='All';nav('browse')}">
+        <button class="ss-filter-icon" aria-label="Browse all" onclick="nav('browse')">
+          <svg style="width:20px;height:20px;" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2.2" viewBox="0 0 24 24">
             <line x1="4" x2="20" y1="7" y2="7"/><circle cx="8" cy="7" fill="white" r="2.5"/>
             <line x1="4" x2="20" y1="17" y2="17"/><circle cx="16" cy="17" fill="white" r="2.5"/>
           </svg>
         </button>
       </div>
-    </div>
 
-    <!-- ── CATEGORY CHIPS ── -->
-    <div class="px-4 mt-4 max-w-[1200px] mx-auto">
-      <div class="flex gap-2.5 overflow-x-auto scrollbar-hide py-1" id="home-cat-pills"></div>
-    </div>
+      <!-- ── CATEGORIES ── -->
+      <section class="ss-categories" id="home-cat-pills" aria-label="Product categories"></section>
 
-    <!-- ── PROMO STRIP ── -->
-    <div class="px-4 md:px-10 pt-5 max-w-[1200px] mx-auto">
-      <div id="home-banner-section">
-        <!-- Default promo (replaced by CMS) -->
-        <div class="relative rounded-2xl overflow-hidden flex items-center justify-between p-3" style="background:linear-gradient(90deg,#d9eccb 0%,#e5f3da 50%,#d6ebd3 100%);border:1px solid rgba(167,218,166,0.5);box-shadow:0 1px 4px rgba(0,0,0,0.04);">
-          <!-- Scalloped badge -->
-          <div class="badge-scallop flex flex-col items-center justify-center shrink-0 p-1" style="width:64px;height:64px;background:#143d22;color:#fcd34d;">
-            <span style="font-size:9px;color:white;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;">Flat</span>
-            <span style="font-size:16px;line-height:1.1;font-weight:900;color:#fcd34d;">30%</span>
-            <span style="font-size:9px;color:white;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;">OFF</span>
-          </div>
-          <!-- Offer text -->
-          <div class="ml-2.5 flex-1 z-10">
-            <div class="font-black leading-tight flex items-center" style="font-size:12.5px;color:#153a22;">
-              <span style="color:#f59e0b;margin-right:4px;font-size:14px;line-height:1;">✦</span>
-              <span>When Buying<br>Above ₹200</span>
-            </div>
-            <button onclick="nav('browse')" class="btn mt-1.5 inline-flex items-center gap-1 px-3 py-1 rounded-full text-white font-bold" style="font-size:10px;background:#1b4329;box-shadow:0 2px 6px rgba(27,67,41,0.3);">
-              Shop Now <span style="font-size:12px;">→</span>
-            </button>
-          </div>
-          <!-- Produce image right -->
-          <div class="shrink-0 -mr-2 z-10" style="width:88px;height:72px;">
-            <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuBOIKtGgI8Bf0hctyaxhDk_zKl1bdes3sO7PbspjY6MBxzjEWCyd_qkhTs44fBpRLLIHrGz-iNwW2raeqq3fDodrVrGmec1LPptdxJlhERlQYJvQONlfK4328rtQEMuSHYTbAvOK5TIVqJ9yWYl4e9Y9pnrTf8Zrx6goOeZzs8tKTf5HYuDb9q7LBb4v0ZvxkYLgvGD2-VK9eobRi8RAIjrb8iY9MF_0a0UOrgogquj" alt="" aria-hidden="true" class="w-full h-full object-cover rounded-xl" style="mix-blend-mode:multiply;filter:contrast(1.1);">
-          </div>
-          <!-- Decorative dots -->
-          <div class="absolute" style="top:4px;left:112px;width:8px;height:8px;border-radius:50%;background:rgba(74,222,128,0.3);"></div>
-          <div class="absolute" style="bottom:4px;right:96px;width:12px;height:4px;border-radius:2px;background:rgba(34,197,94,0.2);transform:rotate(45deg);"></div>
+      <!-- ── PROMO ── (replaced by CMS banner when set) -->
+      <div id="home-banner-section" style="margin-bottom:30px;">
+        <div class="ss-offer" style="margin-bottom:0;">
+          <div class="ss-offer-badge"><span>FLAT</span><strong>30%</strong><span>OFF</span></div>
+          <div class="ss-offer-copy"><small>Special Sunday offer</small><h2>When Buying<br>Above ₹200</h2></div>
+          <button onclick="nav('browse')" class="ss-primary-btn btn">Shop Now →</button>
         </div>
       </div>
-    </div>
 
-    <!-- ── POPULAR PRODUCTS ── -->
-    <section class="py-6 max-w-[1200px] mx-auto px-4 md:px-10">
-      <div class="flex justify-between items-center mb-4">
-        <div class="flex items-center gap-2">
-          <span class="material-symbols-outlined fill-icon text-primary-container" style="font-size:20px">eco</span>
-          <h2 class="text-lg font-extrabold text-on-surface">Popular Products</h2>
-        </div>
-        <button onclick="nav('browse')" class="text-primary-container font-bold text-sm flex items-center gap-0.5 btn">View All <span class="material-symbols-outlined" style="font-size:16px">arrow_forward</span></button>
+      <!-- ── POPULAR PRODUCTS ── -->
+      <div class="ss-section-head">
+        <h2><span>🌿</span>Popular Products</h2>
+        <button onclick="nav('browse')" class="ss-text-link btn">View All&nbsp; →</button>
       </div>
-      <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4" id="home-products">
-        <div class="col-span-2 lg:col-span-4 text-center py-10 text-secondary"><span class="material-symbols-outlined text-4xl block mb-2 text-outline">hourglass_top</span><div class="text-sm">Loading products...</div></div>
-      </div>
-    </section>
+      <section class="grid grid-cols-2 md:grid-cols-4 gap-[15px]" id="home-products">
+        <div class="col-span-2 md:col-span-4 text-center py-10 text-secondary"><span class="material-symbols-outlined text-4xl block mb-2 text-outline">hourglass_top</span><div class="text-sm">Loading products...</div></div>
+      </section>
 
-    <!-- ── SUNDAY ESSENTIALS STRIP ── -->
-    <div class="mx-4 md:mx-10 max-w-[1200px] mb-6 rounded-2xl overflow-hidden border border-outline-variant/20 bg-white flex items-center gap-3 px-4 py-4" style="position:relative;">
-      <div class="flex items-center gap-3 flex-1">
-        <div class="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
-          <span class="material-symbols-outlined text-primary" style="font-size:22px">calendar_month</span>
-        </div>
-        <div>
-          <div class="font-extrabold text-on-surface text-sm">Your Sunday Essentials</div>
-          <div class="text-secondary text-xs">Everything you need, all in one place.</div>
-        </div>
-      </div>
-      <div class="flex items-center gap-1.5 flex-shrink-0">
-        <span class="material-symbols-outlined fill-icon text-primary" style="font-size:13px">check_circle</span>
-        <span class="font-bold text-xs text-primary">Available Every Sunday</span>
-      </div>
-      <!-- Church icon right side -->
-      <div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" style="background:#edf9f1;">
-        <span class="material-symbols-outlined text-primary" style="font-size:20px">church</span>
-      </div>
-    </div>
-
-    <!-- ── CATEGORIES GRID ── -->
-    <section class="pb-6 max-w-[1200px] mx-auto px-4 md:px-10">
-      <h2 class="text-lg font-extrabold mb-4">Shop by Category</h2>
-      <div class="grid grid-cols-4 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-9 gap-2 md:gap-3" id="home-categories-grid">
-        <div class="col-span-4 md:col-span-6 lg:col-span-9 text-center py-6 text-secondary text-sm">Loading categories...</div>
-      </div>
-    </section>
+      <!-- ── SUNDAY ESSENTIALS STRIP ── -->
+      <aside class="ss-sunday">
+        <div class="ss-sunday-icon">🗓️</div>
+        <div><h3>Your Sunday Essentials</h3><p>Everything you need, all in one place.</p></div>
+        <div class="ss-sunday-status">✓ Available<br>Every Sunday</div>
+      </aside>
+    </main>
 
     <div class="bottom-spacer md:hidden"></div>
   </div>
@@ -785,12 +826,12 @@ input,select,textarea{min-width:0;max-width:100%;}
 
 <!-- MOBILE BOTTOM NAV -->
 <div id="mobile-nav" class="md:hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-50" style="width:calc(100% - 32px); max-width:400px">
-  <div class="glass rounded-full shadow-2xl flex justify-around items-center h-16 px-4 border border-white/30">
-    <button class="flex flex-col items-center gap-0.5 btn min-w-[44px]" onclick="nav('home')" id="mn-home"><span class="material-symbols-outlined fill-icon" style="font-size:22px;color:#2d8a45">home</span><span class="text-[9px] font-bold" style="color:#2d8a45">Home</span></button>
-    <button class="flex flex-col items-center gap-0.5 btn min-w-[44px]" onclick="nav('browse')" id="mn-browse"><span class="material-symbols-outlined text-secondary" style="font-size:22px">grid_view</span><span class="text-[9px] font-bold text-secondary">Categories</span></button>
-    <button class="flex flex-col items-center gap-0.5 btn relative min-w-[44px]" onclick="nav('cart')" id="mn-cart"><span class="material-symbols-outlined text-secondary" style="font-size:22px">shopping_cart</span><span class="text-[9px] font-bold text-secondary">Cart</span><span id="mn-cart-badge" class="absolute -top-1 right-1 w-4 h-4 bg-primary-container text-white text-[9px] font-bold rounded-full flex items-center justify-center hidden">0</span></button>
-    <button class="flex flex-col items-center gap-0.5 btn min-w-[44px]" onclick="nav('orders')" id="mn-orders"><span class="material-symbols-outlined text-secondary" style="font-size:22px">package_2</span><span class="text-[9px] font-bold text-secondary">My Orders</span></button>
-    <button class="flex flex-col items-center gap-0.5 btn min-w-[44px]" onclick="nav('profile')" id="mn-profile"><span class="material-symbols-outlined text-secondary" style="font-size:22px">person</span><span class="text-[9px] font-bold text-secondary">Profile</span></button>
+  <div class="flex justify-around items-center">
+    <button class="flex flex-col items-center gap-0.5 btn min-w-[44px]" onclick="nav('home')" id="mn-home"><span class="material-symbols-outlined fill-icon" style="font-size:22px;color:#176b35">home</span><span class="text-[9px] font-bold" style="color:#176b35">Home</span></button>
+    <button class="flex flex-col items-center gap-0.5 btn min-w-[44px]" onclick="nav('browse')" id="mn-browse"><span class="material-symbols-outlined" style="font-size:22px;color:#6e7771">grid_view</span><span class="text-[9px] font-bold" style="color:#6e7771">Categories</span></button>
+    <button class="flex flex-col items-center gap-0.5 btn relative min-w-[44px]" onclick="nav('cart')" id="mn-cart"><span class="material-symbols-outlined" style="font-size:22px;color:#6e7771">shopping_cart</span><span class="text-[9px] font-bold" style="color:#6e7771">Cart</span><span style="background:#e34b43" id="mn-cart-badge" class="absolute -top-1 right-1 w-4 h-4 text-white text-[9px] font-bold rounded-full flex items-center justify-center hidden">0</span></button>
+    <button class="flex flex-col items-center gap-0.5 btn min-w-[44px]" onclick="nav('orders')" id="mn-orders"><span class="material-symbols-outlined" style="font-size:22px;color:#6e7771">package_2</span><span class="text-[9px] font-bold" style="color:#6e7771">My Orders</span></button>
+    <button class="flex flex-col items-center gap-0.5 btn min-w-[44px]" onclick="nav('profile')" id="mn-profile"><span class="material-symbols-outlined" style="font-size:22px;color:#6e7771">person</span><span class="text-[9px] font-bold" style="color:#6e7771">Profile</span></button>
   </div>
 </div>
 
@@ -840,7 +881,7 @@ input,select,textarea{min-width:0;max-width:100%;}
   <!-- Input -->
   <div style="padding:12px 14px;border-top:1px solid #e0c0af30;background:white;display:flex;gap:8px;align-items:flex-end;padding-bottom:calc(12px + env(safe-area-inset-bottom));flex-shrink:0;">
     <textarea id="chat-input" placeholder="Type your message..." rows="1"
-      style="flex:1;border:1.5px solid #e0c0af;border-radius:16px;padding:10px 13px;font-size:13px;outline:none;resize:none;max-height:80px;font-family:inherit;line-height:1.4;background:#f9f9ff;transition:border-color .2s;"
+      style="flex:1;border:1.5px solid #e0c0af;border-radius:16px;padding:10px 13px;font-size:13px;outline:none;resize:none;max-height:80px;font-family:inherit;line-height:1.4;background:#fafbf6;transition:border-color .2s;"
       onfocus="this.style.borderColor='#2d8a45'" onblur="this.style.borderColor='#b0d4ba'"
       oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,80)+'px'"
       onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChatMessage();}"></textarea>
@@ -1217,7 +1258,7 @@ function updatePickupModeUI(){
 function renderCMSBanner(b) {
   const sec=document.getElementById('home-banner-section'); if(!sec)return;
   const bg=b.image?`background-image:url(${b.image});background-size:cover;background-position:center;`:`background:${b.color||'#1a5c2a'};`;
-  sec.innerHTML=`<div class="relative h-44 md:h-60 rounded-[28px] overflow-hidden shimmer-bg" style="${bg}">
+  sec.innerHTML=`<div class="relative h-44 md:h-60 rounded-[24px] overflow-hidden shimmer-bg" style="${bg}">
     ${b.image?'<div class="absolute inset-0" style="background:linear-gradient(90deg,rgba(0,0,0,0.55) 0%,rgba(0,0,0,0.1) 70%)"></div>':''}
     <div class="absolute inset-0 opacity-10" style="background-image:radial-gradient(#ffffff 1.5px,transparent 1.5px);background-size:28px 28px;"></div>
     <div class="relative z-10 h-full flex items-center justify-between px-6 md:px-12 py-6">
@@ -1263,12 +1304,12 @@ function subscribeToUserOrders(uid) {
 // ─── HOMEPAGE BACKGROUND (set from Admin → Settings) ───
 function applyHomeBg(cfg){
   const el=document.getElementById('home-hero');if(!el)return;
-  const base='linear-gradient(135deg,#fff5ed 0%,#fff9f5 50%,#f9f9ff 100%)';
+  const base='linear-gradient(135deg,#fff5ed 0%,#fff9f5 50%,#fafbf6 100%)';
   const url=((cfg&&cfg.bgUrl)||'').trim();
-  if(!url||!(/^https?:\/\//i.test(url)||/^data:image\//i.test(url))){el.style.background=base;return;}
+  if(!url||!(/^https?:\/\//i.test(url)||/^data:image\//i.test(url))){el.style.background='';return;}
   const n=Math.min(Math.max(Number(cfg.overlay),0),90);const a=(isNaN(n)?45:n)/100;
   const safe=url.replace(/["'()\\\s]/g,c=>encodeURIComponent(c));
-  el.style.background=`linear-gradient(rgba(255,255,255,${a}),rgba(255,255,255,${a})), url("${safe}") center/cover no-repeat, ${base}`;
+  el.style.background=`linear-gradient(90deg,rgba(247,250,235,${Math.min(a+.45,.98)}) 0%,rgba(247,250,235,${a}) 55%,rgba(247,250,235,${a*.3}) 100%), url("${safe}") center/cover no-repeat`;
 }
 async function loadHomeBg(){
   try{
@@ -1288,7 +1329,7 @@ function nav(page) {
   currentPage=page;
   document.querySelectorAll('.nav-link').forEach(a=>{a.className=a.dataset.page===page?'text-sm font-bold cursor-pointer nav-link text-primary border-b-2 border-primary pb-1':'text-sm font-semibold cursor-pointer nav-link text-secondary hover:text-primary transition-colors';});
   const mnMap={home:'mn-home',browse:'mn-browse',cart:'mn-cart',orders:'mn-orders',profile:'mn-profile'};
-  Object.entries(mnMap).forEach(([pg,id])=>{const el=document.getElementById(id);if(!el)return;el.querySelectorAll('span').forEach(s=>{if(s.classList.contains('material-symbols-outlined')){s.style.color=pg===page?'#2d8a45':'#4a5e50';if(pg===page)s.classList.add('fill-icon');else s.classList.remove('fill-icon');}else{s.style.color=pg===page?'#2d8a45':'#4a5e50';}});});
+  Object.entries(mnMap).forEach(([pg,id])=>{const el=document.getElementById(id);if(!el)return;el.querySelectorAll('span').forEach(s=>{if(s.classList.contains('material-symbols-outlined')){s.style.color=pg===page?'#176b35':'#6e7771';if(pg===page)s.classList.add('fill-icon');else s.classList.remove('fill-icon');}else{s.style.color=pg===page?'#176b35':'#6e7771';}});});
   if(page==='home')renderHomeProducts();
   if(page==='browse')renderProducts();
   if(page==='cart'){renderCart();fillCartDelivery();updatePickupModeUI();}
@@ -1358,21 +1399,18 @@ function renderCategories() {
   const pills=document.getElementById('home-cat-pills');
   if(pills){
     const allChips=[
-      {label:'All',emoji:'🛒',fn:"filterAndBrowse('All')"},
-      ...cats.map(c=>({label:c.name,emoji:catEmoji(c.name),fn:`filterAndBrowseEnc('${catArg(c.name)}')`}))
+      {label:'All',emoji:'🛒',img:'',fn:"filterAndBrowse('All')"},
+      ...cats.map(c=>({label:c.name,emoji:catEmoji(c.name),img:c.imageUrl||'',fn:`filterAndBrowseEnc('${catArg(c.name)}')`}))
     ];
     pills.innerHTML=allChips.map(ch=>{
-      const imgUrl=catImgMap[ch.label];
-      const inner=imgUrl
-        ?`<img src="${imgUrl}" alt="${escapeHtml(ch.label)}" class="object-contain rounded-md drop-shadow-sm" style="width:36px;height:36px;" onerror="this.style.display='none';this.nextSibling.style.display='block'"><span style="display:none;font-size:22px;">${ch.emoji}</span>`
-        :`<span style="font-size:22px;">${ch.emoji}</span>`;
-      return `<button onclick="${ch.fn}" class="flex-shrink-0 btn flex flex-col items-center gap-1.5" style="min-width:58px;">
-        <div class="w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm" style="background:#edf5ec;border:1px solid rgba(167,218,166,0.4);">${inner}</div>
-        <span style="font-size:11px;font-weight:600;color:#374151;text-align:center;line-height:1.3;">${escapeHtml(ch.label)}</span>
-      </button>`;
+      const inner=ch.img
+        ?`<img src="${escapeHtml(ch.img)}" alt="" onerror="this.parentNode.textContent='${ch.emoji}'">`
+        :ch.emoji;
+      return `<button onclick="${ch.fn}" class="ss-category btn"><span class="ss-emoji">${inner}</span>${escapeHtml(ch.label)}</button>`;
     }).join('');
   }
 
+  // (Shop by Category grid removed in redesign — tiles above replace it)
   // Shop by Category grid
   const grid=document.getElementById('home-categories-grid');
   if(grid){
@@ -1394,44 +1432,28 @@ function productCard(p) {
   const inCart=cart.find(c=>c.id===p.id); const qty=inCart?inCart.qty:0;
   const fallback=catFallback(p.category); const src=p.imageUrl||fallback;
   const oos=(p.stock??0)<=0;
+  const low=(p.stock??0)<=5&&(p.stock??0)>0&&!oos;
+  const action=!oos&&qty>0
+    ?`<div class="ss-qty">
+        <button class="btn" onclick="updateCart('${p.id}',-1)" aria-label="Decrease"><span class="material-symbols-outlined" style="font-size:15px;color:white;">remove</span></button>
+        <span class="ss-q">${qty}</span>
+        <button class="btn" onclick="updateCart('${p.id}',1)" aria-label="Increase"><span class="material-symbols-outlined" style="font-size:15px;color:white;">add</span></button>
+      </div>`
+    :oos
+      ?`<button disabled class="ss-add-btn">Unavailable</button>`
+      :`<button onclick='addToCart(${JSON.stringify(p)})' class="ss-add-btn btn">+ Add</button>`;
 
-  return `<div class="bg-white rounded-2xl border border-gray-100 relative flex flex-col justify-between${oos?' opacity-70':''}" style="padding:12px;box-shadow:0 2px 10px rgba(0,0,0,0.03);">
-    <!-- Fresh / OOS badge top-right -->
-    ${oos
-      ?`<div class="absolute top-2.5 right-2.5 flex items-center gap-1 px-2 py-0.5 rounded-full border" style="background:#fef2f2;color:#dc2626;font-size:9px;font-weight:800;border-color:#fecaca;">
-          <span style="width:6px;height:6px;border-radius:50%;background:#dc2626;display:inline-block;"></span>Out of Stock
-        </div>`
-      :`<div class="absolute top-2.5 right-2.5 flex items-center gap-1 px-2 py-0.5 rounded-full border" style="background:#edf7ed;color:#236b3b;font-size:9px;font-weight:800;border-color:#bbf7d0;">
-          <span style="width:6px;height:6px;border-radius:50%;background:#2e7d32;display:inline-block;"></span>${p.badge||'Fresh'}
-        </div>`}
-    <!-- Image area: centered contain -->
-    <div class="flex items-center justify-center" style="height:112px;padding-top:8px;${oos?'position:relative;':''}" >
-      <img src="${src}" alt="${p.name}" class="max-h-24 object-contain rounded-lg" onerror="this.onerror=null;this.src='${fallback}'" style="max-width:100%;">
-      ${oos?`<div style="position:absolute;inset:0;background:rgba(255,255,255,0.4);border-radius:8px;"></div>`:''}
+  return `<article class="ss-product${oos?' ss-oos':''}">
+    <div class="ss-product-image">
+      <img src="${src}" alt="${p.name}" onerror="this.onerror=null;this.src='${fallback}'">
+      ${oos?`<span class="ss-fresh ss-fresh-oos">Out of Stock</span>`:`<span class="ss-fresh">✓ ${p.badge||'Fresh'}</span>`}
     </div>
-    <!-- Info area -->
-    <div style="margin-top:8px;">
-      <h4 style="font-size:12px;font-weight:700;color:#1f2937;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${p.name}</h4>
-      <div class="flex items-center justify-between" style="margin-top:6px;gap:4px;">
-        <div>
-          <span style="font-size:13px;font-weight:900;color:#143622;">₹${p.price}</span>
-          ${p.unit?`<span style="font-size:10px;color:#6b7280;font-weight:600;"> / ${p.unit}</span>`:''}
-          ${(p.stock??0)<=5&&(p.stock??0)>0&&!oos?`<div style="font-size:10px;color:#dc2626;font-weight:700;margin-top:2px;">${p.stock} left!</div>`:''}
-        </div>
-        ${!oos&&qty>0
-          ?`<div class="flex items-center rounded-full gap-1.5 px-2 py-1" style="background:#1b4329;">
-              <button class="btn leading-none" onclick="updateCart('${p.id}',-1)" style="color:white;"><span class="material-symbols-outlined" style="font-size:14px;color:white;">remove</span></button>
-              <span style="font-size:12px;font-weight:700;color:white;">${qty}</span>
-              <button class="btn leading-none" onclick="updateCart('${p.id}',1)" style="color:white;"><span class="material-symbols-outlined" style="font-size:14px;color:white;">add</span></button>
-            </div>`
-          :oos
-            ?`<button disabled class="btn flex items-center gap-1 px-3 py-1 rounded-full" style="font-size:11px;font-weight:700;background:#f3f4f6;color:#9ca3af;cursor:not-allowed;">Unavailable</button>`
-            :`<button onclick='addToCart(${JSON.stringify(p)})' class="btn flex items-center gap-0.5 px-3 py-1 rounded-full text-white font-bold" style="font-size:11px;background:#1b4329;">
-                + Add
-              </button>`}
-      </div>
+    <h3>${p.name}</h3>
+    <div class="ss-product-bottom">
+      <div class="ss-price">₹${p.price}${p.unit?` <small>/ ${p.unit}</small>`:''}${low?`<div class="ss-low">${p.stock} left!</div>`:''}</div>
+      ${action}
     </div>
-  </div>`;
+  </article>`;
 }
 
 function renderProducts() {
