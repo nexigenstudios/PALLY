@@ -750,13 +750,14 @@ tailwind.config = {
   <div id="cms-page-body"></div>
 </div>
 
-<footer class="bg-white border-t border-outline-variant/15 py-6 hidden md:block">
-  <div class="max-w-[1200px] mx-auto px-10 flex justify-between items-center">
+<footer class="bg-white border-t border-outline-variant/15 py-6 pb-28 md:pb-6">
+  <div class="max-w-[1200px] mx-auto px-5 md:px-10 flex flex-col md:flex-row md:justify-between md:items-center gap-4">
     <div><div class="brand-word text-lg"><span class="b-navy">Santhom</span><span class="b-teal"> Stores</span></div><div class="text-xs text-secondary mt-0.5">© 2026 Santhom Stores · Thomasleeha Pally Church Store</div></div>
-    <div class="flex gap-6 text-xs text-secondary">
+    <div class="flex flex-wrap gap-x-5 gap-y-3 text-xs text-secondary">
       <span class="hover:text-primary cursor-pointer btn" onclick="openCmsPage('about')">About</span>
       <span class="hover:text-primary cursor-pointer btn" onclick="openCmsPage('contact')">Contact</span>
       <span class="hover:text-primary cursor-pointer btn" onclick="openCmsPage('faqs')">FAQs</span>
+      <span class="hover:text-primary cursor-pointer btn" onclick="openCmsPage('blogs')">Blog</span>
       <span class="hover:text-primary cursor-pointer btn" onclick="openCmsPage('terms')">Terms</span>
       <span class="hover:text-primary cursor-pointer btn" onclick="openCmsPage('privacy')">Privacy</span>
       <span class="hover:text-primary cursor-pointer btn" onclick="openChat()">Support Chat</span>
@@ -1689,34 +1690,40 @@ async function refreshCmsSection(page) {
     if (page === 'blogs')   { const s = await getDoc(doc(db,'cms','blogs'));   cmsData.blogs   = s.exists() ? (s.data().items||[]).filter(b=>b.published!==false) : []; }
     if (page === 'contact') { const s = await getDoc(doc(db,'cms','contact')); cmsData.contact = s.exists() ? s.data() : {}; }
     if (['about','terms','privacy'].includes(page)) { const s = await getDoc(doc(db,'cms',page)); cmsData[page] = s.exists() ? s.data().content||'' : ''; }
-  } catch(e) {}
+    return true;
+  } catch(e) { console.error('CMS load failed (' + page + '):', e); return false; }
 }
 
 async function openCmsPage(page) {
-  await refreshCmsSection(page);
+  const cmsOk = await refreshCmsSection(page);
   const overlay = document.getElementById('cms-page');
   const title   = document.getElementById('cms-page-title');
   const body    = document.getElementById('cms-page-body');
   const titles  = { faqs:'FAQs', about:'About Santhom Stores', terms:'Terms & Conditions', privacy:'Privacy Policy', contact:'Contact Us', blogs:'Blog' };
   title.textContent = titles[page] || page;
+  const cached = page==='faqs' ? cmsData.faqs.length : page==='blogs' ? cmsData.blogs.length : page==='contact' ? Object.keys(cmsData.contact||{}).length : (cmsData[page]||'').length;
+  if (!cmsOk && !cached) {
+    body.innerHTML = emptyState('wifi_off', "Couldn't load this page", 'Please check your connection and try again.');
+    overlay.classList.add('open'); return;
+  }
 
   if (page === 'faqs') {
     body.innerHTML = cmsData.faqs.length
       ? cmsData.faqs.map(f => `<details style="border:1px solid #e0c0af30;border-radius:14px;padding:14px 16px;margin-bottom:8px;background:white;">
-          <summary style="font-weight:700;font-size:14px;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:8px;">${f.question||''}
+          <summary style="font-weight:700;font-size:14px;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:8px;">${esc(f.question)}
             <span class="material-symbols-outlined text-secondary" style="font-size:18px;flex-shrink:0;">expand_more</span></summary>
-          <p style="font-size:13px;color:#555f6f;margin-top:10px;line-height:1.7;">${f.answer||''}</p>
-          ${f.category?`<span style="display:inline-block;margin-top:8px;padding:2px 10px;background:#f0f3ff;border-radius:999px;font-size:11px;font-weight:700;color:#555f6f;">${f.category}</span>`:''}
+          <p style="font-size:13px;color:#555f6f;margin-top:10px;line-height:1.7;">${esc(f.answer).replace(/\n/g,'<br>')}</p>
+          ${f.category?`<span style="display:inline-block;margin-top:8px;padding:2px 10px;background:#f0f3ff;border-radius:999px;font-size:11px;font-weight:700;color:#555f6f;">${esc(f.category)}</span>`:''}
         </details>`).join('')
       : emptyState('help', 'No FAQs added yet', 'The team hasn\'t added FAQs yet — try the Support Chat!');
   } else if (page === 'blogs') {
     body.innerHTML = cmsData.blogs.length
       ? cmsData.blogs.map(b => `<div style="background:white;border-radius:18px;border:1px solid #e0c0af30;overflow:hidden;margin-bottom:14px;box-shadow:0 1px 8px rgba(0,0,0,0.04);">
-          ${b.image?`<img src="${b.image}" style="width:100%;height:180px;object-fit:cover;" onerror="this.style.display='none'">` : ''}
+          ${b.image?`<img src="${esc(b.image)}" style="width:100%;height:180px;object-fit:cover;" onerror="this.style.display='none'">` : ''}
           <div style="padding:16px;">
-            <div style="font-size:18px;font-weight:800;color:#151c27;margin-bottom:4px;">${b.title||''}</div>
-            <div style="font-size:11px;color:#8c7263;margin-bottom:10px;font-weight:600;">${b.author||'Santhom Stores Team'} · ${b.date||''}</div>
-            <p style="font-size:14px;color:#555f6f;line-height:1.75;">${(b.content||'').replace(/\n/g,'<br>')}</p>
+            <div style="font-size:18px;font-weight:800;color:#151c27;margin-bottom:4px;">${esc(b.title)}</div>
+            <div style="font-size:11px;color:#8c7263;margin-bottom:10px;font-weight:600;">${esc(b.author||'Santhom Stores Team')} · ${esc(b.date)}</div>
+            <p style="font-size:14px;color:#555f6f;line-height:1.75;">${esc(b.content).replace(/\n/g,'<br>')}</p>
           </div>
         </div>`).join('')
       : emptyState('article', 'No blog posts yet', 'Check back soon for updates and news!');
@@ -1724,9 +1731,9 @@ async function openCmsPage(page) {
     const c = cmsData.contact;
     const hasAny = c.address || c.phone || c.email || c.whatsapp;
     body.innerHTML = `<div style="display:flex;flex-direction:column;gap:10px;">
-      ${c.address ? `<div style="background:white;border-radius:14px;border:1px solid #e0c0af30;padding:14px;display:flex;gap:12px;align-items:flex-start;"><span class="material-symbols-outlined fill-icon text-primary" style="font-size:22px;flex-shrink:0;">location_on</span><div><div style="font-weight:700;font-size:13px;margin-bottom:2px;">Address</div><div style="font-size:13px;color:#555f6f;">${c.address}</div></div></div>` : ''}
-      ${c.phone  ? `<a href="tel:${c.phone}" style="background:white;border-radius:14px;border:1px solid #e0c0af30;padding:14px;display:flex;gap:12px;align-items:center;text-decoration:none;"><span class="material-symbols-outlined fill-icon text-primary" style="font-size:22px;flex-shrink:0;">phone</span><div><div style="font-weight:700;font-size:13px;margin-bottom:2px;">Phone</div><div style="font-size:13px;color:#1a5c2a;">${c.phone}</div></div></a>` : ''}
-      ${c.email  ? `<a href="mailto:${c.email}" style="background:white;border-radius:14px;border:1px solid #e0c0af30;padding:14px;display:flex;gap:12px;align-items:center;text-decoration:none;"><span class="material-symbols-outlined fill-icon text-primary" style="font-size:22px;flex-shrink:0;">mail</span><div><div style="font-weight:700;font-size:13px;margin-bottom:2px;">Email</div><div style="font-size:13px;color:#1a5c2a;">${c.email}</div></div></a>` : ''}
+      ${c.address ? `<div style="background:white;border-radius:14px;border:1px solid #e0c0af30;padding:14px;display:flex;gap:12px;align-items:flex-start;"><span class="material-symbols-outlined fill-icon text-primary" style="font-size:22px;flex-shrink:0;">location_on</span><div><div style="font-weight:700;font-size:13px;margin-bottom:2px;">Address</div><div style="font-size:13px;color:#555f6f;">${esc(c.address)}</div></div></div>` : ''}
+      ${c.phone  ? `<a href="tel:${esc(c.phone)}" style="background:white;border-radius:14px;border:1px solid #e0c0af30;padding:14px;display:flex;gap:12px;align-items:center;text-decoration:none;"><span class="material-symbols-outlined fill-icon text-primary" style="font-size:22px;flex-shrink:0;">phone</span><div><div style="font-weight:700;font-size:13px;margin-bottom:2px;">Phone</div><div style="font-size:13px;color:#1a5c2a;">${esc(c.phone)}</div></div></a>` : ''}
+      ${c.email  ? `<a href="mailto:${esc(c.email)}" style="background:white;border-radius:14px;border:1px solid #e0c0af30;padding:14px;display:flex;gap:12px;align-items:center;text-decoration:none;"><span class="material-symbols-outlined fill-icon text-primary" style="font-size:22px;flex-shrink:0;">mail</span><div><div style="font-weight:700;font-size:13px;margin-bottom:2px;">Email</div><div style="font-size:13px;color:#1a5c2a;">${esc(c.email)}</div></div></a>` : ''}
       ${c.whatsapp ? `<a href="https://wa.me/${c.whatsapp.replace(/\D/g,'')}" target="_blank" style="background:#f0fdf4;border-radius:14px;border:1px solid #bbf7d0;padding:14px;display:flex;gap:12px;align-items:center;text-decoration:none;"><span class="material-symbols-outlined fill-icon" style="color:#16a34a;font-size:22px;flex-shrink:0;">chat</span><div><div style="font-weight:700;font-size:13px;color:#16a34a;margin-bottom:2px;">WhatsApp</div><div style="font-size:13px;color:#16a34a;">${c.whatsapp}</div></div></a>` : ''}
       <div style="background:white;border-radius:14px;border:1px solid #e0c0af30;padding:14px;">
         <div style="font-weight:700;font-size:13px;margin-bottom:8px;color:#151c27;">Live Support Chat</div>
@@ -1738,7 +1745,7 @@ async function openCmsPage(page) {
     // Text pages: about, terms, privacy
     const content = cmsData[page] || '';
     body.innerHTML = content
-      ? `<div style="background:white;border-radius:16px;border:1px solid #e0c0af30;padding:20px;font-size:14px;color:#374151;line-height:1.85;white-space:pre-wrap;box-shadow:0 1px 8px rgba(0,0,0,0.04);">${content}</div>`
+      ? `<div style="background:white;border-radius:16px;border:1px solid #e0c0af30;padding:20px;font-size:14px;color:#374151;line-height:1.85;white-space:pre-wrap;box-shadow:0 1px 8px rgba(0,0,0,0.04);">${esc(content)}</div>`
       : emptyState('article', 'Content coming soon', 'This page hasn\'t been filled in yet.');
   }
 
@@ -1746,6 +1753,8 @@ async function openCmsPage(page) {
 }
 
 function closeCmsPage() { document.getElementById('cms-page').classList.remove('open'); }
+
+function esc(t) { return String(t == null ? '' : t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
 function emptyState(icon, title, sub) {
   return `<div style="text-align:center;padding:48px 16px;color:#8c7263;">
@@ -1769,24 +1778,25 @@ function closeChat() {
   document.getElementById('chat-overlay').classList.remove('open');
 }
 
+function chatIdentity() {
+  const user = window._currentUser;
+  const pp = (typeof allPickupPoints !== 'undefined' && allPickupPoints[0]) || {};
+  return {
+    userId: user.uid,
+    userName: savedDelivery.deliveryName || user.displayName || 'Customer',
+    userEmail: user.email || '',
+    hostelId: (typeof getEffectiveHostelId === 'function' ? getEffectiveHostelId() : '') || '',
+    hostelName: pp.hostelName || '',
+    status: 'open'
+  };
+}
+
 async function createChatDoc() {
   try {
     const user = window._currentUser; if (!user) return;
-    const { db, doc, setDoc, serverTimestamp } = window._fb;
-    // Tag the chat with whichever hostel branch the student currently has
-    // selected, so it routes to that branch's own Reception/admin only —
-    // not to every branch's support inbox.
-    // Single store — no hostel branch tracking needed
-    await setDoc(doc(db, 'support_chats', user.uid), {
-      userId: user.uid,
-      userName: savedDelivery.deliveryName || user.displayName || 'Customer',
-      userEmail: user.email || '',
-      hostelId, hostelName,
-      status: 'open',
-      lastTime: serverTimestamp(),
-      unreadAdmin: 0
-    }, { merge: true });
-  } catch(e) {}
+    const { db, doc, setDoc } = window._fb;
+    await setDoc(doc(db, 'support_chats', user.uid), chatIdentity(), { merge: true });
+  } catch(e) { console.error('createChatDoc:', e); }
 }
 
 function initChatListener() {
@@ -1795,12 +1805,23 @@ function initChatListener() {
   const { db, collection, query, orderBy, onSnapshot } = window._fb;
   const q = query(collection(db, 'support_chats', user.uid, 'messages'), orderBy('timestamp', 'asc'));
   chatListener = onSnapshot(q, snap => {
-    const msgs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    const msgs = snap.docs.map(d => ({ id: d.id, ref: d.ref, ...d.data() }));
     renderChatMessages(msgs);
-    const unread = msgs.filter(m => m.sender === 'admin' && !m.read).length;
+    const isOpen = document.getElementById('chat-overlay')?.classList.contains('open');
+    const unreadMsgs = msgs.filter(m => m.sender === 'admin' && !m.read);
+    if (isOpen && unreadMsgs.length) markChatRead(unreadMsgs);
+    const unread = isOpen ? 0 : unreadMsgs.length;
     const dot = document.getElementById('chat-fab-dot');
     if (dot) { dot.textContent = unread; dot.style.display = unread > 0 ? 'flex' : 'none'; }
-  }, () => {});
+  }, e => console.error('Support chat listener:', e));
+}
+
+async function markChatRead(list) {
+  try {
+    const { db, doc, updateDoc } = window._fb;
+    await Promise.all(list.map(m => updateDoc(m.ref, { read: true })));
+    await updateDoc(doc(db, 'support_chats', window._currentUser.uid), { unreadCustomer: 0 });
+  } catch(e) {}
 }
 
 function renderChatMessages(msgs) {
@@ -1829,11 +1850,15 @@ async function sendChatMessage() {
   if (!text || !window._currentUser) return;
   input.value = ''; input.style.height = 'auto';
   const user = window._currentUser;
-  const { db, collection, addDoc, doc, updateDoc, serverTimestamp } = window._fb;
+  const { db, collection, addDoc, doc, setDoc, serverTimestamp } = window._fb;
   try {
-    await addDoc(collection(db, 'support_chats', user.uid, 'messages'), { text, sender:'customer', timestamp:serverTimestamp(), read:false });
-    await updateDoc(doc(db, 'support_chats', user.uid), { lastMessage:text, lastTime:serverTimestamp(), unreadAdmin:99 });
-  } catch(e) { showToast('Failed to send message'); }
+    await setDoc(doc(db, 'support_chats', user.uid), { ...chatIdentity(), lastMessage: text, lastTime: serverTimestamp(), unreadAdmin: 99 }, { merge: true });
+    await addDoc(collection(db, 'support_chats', user.uid, 'messages'), { text, sender: 'customer', timestamp: serverTimestamp(), read: false });
+  } catch(e) {
+    console.error('sendChatMessage:', e);
+    input.value = text;
+    showToast(e.code === 'permission-denied' ? 'Message blocked (permission denied)' : 'Failed to send message');
+  }
 }
 
 function escapeHtml(t) { return (t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>'); }
