@@ -1834,30 +1834,22 @@ function renderHistoryCard(o) {
 async function cancelOrder(firestoreId) {
   if(!confirm('Cancel this order?'))return;
   try{
-    const{db,doc,runTransaction}=window._fb;
-    await runTransaction(db,async(txn)=>{
-      // ── READS FIRST ──
-      const orderRef=doc(db,'orders',firestoreId);
-      const orderSnap=await txn.get(orderRef);
-      if(!orderSnap.exists())throw new Error('Order not found');
-      const order=orderSnap.data();
-      if(order.status==='Cancelled')throw new Error('already-cancelled');
-      const items=order.items||[];
-      const productRefs=items.map(i=>doc(db,'products',i.id));
-      const productSnaps=await Promise.all(productRefs.map(r=>txn.get(r)));
-      // ── WRITES ──
-      txn.update(orderRef,{status:'Cancelled'});
-      for(let i=0;i<items.length;i++){
-        if(!productSnaps[i].exists())continue;
-        const cur=productSnaps[i].data().stock??0;
-        txn.update(productRefs[i],{stock:cur+items[i].qty});
-      }
+    const{db,doc,updateDoc}=window._fb;
+    const orderRef=doc(db,'orders',firestoreId);
+    // Customers are only allowed to write to the orders collection —
+    // writing to products would be blocked by Firestore security rules.
+    // We set status:'Cancelled' and stockRestorePending:true so the admin
+    // panel's real-time listener picks it up and restores stock automatically.
+    await updateDoc(orderRef,{
+      status:'Cancelled',
+      stockRestorePending:true,
+      cancelledBy:'customer',
+      cancelledAt:new Date().toISOString()
     });
-    showToast('Order cancelled — stock restored');
+    showToast('Order cancelled');
   }catch(e){
-    if(e.message==='already-cancelled'){showToast('Order is already cancelled');return;}
     console.error('cancelOrder:',e);
-    showToast('Error cancelling order');
+    showToast(e.code==='permission-denied'?'Permission denied — contact support':'Error cancelling order');
   }
 }
 
