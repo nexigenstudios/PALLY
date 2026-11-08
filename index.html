@@ -426,6 +426,15 @@ body{background:var(--cream);color:var(--ink);}
 #chat-fab{background:var(--green);box-shadow:0 7px 20px rgba(20,80,35,.25);}
 #toast{background:#183d25;font-family:'DM Sans',sans-serif;}
 .msg-bubble.customer{background:var(--green);}
+
+/* Skeleton loader shimmer */
+@keyframes ss-shimmer{0%{background-position:-400px 0}100%{background-position:400px 0}}
+.ss-skeleton{pointer-events:none;}
+.ss-skeleton .ss-product-image,.ss-skeleton div[style*="background:#f0f4ee"]{
+  background:linear-gradient(90deg,#f0f4ee 25%,#e4ece0 50%,#f0f4ee 75%) !important;
+  background-size:800px 100% !important;
+  animation:ss-shimmer 1.4s infinite linear;
+}
 </style>
 </head>
 <body class="bg-background text-on-surface overflow-x-hidden">
@@ -651,7 +660,10 @@ body{background:var(--cream);color:var(--ink);}
         <button onclick="nav('browse')" class="ss-text-link btn">View All&nbsp; →</button>
       </div>
       <section class="grid grid-cols-2 md:grid-cols-4 gap-[15px]" id="home-products">
-        <div class="col-span-2 md:col-span-4 text-center py-10 text-secondary"><span class="material-symbols-outlined text-4xl block mb-2 text-outline">hourglass_top</span><div class="text-sm">Loading products...</div></div>
+        <article class="ss-product ss-skeleton"><div class="ss-product-image" style="background:#f0f4ee;"></div><div style="height:14px;background:#f0f4ee;border-radius:6px;margin:14px 2px 8px;"></div><div style="height:28px;background:#f0f4ee;border-radius:20px;width:70%;margin-top:auto;"></div></article>
+        <article class="ss-product ss-skeleton"><div class="ss-product-image" style="background:#f0f4ee;"></div><div style="height:14px;background:#f0f4ee;border-radius:6px;margin:14px 2px 8px;"></div><div style="height:28px;background:#f0f4ee;border-radius:20px;width:70%;margin-top:auto;"></div></article>
+        <article class="ss-product ss-skeleton hidden md:flex"><div class="ss-product-image" style="background:#f0f4ee;"></div><div style="height:14px;background:#f0f4ee;border-radius:6px;margin:14px 2px 8px;"></div><div style="height:28px;background:#f0f4ee;border-radius:20px;width:70%;margin-top:auto;"></div></article>
+        <article class="ss-product ss-skeleton hidden md:flex"><div class="ss-product-image" style="background:#f0f4ee;"></div><div style="height:14px;background:#f0f4ee;border-radius:6px;margin:14px 2px 8px;"></div><div style="height:28px;background:#f0f4ee;border-radius:20px;width:70%;margin-top:auto;"></div></article>
       </section>
 
       <!-- ── SUNDAY ESSENTIALS STRIP ── -->
@@ -680,7 +692,10 @@ body{background:var(--cream);color:var(--ink);}
     </div>
     <div class="flex gap-2 overflow-x-auto pb-3 mb-5 scrollbar-hide" id="cat-pills"></div>
     <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-4" id="products-grid">
-      <div class="col-span-2 lg:col-span-4 text-center py-16 text-secondary"><span class="material-symbols-outlined text-4xl block mb-2 text-outline">hourglass_top</span><div class="text-sm">Loading...</div></div>
+      <article class="ss-product ss-skeleton"><div class="ss-product-image" style="background:#f0f4ee;"></div><div style="height:14px;background:#f0f4ee;border-radius:6px;margin:14px 2px 8px;"></div><div style="height:28px;background:#f0f4ee;border-radius:20px;width:70%;margin-top:auto;"></div></article>
+      <article class="ss-product ss-skeleton"><div class="ss-product-image" style="background:#f0f4ee;"></div><div style="height:14px;background:#f0f4ee;border-radius:6px;margin:14px 2px 8px;"></div><div style="height:28px;background:#f0f4ee;border-radius:20px;width:70%;margin-top:auto;"></div></article>
+      <article class="ss-product ss-skeleton hidden sm:flex"><div class="ss-product-image" style="background:#f0f4ee;"></div><div style="height:14px;background:#f0f4ee;border-radius:6px;margin:14px 2px 8px;"></div><div style="height:28px;background:#f0f4ee;border-radius:20px;width:70%;margin-top:auto;"></div></article>
+      <article class="ss-product ss-skeleton hidden xl:flex"><div class="ss-product-image" style="background:#f0f4ee;"></div><div style="height:14px;background:#f0f4ee;border-radius:6px;margin:14px 2px 8px;"></div><div style="height:28px;background:#f0f4ee;border-radius:20px;width:70%;margin-top:auto;"></div></article>
     </div>
   </div>
   <div class="bottom-spacer md:hidden"></div>
@@ -926,6 +941,34 @@ let ordersListener = null, activeOrderTab = 'active';
 let savedDelivery = {}, pendingAction = null;
 let roomDeliverySettings = { enabled:true, offTime:'', pickupLocation:'' };
 
+// ── INSTANT LOAD: paint cached products before Firebase responds ──
+(function(){
+  try{
+    const cached=localStorage.getItem('ss_products_cache');
+    if(cached){
+      const parsed=JSON.parse(cached);
+      if(Array.isArray(parsed)&&parsed.length>0){
+        customProducts=parsed;
+        // Render home products immediately (page is already 'home')
+        setTimeout(()=>{
+          if(currentPage==='home')renderHomeProducts();
+          if(currentPage==='browse')renderProducts();
+        },0);
+      }
+    }
+  }catch(_){}
+  try{
+    const cachedCats=localStorage.getItem('ss_categories_cache');
+    if(cachedCats){
+      const parsed=JSON.parse(cachedCats);
+      if(Array.isArray(parsed)){
+        storeCategories=parsed;
+        setTimeout(()=>renderCategories(),0);
+      }
+    }
+  }catch(_){}
+})();
+
 const STATUSES = ['Pending', 'Accepted', 'Preparing', 'Out for Delivery', 'Delivered'];
 const TERMINAL = ['Delivered', 'Cancelled'];
 const statusColors = { Pending:'bg-yellow-100 text-yellow-700', Accepted:'bg-blue-100 text-blue-700', Preparing:'bg-orange-100 text-orange-700', 'Out for Delivery':'bg-purple-100 text-purple-700', Delivered:'bg-green-100 text-green-700', Cancelled:'bg-red-100 text-red-700' };
@@ -1127,6 +1170,8 @@ function subscribeProducts() {
       q,
       snap=>{
         customProducts=snap.docs.map(d=>({id:d.id,...d.data()}));
+        // Persist to localStorage so next visit renders instantly
+        try{localStorage.setItem('ss_products_cache',JSON.stringify(customProducts));}catch(_){}
         const cnt=document.getElementById('home-product-count');
         if(cnt)cnt.textContent=customProducts.length+'+';
         if(currentPage==='home')renderHomeProducts();
@@ -1372,6 +1417,8 @@ function subscribeCategories() {
         // Doc present with an empty list = admin deleted everything → show nothing.
         const cats=Array.isArray(list)?list:(snap.exists()?[]:DEFAULT_STORE_CATEGORIES);
         storeCategories=[...cats].filter(c=>c&&c.name).sort((a,b)=>(a.sortOrder??99)-(b.sortOrder??99));
+        // Persist so next visit renders categories instantly
+        try{localStorage.setItem('ss_categories_cache',JSON.stringify(storeCategories));}catch(_){}
         renderCategories();
       },
       e=>{
@@ -1786,8 +1833,32 @@ function renderHistoryCard(o) {
 
 async function cancelOrder(firestoreId) {
   if(!confirm('Cancel this order?'))return;
-  try{const{db,doc,updateDoc}=window._fb;await updateDoc(doc(db,'orders',firestoreId),{status:'Cancelled'});showToast('Order cancelled');}
-  catch(e){showToast('Error cancelling order');}
+  try{
+    const{db,doc,runTransaction}=window._fb;
+    await runTransaction(db,async(txn)=>{
+      // ── READS FIRST ──
+      const orderRef=doc(db,'orders',firestoreId);
+      const orderSnap=await txn.get(orderRef);
+      if(!orderSnap.exists())throw new Error('Order not found');
+      const order=orderSnap.data();
+      if(order.status==='Cancelled')throw new Error('already-cancelled');
+      const items=order.items||[];
+      const productRefs=items.map(i=>doc(db,'products',i.id));
+      const productSnaps=await Promise.all(productRefs.map(r=>txn.get(r)));
+      // ── WRITES ──
+      txn.update(orderRef,{status:'Cancelled'});
+      for(let i=0;i<items.length;i++){
+        if(!productSnaps[i].exists())continue;
+        const cur=productSnaps[i].data().stock??0;
+        txn.update(productRefs[i],{stock:cur+items[i].qty});
+      }
+    });
+    showToast('Order cancelled — stock restored');
+  }catch(e){
+    if(e.message==='already-cancelled'){showToast('Order is already cancelled');return;}
+    console.error('cancelOrder:',e);
+    showToast('Error cancelling order');
+  }
 }
 
 function reorder(orderId) {
@@ -2042,7 +2113,9 @@ window._onAuthChange = async function(user) {
 
 // ─────────────── INIT ───────────────
 nav('home');
-setTimeout(() => { if (window._fb) { loadPickupPoints(); loadHomeBg(); loadCMSBanners(); subscribeRoomDeliverySettings(); subscribeCategories(); subscribeProducts(); } }, 600);
+// Start Firebase subscriptions immediately — no artificial delay.
+// _fb is set synchronously by the module script above, so it's always ready here.
+if (window._fb) { loadPickupPoints(); loadHomeBg(); loadCMSBanners(); subscribeRoomDeliverySettings(); subscribeCategories(); subscribeProducts(); }
 </script>
 
 <script>
