@@ -10,6 +10,7 @@
 <meta name="format-detection" content="telephone=no">
 <title>Santhom Stores – Fresh Choices. Everyday Essentials.</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+<link rel="preconnect" href="https://firestore.googleapis.com" crossorigin><link rel="preconnect" href="https://images.unsplash.com" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&display=swap" rel="stylesheet">
@@ -23,7 +24,7 @@
     signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile
   } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
   import {
-    initializeFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc,
+    initializeFirestore, persistentLocalCache, persistentMultipleTabManager, collection, addDoc, getDocs, doc, updateDoc, deleteDoc,
     onSnapshot, query, orderBy, serverTimestamp, setDoc, getDoc, where, arrayUnion, runTransaction
   } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
@@ -42,7 +43,10 @@
   // experimentalAutoDetectLongPolling: fixes Firestore hanging/slow behind
   // campus wifi, hostel routers, or corporate proxies that throttle/block
   // the WebChannel (websocket-style) connection Firestore prefers by default.
-  const db = initializeFirestore(app, { experimentalAutoDetectLongPolling: true });
+  const db = initializeFirestore(app, {
+    localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() }),
+    experimentalAutoDetectLongPolling: true
+  });
   const googleProvider = new GoogleAuthProvider();
   googleProvider.setCustomParameters({ prompt: 'select_account' });
 
@@ -54,6 +58,7 @@
     collection, addDoc, getDocs, doc, updateDoc, deleteDoc,
     onSnapshot, query, orderBy, serverTimestamp, setDoc, getDoc, where, arrayUnion, runTransaction
   };
+  window.dispatchEvent(new Event('fb-ready'));
 
   getRedirectResult(auth).then(result => {
     if (result?.user && window._onRedirectResult) window._onRedirectResult(result.user);
@@ -426,15 +431,10 @@ body{background:var(--cream);color:var(--ink);}
 #chat-fab{background:var(--green);box-shadow:0 7px 20px rgba(20,80,35,.25);}
 #toast{background:#183d25;font-family:'DM Sans',sans-serif;}
 .msg-bubble.customer{background:var(--green);}
-
-/* Skeleton loader shimmer */
-@keyframes ss-shimmer{0%{background-position:-400px 0}100%{background-position:400px 0}}
-.ss-skeleton{pointer-events:none;}
-.ss-skeleton .ss-product-image,.ss-skeleton div[style*="background:#f0f4ee"]{
-  background:linear-gradient(90deg,#f0f4ee 25%,#e4ece0 50%,#f0f4ee 75%) !important;
-  background-size:800px 100% !important;
-  animation:ss-shimmer 1.4s infinite linear;
-}
+</style>
+<style>
+.ss-skel{height:210px;border-radius:16px;background:linear-gradient(90deg,#eef1ef 25%,#f7f9f7 37%,#eef1ef 63%);background-size:400% 100%;animation:ss-shimmer 1.2s ease infinite}
+@keyframes ss-shimmer{0%{background-position:100% 0}100%{background-position:0 0}}
 </style>
 </head>
 <body class="bg-background text-on-surface overflow-x-hidden">
@@ -660,10 +660,7 @@ body{background:var(--cream);color:var(--ink);}
         <button onclick="nav('browse')" class="ss-text-link btn">View All&nbsp; →</button>
       </div>
       <section class="grid grid-cols-2 md:grid-cols-4 gap-[15px]" id="home-products">
-        <article class="ss-product ss-skeleton"><div class="ss-product-image" style="background:#f0f4ee;"></div><div style="height:14px;background:#f0f4ee;border-radius:6px;margin:14px 2px 8px;"></div><div style="height:28px;background:#f0f4ee;border-radius:20px;width:70%;margin-top:auto;"></div></article>
-        <article class="ss-product ss-skeleton"><div class="ss-product-image" style="background:#f0f4ee;"></div><div style="height:14px;background:#f0f4ee;border-radius:6px;margin:14px 2px 8px;"></div><div style="height:28px;background:#f0f4ee;border-radius:20px;width:70%;margin-top:auto;"></div></article>
-        <article class="ss-product ss-skeleton hidden md:flex"><div class="ss-product-image" style="background:#f0f4ee;"></div><div style="height:14px;background:#f0f4ee;border-radius:6px;margin:14px 2px 8px;"></div><div style="height:28px;background:#f0f4ee;border-radius:20px;width:70%;margin-top:auto;"></div></article>
-        <article class="ss-product ss-skeleton hidden md:flex"><div class="ss-product-image" style="background:#f0f4ee;"></div><div style="height:14px;background:#f0f4ee;border-radius:6px;margin:14px 2px 8px;"></div><div style="height:28px;background:#f0f4ee;border-radius:20px;width:70%;margin-top:auto;"></div></article>
+        <div class="col-span-2 md:col-span-4 text-center py-10 text-secondary"><span class="material-symbols-outlined text-4xl block mb-2 text-outline">hourglass_top</span><div class="text-sm">Loading products...</div></div>
       </section>
 
       <!-- ── SUNDAY ESSENTIALS STRIP ── -->
@@ -692,10 +689,7 @@ body{background:var(--cream);color:var(--ink);}
     </div>
     <div class="flex gap-2 overflow-x-auto pb-3 mb-5 scrollbar-hide" id="cat-pills"></div>
     <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-4" id="products-grid">
-      <article class="ss-product ss-skeleton"><div class="ss-product-image" style="background:#f0f4ee;"></div><div style="height:14px;background:#f0f4ee;border-radius:6px;margin:14px 2px 8px;"></div><div style="height:28px;background:#f0f4ee;border-radius:20px;width:70%;margin-top:auto;"></div></article>
-      <article class="ss-product ss-skeleton"><div class="ss-product-image" style="background:#f0f4ee;"></div><div style="height:14px;background:#f0f4ee;border-radius:6px;margin:14px 2px 8px;"></div><div style="height:28px;background:#f0f4ee;border-radius:20px;width:70%;margin-top:auto;"></div></article>
-      <article class="ss-product ss-skeleton hidden sm:flex"><div class="ss-product-image" style="background:#f0f4ee;"></div><div style="height:14px;background:#f0f4ee;border-radius:6px;margin:14px 2px 8px;"></div><div style="height:28px;background:#f0f4ee;border-radius:20px;width:70%;margin-top:auto;"></div></article>
-      <article class="ss-product ss-skeleton hidden xl:flex"><div class="ss-product-image" style="background:#f0f4ee;"></div><div style="height:14px;background:#f0f4ee;border-radius:6px;margin:14px 2px 8px;"></div><div style="height:28px;background:#f0f4ee;border-radius:20px;width:70%;margin-top:auto;"></div></article>
+      <div class="col-span-2 lg:col-span-4 text-center py-16 text-secondary"><span class="material-symbols-outlined text-4xl block mb-2 text-outline">hourglass_top</span><div class="text-sm">Loading...</div></div>
     </div>
   </div>
   <div class="bottom-spacer md:hidden"></div>
@@ -933,6 +927,7 @@ body{background:var(--cream);color:var(--ink);}
 </footer>
 <script>
 // ─────────────── STATE ───────────────
+let productsLoaded = false;
 let customProducts = [], cart = [], orders = [], allHostels = [], allPickupPoints = [];
 let selectedHostelId = localStorage.getItem('sm_selected_hostel') || '';
 let activePromo = null; // { code, value, type, description }
@@ -940,34 +935,6 @@ let currentFilter = 'All', currentPage = 'home';
 let ordersListener = null, activeOrderTab = 'active';
 let savedDelivery = {}, pendingAction = null;
 let roomDeliverySettings = { enabled:true, offTime:'', pickupLocation:'' };
-
-// ── INSTANT LOAD: paint cached products before Firebase responds ──
-(function(){
-  try{
-    const cached=localStorage.getItem('ss_products_cache');
-    if(cached){
-      const parsed=JSON.parse(cached);
-      if(Array.isArray(parsed)&&parsed.length>0){
-        customProducts=parsed;
-        // Render home products immediately (page is already 'home')
-        setTimeout(()=>{
-          if(currentPage==='home')renderHomeProducts();
-          if(currentPage==='browse')renderProducts();
-        },0);
-      }
-    }
-  }catch(_){}
-  try{
-    const cachedCats=localStorage.getItem('ss_categories_cache');
-    if(cachedCats){
-      const parsed=JSON.parse(cachedCats);
-      if(Array.isArray(parsed)){
-        storeCategories=parsed;
-        setTimeout(()=>renderCategories(),0);
-      }
-    }
-  }catch(_){}
-})();
 
 const STATUSES = ['Pending', 'Accepted', 'Preparing', 'Out for Delivery', 'Delivered'];
 const TERMINAL = ['Delivered', 'Cancelled'];
@@ -1160,8 +1127,30 @@ function renderHeader() {
 
 // ─────────────── FIREBASE DATA ───────────────
 // Real-time product subscription — stock updates propagate instantly to all customers
+const PRODUCTS_CACHE_KEY='sm_products_cache_v1';
+function saveProductsCache(){
+  try{
+    const slim=customProducts.map(({createdAt,updatedAt,...rest})=>rest);
+    localStorage.setItem(PRODUCTS_CACHE_KEY,JSON.stringify({t:Date.now(),items:slim}));
+  }catch(e){}
+}
+// Paints the last-known products synchronously, before Firebase has even connected.
+// Stock shown here may be slightly old; checkout always re-validates stock server-side.
+function hydrateProductsFromCache(){
+  try{
+    const raw=localStorage.getItem(PRODUCTS_CACHE_KEY); if(!raw)return false;
+    const c=JSON.parse(raw); if(!c||!Array.isArray(c.items)||!c.items.length)return false;
+    customProducts=c.items;
+    const cnt=document.getElementById('home-product-count'); if(cnt)cnt.textContent=customProducts.length+'+';
+    renderHomeProducts();
+    if(currentPage==='browse')renderProducts();
+    return true;
+  }catch(e){return false;}
+}
+function skeletonCards(n){return Array.from({length:n},()=>'<div class="ss-skel"></div>').join('');}
+
 function subscribeProducts() {
-  if(window._productsUnsub){window._productsUnsub();window._productsUnsub=null;}
+  if(window._productsUnsub)return; // query never changes — don't tear down & re-fetch
   try{
     const{db,collection,query,where,orderBy,onSnapshot}=window._fb;
     // Single store — always fetch all products
@@ -1169,9 +1158,11 @@ function subscribeProducts() {
     window._productsUnsub=onSnapshot(
       q,
       snap=>{
+        // An empty answer from a cold cache is "don't know yet", not "no products"
+        if(snap.metadata.fromCache&&snap.empty&&!productsLoaded)return;
         customProducts=snap.docs.map(d=>({id:d.id,...d.data()}));
-        // Persist to localStorage so next visit renders instantly
-        try{localStorage.setItem('ss_products_cache',JSON.stringify(customProducts));}catch(_){}
+        productsLoaded=true;
+        saveProductsCache();
         const cnt=document.getElementById('home-product-count');
         if(cnt)cnt.textContent=customProducts.length+'+';
         if(currentPage==='home')renderHomeProducts();
@@ -1417,8 +1408,6 @@ function subscribeCategories() {
         // Doc present with an empty list = admin deleted everything → show nothing.
         const cats=Array.isArray(list)?list:(snap.exists()?[]:DEFAULT_STORE_CATEGORIES);
         storeCategories=[...cats].filter(c=>c&&c.name).sort((a,b)=>(a.sortOrder??99)-(b.sortOrder??99));
-        // Persist so next visit renders categories instantly
-        try{localStorage.setItem('ss_categories_cache',JSON.stringify(storeCategories));}catch(_){}
         renderCategories();
       },
       e=>{
@@ -1475,7 +1464,7 @@ function renderCategories() {
 }
 
 // ─────────────── PRODUCTS ───────────────
-function productCard(p) {
+function productCard(p, eager) {
   const inCart=cart.find(c=>c.id===p.id); const qty=inCart?inCart.qty:0;
   const fallback=catFallback(p.category); const src=p.imageUrl||fallback;
   const oos=(p.stock??0)<=0;
@@ -1492,7 +1481,7 @@ function productCard(p) {
 
   return `<article class="ss-product${oos?' ss-oos':''}">
     <div class="ss-product-image">
-      <img src="${src}" alt="${p.name}" onerror="this.onerror=null;this.src='${fallback}'">
+      <img src="${src}" alt="${p.name}" loading="${eager?'eager':'lazy'}" decoding="async"${eager?' fetchpriority="high"':''} onerror="this.onerror=null;this.src='${fallback}'">
       ${oos?`<span class="ss-fresh ss-fresh-oos">Out of Stock</span>`:`<span class="ss-fresh">✓ ${p.badge||'Fresh'}</span>`}
     </div>
     <h3>${p.name}</h3>
@@ -1512,14 +1501,16 @@ function renderProducts() {
   if(pillsEl)pillsEl.innerHTML=allCats.map(c=>`<button onclick="setCatFilter('${encodeURIComponent(c)}')" class="flex-shrink-0 px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap btn transition-all ${currentFilter===c?'bg-primary-container text-white shadow-md':'bg-white border border-outline-variant/25 text-on-surface hover:bg-surface-container'}">${escapeHtml(c)}</button>`).join('');
   const filtered=customProducts.filter(p=>(currentFilter==='All'||p.category===currentFilter)&&((p.name||'').toLowerCase().includes(searchVal)||(p.category||'').toLowerCase().includes(searchVal)));
   const grid=document.getElementById('products-grid'); if(!grid)return;
+  if(customProducts.length===0&&!productsLoaded){grid.innerHTML=skeletonCards(6);return;}
   if(customProducts.length===0){grid.innerHTML='<div class="col-span-2 text-center py-12 text-secondary"><div class="font-semibold">No products yet</div><div class="text-sm mt-1">Check back soon!</div></div>';return;}
   grid.innerHTML=filtered.length===0?'<div class="col-span-2 text-center py-12 text-secondary"><div class="font-semibold">No products found</div></div>':filtered.map(p=>productCard(p)).join('');
 }
 
 function renderHomeProducts() {
   const el=document.getElementById('home-products'); if(!el)return;
+  if(customProducts.length===0&&!productsLoaded){el.innerHTML=skeletonCards(4);return;}
   if(customProducts.length===0){el.innerHTML='<div class="col-span-2 text-center py-8 text-secondary text-sm">No products yet — check back soon!</div>';return;}
-  el.innerHTML=customProducts.slice(0,4).map(p=>productCard(p)).join('');
+  el.innerHTML=customProducts.slice(0,4).map(p=>productCard(p,true)).join('');
 }
 
 function sortProducts(by) {
@@ -1834,22 +1825,29 @@ function renderHistoryCard(o) {
 async function cancelOrder(firestoreId) {
   if(!confirm('Cancel this order?'))return;
   try{
-    const{db,doc,updateDoc}=window._fb;
+    const{db,doc,runTransaction}=window._fb;
     const orderRef=doc(db,'orders',firestoreId);
-    // Customers are only allowed to write to the orders collection —
-    // writing to products would be blocked by Firestore security rules.
-    // We set status:'Cancelled' and stockRestorePending:true so the admin
-    // panel's real-time listener picks it up and restores stock automatically.
-    await updateDoc(orderRef,{
-      status:'Cancelled',
-      stockRestorePending:true,
-      cancelledBy:'customer',
-      cancelledAt:new Date().toISOString()
+    // Cancel + return every item's quantity to stock in ONE atomic step.
+    await runTransaction(db,async(txn)=>{
+      const oSnap=await txn.get(orderRef);
+      if(!oSnap.exists())throw new Error('Order not found.');
+      const o=oSnap.data();
+      if(o.status!=='Pending')throw new Error('This order can no longer be cancelled.');
+      const qtyById={};
+      (o.items||[]).forEach(i=>{if(i.id)qtyById[i.id]=(qtyById[i.id]||0)+(Number(i.qty)||0);});
+      const ids=Object.keys(qtyById);
+      const refs=ids.map(id=>doc(db,'products',id));
+      const snaps=await Promise.all(refs.map(r=>txn.get(r)));
+      snaps.forEach((snap,k)=>{
+        if(!snap.exists())return; // product was deleted meanwhile
+        txn.update(refs[k],{stock:(snap.data().stock??0)+qtyById[ids[k]],lastRestockOrderId:firestoreId});
+      });
+      txn.update(orderRef,{status:'Cancelled'});
     });
     showToast('Order cancelled');
   }catch(e){
     console.error('cancelOrder:',e);
-    showToast(e.code==='permission-denied'?'Permission denied — contact support':'Error cancelling order');
+    showToast(e.message&&/cancelled|found/.test(e.message)?e.message:'Error cancelling order');
   }
 }
 
@@ -2105,18 +2103,9 @@ window._onAuthChange = async function(user) {
 
 // ─────────────── INIT ───────────────
 nav('home');
-// Firebase is loaded via type="module" which the browser always defers until
-// after classic scripts finish — so window._fb is never set yet at this point.
-// We poll with rAF (runs every frame, ~16 ms) instead of a fixed 600 ms timeout,
-// so subscriptions start the instant the module resolves, typically < 50 ms.
-(function waitForFb(){
-  if(window._fb){
-    loadPickupPoints(); loadHomeBg(); loadCMSBanners();
-    subscribeRoomDeliverySettings(); subscribeCategories(); subscribeProducts();
-  } else {
-    requestAnimationFrame(waitForFb);
-  }
-})();
+hydrateProductsFromCache();          // instant paint from last visit
+function startData() { loadPickupPoints(); loadHomeBg(); loadCMSBanners(); subscribeRoomDeliverySettings(); subscribeCategories(); subscribeProducts(); }
+if (window._fb) startData(); else window.addEventListener('fb-ready', startData, { once: true });
 </script>
 
 <script>
