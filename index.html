@@ -2113,9 +2113,18 @@ window._onAuthChange = async function(user) {
 
 // ─────────────── INIT ───────────────
 nav('home');
-// Start Firebase subscriptions immediately — no artificial delay.
-// _fb is set synchronously by the module script above, so it's always ready here.
-if (window._fb) { loadPickupPoints(); loadHomeBg(); loadCMSBanners(); subscribeRoomDeliverySettings(); subscribeCategories(); subscribeProducts(); }
+// Firebase is loaded via type="module" which the browser always defers until
+// after classic scripts finish — so window._fb is never set yet at this point.
+// We poll with rAF (runs every frame, ~16 ms) instead of a fixed 600 ms timeout,
+// so subscriptions start the instant the module resolves, typically < 50 ms.
+(function waitForFb(){
+  if(window._fb){
+    loadPickupPoints(); loadHomeBg(); loadCMSBanners();
+    subscribeRoomDeliverySettings(); subscribeCategories(); subscribeProducts();
+  } else {
+    requestAnimationFrame(waitForFb);
+  }
+})();
 </script>
 
 <script>
