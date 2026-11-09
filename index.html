@@ -990,6 +990,14 @@ body{background:var(--cream);color:var(--ink);}
 // ─────────────── STATE ───────────────
 let productsLoaded = false;
 let customProducts = [], cart = [], orders = [], allHostels = [], allPickupPoints = [];
+// ── Admin "Hide" support ──
+// rawProducts = everything in Firestore; customProducts = only what customers may see.
+// A product is hidden if admin hid it directly (p.hidden) OR hid its whole category.
+let rawProducts = [];
+let hiddenCategoryNames = new Set();
+function applyProductVisibility(){
+  customProducts = rawProducts.filter(p => !p.hidden && !hiddenCategoryNames.has(p.category));
+}
 // Cart survives closing the app / clearing it from recents
 const CART_KEY='sm_cart_v1';
 try{const _c=JSON.parse(localStorage.getItem(CART_KEY)||'[]');if(Array.isArray(_c))cart=_c.filter(i=>i&&i.id&&i.qty>0);}catch(e){}
@@ -1194,7 +1202,7 @@ function renderHeader() {
 const PRODUCTS_CACHE_KEY='sm_products_cache_v1';
 function saveProductsCache(){
   try{
-    const slim=customProducts.map(({createdAt,updatedAt,...rest})=>rest);
+    const slim=rawProducts.map(({createdAt,updatedAt,...rest})=>rest);
     localStorage.setItem(PRODUCTS_CACHE_KEY,JSON.stringify({t:Date.now(),items:slim}));
   }catch(e){}
 }
@@ -1204,7 +1212,7 @@ function hydrateProductsFromCache(){
   try{
     const raw=localStorage.getItem(PRODUCTS_CACHE_KEY); if(!raw)return false;
     const c=JSON.parse(raw); if(!c||!Array.isArray(c.items)||!c.items.length)return false;
-    customProducts=c.items;
+    rawProducts=c.items; applyProductVisibility();
     const cnt=document.getElementById('home-product-count'); if(cnt)cnt.textContent=customProducts.length+'+';
     renderHomeProducts();
     if(currentPage==='browse')renderProducts();
@@ -1224,7 +1232,8 @@ function subscribeProducts() {
       snap=>{
         // An empty answer from a cold cache is "don't know yet", not "no products"
         if(snap.metadata.fromCache&&snap.empty&&!productsLoaded)return;
-        customProducts=snap.docs.map(d=>({id:d.id,...d.data()}));
+        rawProducts=snap.docs.map(d=>({id:d.id,...d.data()}));
+        applyProductVisibility();
         productsLoaded=true;
         saveProductsCache();
         if(cart.length){ // refresh saved cart with latest price/stock; drop removed or sold-out items
@@ -1476,8 +1485,14 @@ function subscribeCategories() {
         // Doc missing = admin never opened Categories yet → show the same defaults the admin seeds.
         // Doc present with an empty list = admin deleted everything → show nothing.
         const cats=Array.isArray(list)?list:(snap.exists()?[]:DEFAULT_STORE_CATEGORIES);
-        storeCategories=[...cats].filter(c=>c&&c.name).sort((a,b)=>(a.sortOrder??99)-(b.sortOrder??99));
+        const validCats=[...cats].filter(c=>c&&c.name);
+        hiddenCategoryNames=new Set(validCats.filter(c=>c.hidden).map(c=>c.name));
+        storeCategories=validCats.filter(c=>!c.hidden).sort((a,b)=>(a.sortOrder??99)-(b.sortOrder??99));
+        applyProductVisibility(); // category hide/show changes which products are visible
         renderCategories();
+        const cnt=document.getElementById('home-product-count'); if(cnt)cnt.textContent=customProducts.length+'+';
+        if(currentPage==='home')renderHomeProducts();
+        if(currentPage==='browse')renderProducts();
       },
       e=>{
         console.error('Categories listener:',e);
@@ -1845,7 +1860,7 @@ async function placeOrder() {
       // ── VALIDATE STOCK ──
       for(let i=0;i<cart.length;i++){
         const snap=productSnaps[i];
-        if(!snap.exists()) throw new Error(`"${cart[i].name}" is no longer available.`);
+        if(!snap.exists() || snap.data().hidden || hiddenCategoryNames.has(snap.data().category)) throw new Error(`"${cart[i].name}" is no longer available.`);
         const available=snap.data().stock??0;
         if(available<cart[i].qty){
           throw new Error(available===0
