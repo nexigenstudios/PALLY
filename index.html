@@ -345,7 +345,13 @@ body{background:var(--cream);color:var(--ink);}
 
 /* Hero */
 .ss-hero{min-height:405px;position:relative;overflow:hidden;display:flex;align-items:center;padding:28px 22px;isolation:isolate;
-  background:linear-gradient(90deg,rgba(247,250,235,.98) 0%,rgba(247,250,235,.93) 42%,rgba(247,250,235,.12) 100%),url("https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=1500&q=85") 58% center/cover;}
+  background:#f7faeb;}
+/* Auto-scrolling hero images (crossfade, driven by initHeroSlider below) */
+.ss-hero-slides{position:absolute;inset:0;z-index:-1;}
+.ss-hero-slide{position:absolute;inset:0;background-size:cover;background-position:58% center;opacity:0;transition:opacity .9s ease;}
+.ss-hero-slide.active{opacity:1;}
+.ss-hero-slides::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(247,250,235,.98) 0%,rgba(247,250,235,.93) 42%,rgba(247,250,235,.12) 100%);}
+.ss-hero-custom .ss-hero-slides{display:none;} /* admin-set homepage background wins over the slider */
 .ss-hero-copy{max-width:290px;position:relative;z-index:1;}
 .ss-eyebrow{display:inline-flex;align-items:center;gap:7px;color:var(--green);background:rgba(231,244,222,.9);padding:8px 12px;border-radius:30px;font-size:11px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;}
 .ss-hero h1{margin:19px 0 8px;color:var(--green-dark);font-size:clamp(36px,7vw,57px);line-height:1.02;letter-spacing:-2.5px;font-weight:700;}
@@ -354,10 +360,11 @@ body{background:var(--cream);color:var(--ink);}
 .ss-primary-btn{border:0;border-radius:50px;background:var(--green);color:#fff;font-weight:800;font-size:14px;padding:14px 23px;box-shadow:0 7px 16px rgba(23,107,53,.2);cursor:pointer;transition:background .15s;white-space:nowrap;}
 .ss-primary-btn:hover,.ss-add-btn:hover{background:var(--green-dark);}
 .ss-hero-dots{display:flex;gap:7px;margin-top:28px;}
-.ss-hero-dots i{width:8px;height:8px;border-radius:50%;background:#fff;display:block;}
-.ss-hero-dots i:first-child{width:20px;background:var(--green);border-radius:8px;}
+.ss-hero-dots i{width:8px;height:8px;border-radius:50%;background:#fff;display:block;cursor:pointer;transition:width .3s,background .3s;}
+.ss-hero-dots i.active{width:20px;background:var(--green);border-radius:8px;}
 @media(min-width:760px){
-  .ss-hero{min-height:470px;padding:38px 6.5% 38px max(7%,calc((100% - 1050px)/2));background-position:center;}
+  .ss-hero{min-height:470px;padding:38px 6.5% 38px max(7%,calc((100% - 1050px)/2));}
+  .ss-hero-slide{background-position:center;}
   .ss-hero-copy{max-width:460px;}
   .ss-hero p{max-width:340px;font-size:15px;}
 }
@@ -679,14 +686,34 @@ body{background:var(--cream);color:var(--ink);}
 
     <!-- ── HERO BANNER ── -->
     <section id="home-hero" class="ss-hero">
+      <div class="ss-hero-slides" aria-hidden="true"><div class="ss-hero-slide active" style="background-image:url('https://images.unsplash.com/photo-1610832958506-aa56368176cf?auto=format&fit=crop&w=1500&q=80')"></div><div class="ss-hero-slide" style="background-image:url('https://images.unsplash.com/photo-1589927986089-35812388d1f4?auto=format&fit=crop&w=1500&q=80')"></div><div class="ss-hero-slide" style="background-image:url('https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&fit=crop&w=1500&q=80')"></div></div>
       <div class="ss-hero-copy">
         <div class="ss-eyebrow">✦ Thomasleeha Pally Church Store</div>
         <h1>Fresh from<br>Our Store.<span>Everyday Essentials.</span></h1>
         <p>Your trusted church store for fresh produce, groceries and daily essentials.</p>
         <button onclick="nav('browse')" class="ss-primary-btn btn">Explore Products&nbsp; →</button>
-        <div class="ss-hero-dots"><i></i><i></i><i></i></div>
+        <div class="ss-hero-dots"><i class="active"></i><i></i><i></i></div>
       </div>
     </section>
+    <script>
+    // Hero image slider: changes image every 3 seconds, dots are clickable
+    (function initHeroSlider(){
+      var hero=document.getElementById('home-hero'); if(!hero)return;
+      var slides=hero.querySelectorAll('.ss-hero-slide'), dots=hero.querySelectorAll('.ss-hero-dots i');
+      if(slides.length<2)return;
+      var idx=0, timer=null;
+      function show(n){
+        idx=(n+slides.length)%slides.length;
+        slides.forEach(function(s,i){s.classList.toggle('active',i===idx);});
+        dots.forEach(function(d,i){d.classList.toggle('active',i===idx);});
+      }
+      function stop(){ if(timer){clearInterval(timer);timer=null;} }
+      function start(){ stop(); timer=setInterval(function(){ if(hero.offsetParent!==null)show(idx+1); },3000); }
+      dots.forEach(function(d,i){ d.addEventListener('click',function(){show(i);start();}); });
+      document.addEventListener('visibilitychange',function(){ document.hidden?stop():start(); });
+      start();
+    })();
+    </script>
 
     <main class="ss-content">
 
@@ -1420,7 +1447,8 @@ function applyHomeBg(cfg){
   const el=document.getElementById('home-hero');if(!el)return;
   const base='linear-gradient(135deg,#fff5ed 0%,#fff9f5 50%,#fafbf6 100%)';
   const url=((cfg&&cfg.bgUrl)||'').trim();
-  if(!url||!(/^https?:\/\//i.test(url)||/^data:image\//i.test(url))){el.style.background='';return;}
+  if(!url||!(/^https?:\/\//i.test(url)||/^data:image\//i.test(url))){el.style.background='';el.classList.remove('ss-hero-custom');return;}
+  el.classList.add('ss-hero-custom');
   const n=Math.min(Math.max(Number(cfg.overlay),0),90);const a=(isNaN(n)?45:n)/100;
   const safe=url.replace(/["'()\\\s]/g,c=>encodeURIComponent(c));
   el.style.background=`linear-gradient(90deg,rgba(247,250,235,${Math.min(a+.45,.98)}) 0%,rgba(247,250,235,${a}) 55%,rgba(247,250,235,${a*.3}) 100%), url("${safe}") center/cover no-repeat`;
