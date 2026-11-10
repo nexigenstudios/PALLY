@@ -1192,6 +1192,7 @@ async function saveDeliveryStep2() {
       await setDoc(doc(db,'users',user.uid),delivery,{merge:true});
       savedDelivery={...savedDelivery,...delivery};
     }
+    fillCartDelivery(); // push the just-saved name/phone into the checkout form
     closeAuth();
     showToast(savedDelivery.deliveryPhone?'Details confirmed!':'Welcome to Santhom Store!');
     if(pendingAction){const a=pendingAction;pendingAction=null;setTimeout(()=>a(),200);}
