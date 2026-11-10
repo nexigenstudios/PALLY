@@ -1025,9 +1025,10 @@ let rawProducts = [];
 let hiddenCategoryNames = new Set();
 // ── Fruit pre-order window (admin sets it in settings/preorder) ──
 // While open: fruits show, with no stock limit. After closing time: fruits are hidden.
+let preorderKnown = false; // fruits stay hidden until the pre-order window state is known
 let preorder = { open:false, closesAt:0, windowId:'', categories:['Fruits'] };
 function isPreorderCat(c){ return (preorder.categories||['Fruits']).includes(c); }
-function preorderOpen(){ return !!preorder.open && (!preorder.closesAt || Date.now() < preorder.closesAt); }
+function preorderOpen(){ return preorderKnown && !!preorder.open && (!preorder.closesAt || Date.now() < preorder.closesAt); }
 function applyProductVisibility(){
   const po = preorderOpen();
   customProducts = rawProducts
@@ -1049,7 +1050,7 @@ function renderPreorderBanner(){
   if(!preorderOpen()){el.style.display='none';el.innerHTML='';return;}
   const d=preorder.closesAt?new Date(preorder.closesAt).toLocaleString('en-IN',{weekday:'short',day:'numeric',month:'short',hour:'numeric',minute:'2-digit'}):'';
   el.style.display='block';
-  el.innerHTML=`<div style="display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:16px;background:#fff7e0;border:1px solid #f3d98b;color:#5c4400;font-size:13px;line-height:1.4"><span style="font-size:24px">🍎</span><div><b>Fruit pre-order is open</b>${d?` — order before <b>${d}</b>`:''}.<br>Fruits are supplied fresh and delivered after ordering closes.</div></div>`;
+  el.innerHTML=`<div style="display:flex;align-items:flex-start;gap:12px;padding:12px 16px;background:#fff;border:1px solid #dde2d8;border-left:3px solid #176b35;border-radius:8px;color:#1f2937;font-size:13px;line-height:1.45"><span class="material-symbols-outlined" style="font-size:20px;color:#176b35;margin-top:1px">schedule</span><div><div style="font-weight:700">Fruit pre-order open</div><div style="color:#555f6f">${d?`Order before ${d}. `:''}Fruits are delivered after ordering closes.</div></div></div>`;
 }
 function subscribePreorder(){
   try{
@@ -1057,6 +1058,7 @@ function subscribePreorder(){
     onSnapshot(doc(db,'settings','preorder'),snap=>{
       const d=snap.exists()?snap.data():{};
       preorder={open:!!d.open,closesAt:Number(d.closesAt)||0,windowId:d.windowId||'',categories:Array.isArray(d.categories)&&d.categories.length?d.categories:['Fruits']};
+      preorderKnown=true; saveVisCache();
       refreshPreorderUI();
     },e=>console.error('Preorder listener:',e));
     // Auto-hide fruits the moment the closing time passes
@@ -1266,6 +1268,11 @@ function renderHeader() {
 // ─────────────── FIREBASE DATA ───────────────
 // Real-time product subscription — stock updates propagate instantly to all customers
 const PRODUCTS_CACHE_KEY='sm_products_cache_v1';
+// Remembers which categories are hidden, the pre-order window and the category list, so the first paint
+// already hides hidden products instead of flashing them until Firebase answers.
+const VIS_KEY='sm_vis_cache_v1';
+function saveVisCache(){try{localStorage.setItem(VIS_KEY,JSON.stringify({hidden:[...hiddenCategoryNames],preorder,cats:storeCategories}));}catch(e){}}
+function loadVisCache(){try{const c=JSON.parse(localStorage.getItem(VIS_KEY)||'null');if(!c||!Array.isArray(c.hidden)||!c.preorder)return false;hiddenCategoryNames=new Set(c.hidden);preorder=c.preorder;preorderKnown=true;if(Array.isArray(c.cats))storeCategories=c.cats;return true;}catch(e){return false;}}
 function saveProductsCache(){
   try{
     const slim=rawProducts.map(({createdAt,updatedAt,...rest})=>rest);
@@ -1276,9 +1283,11 @@ function saveProductsCache(){
 // Stock shown here may be slightly old; checkout always re-validates stock server-side.
 function hydrateProductsFromCache(){
   try{
+    if(!loadVisCache())return false; // without it we can't tell what is hidden, so show the loader instead of risking a flash
     const raw=localStorage.getItem(PRODUCTS_CACHE_KEY); if(!raw)return false;
     const c=JSON.parse(raw); if(!c||!Array.isArray(c.items)||!c.items.length)return false;
     rawProducts=c.items; applyProductVisibility();
+    renderCategories(); renderPreorderBanner();
     const cnt=document.getElementById('home-product-count'); if(cnt)cnt.textContent=customProducts.length+'+';
     renderHomeProducts();
     if(currentPage==='browse')renderProducts();
@@ -1556,6 +1565,7 @@ function subscribeCategories() {
         hiddenCategoryNames=new Set(validCats.filter(c=>c.hidden).map(c=>c.name));
         storeCategories=validCats.filter(c=>!c.hidden).sort((a,b)=>(a.sortOrder??99)-(b.sortOrder??99));
         applyProductVisibility(); // category hide/show changes which products are visible
+        saveVisCache();
         renderCategories();
         const cnt=document.getElementById('home-product-count'); if(cnt)cnt.textContent=customProducts.length+'+';
         if(currentPage==='home')renderHomeProducts();
