@@ -1192,7 +1192,7 @@ async function saveDeliveryStep2() {
       await setDoc(doc(db,'users',user.uid),delivery,{merge:true});
       savedDelivery={...savedDelivery,...delivery};
     }
-    fillCartDelivery(); // push the just-saved name/phone into the checkout form
+    fillCartDelivery({name,phone}); // fill checkout instantly from what was just entered
     closeAuth();
     showToast(savedDelivery.deliveryPhone?'Details confirmed!':'Welcome to Santhom Store!');
     if(pendingAction){const a=pendingAction;pendingAction=null;setTimeout(()=>a(),200);}
@@ -1229,10 +1229,16 @@ function togglePwd(inp,icon) { const i=document.getElementById(inp),e=document.g
 function getAuthError(c) { const m={'auth/invalid-email':'Invalid email','auth/user-not-found':'No account with this email','auth/wrong-password':'Incorrect password','auth/email-already-in-use':'Email already registered','auth/weak-password':'Password must be at least 6 characters','auth/too-many-requests':'Too many attempts. Try again later.','auth/invalid-credential':'Invalid email or password'}; return m[c]||'An error occurred. Please try again.'; }
 function handleUserBtn() { if(window._currentUser)nav('profile'); else openAuth('Sign in to your account'); }
 
-function fillCartDelivery() {
-  if(!savedDelivery.deliveryPhone)return;
-  [['d-name',savedDelivery.deliveryName],['d-phone',savedDelivery.deliveryPhone]].forEach(([id,v])=>{const el=document.getElementById(id);if(el&&v)el.value=v;});
-  document.getElementById('delivery-autofill-badge')?.classList.remove('hidden');
+function fillCartDelivery(force) {
+  // force = {name, phone} -> fill immediately from what the user just typed (no waiting on the DB)
+  const name=(force&&force.name)||savedDelivery.deliveryName||'';
+  const phone=(force&&force.phone)||savedDelivery.deliveryPhone||'';
+  if(!phone&&!name)return;
+  [['d-name',name],['d-phone',phone]].forEach(([id,v])=>{
+    const el=document.getElementById(id);
+    if(el&&v&&(force||!el.value)){el.value=v;el.dispatchEvent(new Event('input',{bubbles:true}));}
+  });
+  if(phone)document.getElementById('delivery-autofill-badge')?.classList.remove('hidden');
 }
 
 // ─────────────── AUTH STATE (does NOT block browsing) ───────────────
@@ -1240,7 +1246,7 @@ window._onAuthChange = async function(user) {
   renderHeader();
   if(user){
     subscribeToUserOrders(user.uid);
-    try{ const{db,doc,getDoc}=window._fb; const s=await getDoc(doc(db,'users',user.uid)); if(s.exists())savedDelivery=s.data(); }catch(e){}
+    try{ const{db,doc,getDoc}=window._fb; const s=await getDoc(doc(db,'users',user.uid)); if(s.exists())savedDelivery={...s.data(),...(savedDelivery.deliveryPhone?{deliveryName:savedDelivery.deliveryName,deliveryPhone:savedDelivery.deliveryPhone}:{})}; }catch(e){}
     if(currentPage==='cart')fillCartDelivery();
     if(currentPage==='profile')renderProfile();
   } else {
