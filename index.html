@@ -731,6 +731,7 @@ body{background:var(--cream);color:var(--ink);}
       </div>
 
       <!-- ── CATEGORIES ── -->
+      <div id="preorder-banner" style="display:none;margin:0 0 12px"></div>
       <section class="ss-categories" id="home-cat-pills" aria-label="Product categories"></section>
 
       <!-- ── PROMO ── (replaced by CMS banner when set) -->
@@ -1022,8 +1023,46 @@ let customProducts = [], cart = [], orders = [], allHostels = [], allPickupPoint
 // A product is hidden if admin hid it directly (p.hidden) OR hid its whole category.
 let rawProducts = [];
 let hiddenCategoryNames = new Set();
+// ── Fruit pre-order window (admin sets it in settings/preorder) ──
+// While open: fruits show, with no stock limit. After closing time: fruits are hidden.
+let preorder = { open:false, closesAt:0, windowId:'', categories:['Fruits'] };
+function isPreorderCat(c){ return (preorder.categories||['Fruits']).includes(c); }
+function preorderOpen(){ return !!preorder.open && (!preorder.closesAt || Date.now() < preorder.closesAt); }
 function applyProductVisibility(){
-  customProducts = rawProducts.filter(p => !p.hidden && !hiddenCategoryNames.has(p.category));
+  const po = preorderOpen();
+  customProducts = rawProducts
+    .filter(p => !p.hidden && !hiddenCategoryNames.has(p.category) && (po || !isPreorderCat(p.category)))
+    .map(p => isPreorderCat(p.category) ? {...p, stock:9999, preorder:true} : p);
+}
+function refreshPreorderUI(){
+  applyProductVisibility();
+  if(cart.length && productsLoaded){ cart = cart.filter(ci => customProducts.some(x => x.id === ci.id)); updateCartBadge(); }
+  if(typeof renderCategories==='function') renderCategories();
+  renderPreorderBanner();
+  const cnt=document.getElementById('home-product-count'); if(cnt)cnt.textContent=customProducts.length+'+';
+  if(currentPage==='home')renderHomeProducts();
+  if(currentPage==='browse')renderProducts();
+  if(currentPage==='cart')renderCart();
+}
+function renderPreorderBanner(){
+  const el=document.getElementById('preorder-banner'); if(!el)return;
+  if(!preorderOpen()){el.style.display='none';el.innerHTML='';return;}
+  const d=preorder.closesAt?new Date(preorder.closesAt).toLocaleString('en-IN',{weekday:'short',day:'numeric',month:'short',hour:'numeric',minute:'2-digit'}):'';
+  el.style.display='block';
+  el.innerHTML=`<div style="display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:16px;background:#fff7e0;border:1px solid #f3d98b;color:#5c4400;font-size:13px;line-height:1.4"><span style="font-size:24px">🍎</span><div><b>Fruit pre-order is open</b>${d?` — order before <b>${d}</b>`:''}.<br>Fruits are supplied fresh and delivered after ordering closes.</div></div>`;
+}
+function subscribePreorder(){
+  try{
+    const{db,doc,onSnapshot}=window._fb;
+    onSnapshot(doc(db,'settings','preorder'),snap=>{
+      const d=snap.exists()?snap.data():{};
+      preorder={open:!!d.open,closesAt:Number(d.closesAt)||0,windowId:d.windowId||'',categories:Array.isArray(d.categories)&&d.categories.length?d.categories:['Fruits']};
+      refreshPreorderUI();
+    },e=>console.error('Preorder listener:',e));
+    // Auto-hide fruits the moment the closing time passes
+    let was=preorderOpen();
+    setInterval(()=>{const now=preorderOpen();if(now!==was){was=now;refreshPreorderUI();}},15000);
+  }catch(e){console.error('subscribePreorder:',e);}
 }
 // Cart survives closing the app / clearing it from recents
 const CART_KEY='sm_cart_v1';
@@ -1531,7 +1570,7 @@ function subscribeCategories() {
 }
 
 function renderCategories() {
-  const cats=storeCategories||[];
+  const cats=(storeCategories||[]).filter(c=>preorderOpen()||!isPreorderCat(c.name));
   // If the category the customer is currently filtering by was removed, reset to All
   if(currentFilter!=='All'&&!cats.some(c=>c.name===currentFilter))currentFilter='All';
 
@@ -1606,7 +1645,7 @@ function productCard(p, eager) {
 
 function renderProducts() {
   const searchVal=(document.getElementById('search-input')?.value||'').toLowerCase();
-  const allCats=['All',...(storeCategories?storeCategories.map(c=>c.name):[...new Set(customProducts.map(p=>p.category).filter(Boolean))])];
+  const allCats=['All',...(storeCategories?storeCategories.filter(c=>preorderOpen()||!isPreorderCat(c.name)).map(c=>c.name):[...new Set(customProducts.map(p=>p.category).filter(Boolean))])];
   // If the active filter was removed in the admin panel, fall back to "All"
   if(!allCats.includes(currentFilter))currentFilter='All';
   const pillsEl=document.getElementById('cat-pills');
@@ -1884,11 +1923,17 @@ async function placeOrder() {
       // ── READS FIRST (Firestore rule: all reads before writes) ──
       const productRefs=cart.map(item=>doc(db,'products',item.id));
       const productSnaps=await Promise.all(productRefs.map(r=>txn.get(r)));
+      const poSnap=await txn.get(doc(db,'settings','preorder'));
+      const poD=poSnap.exists()?poSnap.data():{};
+      const poOpen=!!poD.open&&(!poD.closesAt||Date.now()<poD.closesAt);
+      const poCats=Array.isArray(poD.categories)&&poD.categories.length?poD.categories:['Fruits'];
+      const isPre=cart.map((c,i)=>productSnaps[i].exists()&&poCats.includes(productSnaps[i].data().category));
 
       // ── VALIDATE STOCK ──
       for(let i=0;i<cart.length;i++){
         const snap=productSnaps[i];
         if(!snap.exists() || snap.data().hidden || hiddenCategoryNames.has(snap.data().category)) throw new Error(`"${cart[i].name}" is no longer available.`);
+        if(isPre[i]){ if(!poOpen) throw new Error(`Pre-ordering has closed — "${cart[i].name}" can no longer be ordered.`); continue; } // pre-order: no stock limit
         const available=snap.data().stock??0;
         if(available<cart[i].qty){
           throw new Error(available===0
@@ -1901,7 +1946,8 @@ async function placeOrder() {
       // 1. Create the order
       txn.set(orderRef,{
         orderId, userId:user.uid, userEmail:user.email,
-        items:cart.map(i=>({id:i.id,name:i.name,price:i.price,qty:i.qty,unit:i.unit||'',category:i.category||'',imageUrl:i.imageUrl||''})),
+        items:cart.map((i,k)=>({id:i.id,name:i.name,price:i.price,qty:i.qty,unit:i.unit||'',category:i.category||'',imageUrl:i.imageUrl||'',preorder:!!isPre[k]})),
+        preorder:isPre.some(Boolean), preorderWindowId:isPre.some(Boolean)?(poD.windowId||''):'',
         total, status:'Pending', name, phone, notes, payment,
         deliveryMode: 'pickup',
         pickupLocation: pickupLocationName,
@@ -1913,6 +1959,7 @@ async function placeOrder() {
 
       // 2. Decrease stock for every ordered item
       for(let i=0;i<cart.length;i++){
+        if(isPre[i])continue;
         const available=productSnaps[i].data().stock??0;
         txn.update(productRefs[i],{stock:available-cart[i].qty});
       }
@@ -2034,8 +2081,10 @@ async function cancelOrder(firestoreId) {
       if(!oSnap.exists())throw new Error('Order not found.');
       const o=oSnap.data();
       if(o.status!=='Pending')throw new Error('This order can no longer be cancelled.');
+      const pS=o.preorder?await txn.get(doc(db,'settings','preorder')):null;
+      if(o.preorder){const pd=pS&&pS.exists()?pS.data():{};if(!(pd.open&&(!pd.closesAt||Date.now()<pd.closesAt)&&pd.windowId===o.preorderWindowId))throw new Error('Pre-ordering has closed, so this order can no longer be cancelled.');}
       const qtyById={};
-      (o.items||[]).forEach(i=>{if(i.id)qtyById[i.id]=(qtyById[i.id]||0)+(Number(i.qty)||0);});
+      (o.items||[]).forEach(i=>{if(i.id&&!i.preorder)qtyById[i.id]=(qtyById[i.id]||0)+(Number(i.qty)||0);});
       const ids=Object.keys(qtyById);
       const refs=ids.map(id=>doc(db,'products',id));
       const snaps=await Promise.all(refs.map(r=>txn.get(r)));
@@ -2305,7 +2354,7 @@ window._onAuthChange = async function(user) {
 // ─────────────── INIT ───────────────
 nav('home');
 hydrateProductsFromCache();          // instant paint from last visit
-function startData() { loadPickupPoints(); loadHomeBg(); loadCMSBanners(); subscribeRoomDeliverySettings(); subscribeCategories(); subscribeProducts(); }
+function startData() { loadPickupPoints(); loadHomeBg(); loadCMSBanners(); subscribeRoomDeliverySettings(); subscribeCategories(); subscribePreorder(); subscribeProducts(); }
 updateCartBadge(); renderCart();
 if (window._fb) startData(); else window.addEventListener('fb-ready', startData, { once: true });
 </script>
