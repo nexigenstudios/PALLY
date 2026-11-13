@@ -478,6 +478,9 @@ body{background:var(--cream);color:var(--ink);}
 .pdp-low{color:#dc2626;}
 .pdp-label{margin:16px 0 8px;font-size:13px;color:var(--muted);}
 .pdp-chip{display:inline-block;border:2px solid var(--green);border-radius:12px;padding:10px 16px;font-size:14px;font-weight:800;color:var(--ink);}
+.pdp-wchip{display:inline-block;border:2px solid #d4e8d9;border-radius:12px;padding:9px 15px;font-size:13px;font-weight:700;color:var(--ink);cursor:pointer;transition:all .15s;}
+.pdp-wchip.sel{border-color:var(--green);background:#e8f5ec;color:var(--green);}
+.pdp-wchips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;}
 .pdp-bar{flex-shrink:0;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px) * 0);background:#fff;border-top:1px solid #edf0eb;}
 .pdp-bar-l{min-width:0;}
 .pdp-bar-sub{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
@@ -1725,16 +1728,61 @@ function sortProducts(by) {
 
 // ─────────────── PRODUCT DETAIL SHEET ───────────────
 let pdpIds=[], pdpIdx=0, pdpRaf=0;
+// Weight selection state: productId -> selectedWeight string
+const _pdpWeightSel = {};
 const _pa=t=>String(t==null?'':t).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
 function pdpProduct(id){return customProducts.find(p=>p.id===id);}
+// Parse a weight string like "500g","1kg","1.5kg","250g" → grams
+function woptToGrams(w){
+  if(!w)return 0;
+  const s=w.toString().toLowerCase().trim();
+  const kg=s.match(/^(\d+\.?\d*)\s*kg$/);
+  if(kg)return parseFloat(kg[1])*1000;
+  const g=s.match(/^(\d+\.?\d*)\s*g$/);
+  if(g)return parseFloat(g[1]);
+  return 0;
+}
+// Get effective price for a product given its currently selected weight
+function pdpEffectivePrice(p){
+  if(!p.weightBased||!p.pricePerKg)return p.price;
+  const w=_pdpWeightSel[p.id]||(p.weightOptions&&p.weightOptions[0]);
+  if(!w)return p.price;
+  return Math.round((p.pricePerKg*woptToGrams(w)/1000)*100)/100;
+}
+// Select a weight option for a product and re-render
+function pdpSelectWeight(id,w){
+  _pdpWeightSel[id]=w;
+  pdpRefreshBar(id);
+  // Re-render weight chips
+  const chips=document.getElementById('pdp-wchips-'+id);
+  if(chips){
+    chips.querySelectorAll('.pdp-wchip').forEach(el=>{
+      el.classList.toggle('sel',el.dataset.w===w);
+    });
+  }
+  // Update price label in PDP info area
+  const priceEl=document.getElementById('pdp-wprice-'+id);
+  if(priceEl){
+    const p=pdpProduct(id); if(!p)return;
+    const price=pdpEffectivePrice(p);
+    priceEl.textContent='₹'+price;
+  }
+}
 function pdpBarHtml(p){
-  const stock=p.stock??0, oos=stock<=0, ex=cart.find(c=>c.id===p.id), qty=ex?ex.qty:0;
-  const off=(p.mrp&&p.mrp>p.price)?Math.round((1-p.price/p.mrp)*100):0;
+  const stock=p.stock??0, oos=stock<=0;
+  const selW=p.weightBased?(_pdpWeightSel[p.id]||(p.weightOptions&&p.weightOptions[0])):null;
+  // For weight-based, match cart by id+weight combo key; otherwise plain id
+  const cartKey=p.weightBased&&selW?p.id+'__'+selW:p.id;
+  const ex=cart.find(c=>c.cartKey===cartKey||(c.id===p.id&&!p.weightBased));
+  const qty=ex?ex.qty:0;
+  const price=pdpEffectivePrice(p);
+  const off=(p.mrp&&p.mrp>p.price&&!p.weightBased)?Math.round((1-p.price/p.mrp)*100):0;
+  const selWLabel=selW?` • ${selW}`:'';
   const act=oos?`<button class="pdp-add" disabled>Unavailable</button>`
-    :qty>0?`<div class="pdp-step"><button class="btn" onclick="pdpStep('${p.id}',-1)" aria-label="Decrease"><span class="material-symbols-outlined">remove</span></button><span>${qty}</span><button class="btn" onclick="pdpStep('${p.id}',1)" aria-label="Increase"><span class="material-symbols-outlined">add</span></button></div>`
+    :qty>0?`<div class="pdp-step"><button class="btn" onclick="pdpStep('${p.id}',-1,'${selW||''}')" aria-label="Decrease"><span class="material-symbols-outlined">remove</span></button><span>${qty}</span><button class="btn" onclick="pdpStep('${p.id}',1,'${selW||''}')" aria-label="Increase"><span class="material-symbols-outlined">add</span></button></div>`
     :`<button class="pdp-add btn" onclick="pdpAdd('${p.id}')">ADD</button>`;
-  return `<div class="pdp-bar-l"><div class="pdp-bar-sub">${_pa(p.name)}${p.unit?' • '+_pa(p.unit):''}</div>
-    <div class="pdp-bar-price">₹${p.price}${off?`<s>₹${p.mrp}</s><span class="pdp-off">${off}% OFF</span>`:''}</div></div>${act}`;
+  return `<div class="pdp-bar-l"><div class="pdp-bar-sub">${_pa(p.name)}${selWLabel}</div>
+    <div class="pdp-bar-price" id="pdp-wprice-${p.id}">₹${price}${off?`<s>₹${p.mrp}</s><span class="pdp-off">${off}% OFF</span>`:''}</div></div>${act}`;
 }
 function pdpSlideHtml(p){
   const fb=catFallback(p.category), src=p.imageUrl||fb, stock=p.stock??0, oos=stock<=0, low=!oos&&stock<=5;
@@ -1750,6 +1798,13 @@ function pdpSlideHtml(p){
         ${p.desc?`<p class="pdp-desc">${escapeHtml(p.desc)}</p>`:''}
         <div class="pdp-meta"><span><span class="star">★</span> ${p.rating||4.5}</span>${low?`<span class="pdp-low">Only ${stock} left</span>`:''}</div>
         ${p.unit?`<div class="pdp-label">Quantity: ${_pa(p.unit)}</div><span class="pdp-chip">${_pa(p.unit)}</span>`:''}
+        ${p.weightBased&&p.weightOptions&&p.weightOptions.length?`
+          <div class="pdp-label" style="margin-top:14px;">Select Weight</div>
+          <div class="pdp-wchips" id="pdp-wchips-${p.id}">${p.weightOptions.map((w,i)=>{
+            const sel=(_pdpWeightSel[p.id]||p.weightOptions[0])===w;
+            const price=Math.round((p.pricePerKg*woptToGrams(w)/1000)*100)/100;
+            return `<button class="pdp-wchip btn${sel?' sel':''}" data-w="${w}" onclick="pdpSelectWeight('${p.id}','${w}')">${w}<span style="display:block;font-size:11px;font-weight:600;color:#5a7a62;">₹${price}</span></button>`;
+          }).join('')}</div>`:''}
       </div>
     </div>
     <div class="pdp-bar" id="pdp-bar-${p.id}">${pdpBarHtml(p)}</div>
@@ -1766,6 +1821,8 @@ function openProduct(id){
   pdpIdx=Math.max(0,pdpIds.indexOf(id));
   if(!pdpIds.includes(id)){pdpIds=customProducts.map(p=>p.id);pdpIdx=Math.max(0,pdpIds.indexOf(id));}
   const track=document.getElementById('pdp-track'), th=document.getElementById('pdp-thumbs'), el=document.getElementById('pdp');
+  // Init default weight selection for each product
+  pdpIds.forEach(i=>{const p=pdpProduct(i);if(p&&p.weightBased&&p.weightOptions&&p.weightOptions.length&&!_pdpWeightSel[i])_pdpWeightSel[i]=p.weightOptions[0];});
   track.innerHTML=pdpIds.map(i=>pdpSlideHtml(pdpProduct(i))).join('');
   th.innerHTML=pdpIds.map((i,n)=>{const p=pdpProduct(i);return `<button class="pdp-th btn" onclick="pdpTo(${n})" aria-label="${_pa(p.name)}"><img src="${_pa(p.imageUrl||catFallback(p.category))}" alt="" loading="lazy" onerror="this.onerror=null;this.src='${catFallback(p.category)}'"></button>`;}).join('');
   document.body.style.overflow='hidden';
@@ -1801,8 +1858,28 @@ function pdpRefreshBar(id){
   const p=pdpProduct(id), b=document.getElementById('pdp-bar-'+id); if(p&&b)b.innerHTML=pdpBarHtml(p);
 }
 function pdpRefresh(){ if(document.getElementById('pdp')?.classList.contains('open'))pdpIds.forEach(pdpRefreshBar); }
-function pdpAdd(id){const p=pdpProduct(id); if(!p)return; addToCart(p); pdpRefreshBar(id);}
-function pdpStep(id,d){updateCart(id,d); pdpRefreshBar(id);}
+function pdpAdd(id){
+  const p=pdpProduct(id); if(!p)return;
+  if(p.weightBased){
+    const w=_pdpWeightSel[id]||(p.weightOptions&&p.weightOptions[0]);
+    const price=pdpEffectivePrice(p);
+    const cartKey=id+'__'+w;
+    addToCart({...p,selectedWeight:w,price,cartKey,displayName:p.name+' ('+w+')'});
+  } else {
+    addToCart(p);
+  }
+  pdpRefreshBar(id);
+}
+function pdpStep(id,d,w){
+  const p=pdpProduct(id); if(!p)return;
+  if(p&&p.weightBased&&w){
+    const cartKey=id+'__'+w;
+    updateCartByKey(cartKey,d);
+  } else {
+    updateCart(id,d);
+  }
+  pdpRefreshBar(id);
+}
 function pdpExplore(id){const p=pdpProduct(id); closeProduct(); if(p&&p.category)filterAndBrowse(p.category);}
 async function pdpShare(id){
   const p=pdpProduct(id); if(!p)return;
@@ -1817,24 +1894,39 @@ function addToCart(p) {
   const latest=customProducts.find(x=>x.id===p.id)||p;
   const available=latest.stock??0;
   if(available<=0){showToast(p.name+' is out of stock');return;}
-  const ex=cart.find(c=>c.id===p.id);
+  // For weight-based, use cartKey; otherwise id
+  const key=p.cartKey||p.id;
+  const ex=cart.find(c=>(c.cartKey||c.id)===key);
   const currentQty=ex?ex.qty:0;
   if(currentQty>=available){showToast('Only '+available+' in stock for '+p.name);return;}
-  if(ex)ex.qty++; else cart.push({...p,qty:1});
+  if(ex)ex.qty++; else cart.push({...p,qty:1,cartKey:key});
   updateCartBadge(); renderCart();
   if(currentPage==='browse')renderProducts();
   if(currentPage==='home')renderHomeProducts();
-  showToast(p.name+' added to cart');
+  showToast((p.displayName||p.name)+' added to cart');
 }
 
 function updateCart(id,delta) {
-  const item=cart.find(c=>c.id===id); if(!item)return;
+  const item=cart.find(c=>c.id===id&&!c.selectedWeight); if(!item)return;
   if(delta>0){
     const latest=customProducts.find(x=>x.id===id);
     const available=latest?.stock??0;
     if(item.qty>=available){showToast('Only '+available+' available for '+item.name);return;}
   }
-  item.qty+=delta; if(item.qty<=0)cart=cart.filter(c=>c.id!==id);
+  item.qty+=delta; if(item.qty<=0)cart=cart.filter(c=>(c.cartKey||c.id)!==id||c.selectedWeight);
+  updateCartBadge(); renderCart();
+  if(currentPage==='browse')renderProducts();
+  if(currentPage==='home')renderHomeProducts();
+}
+
+function updateCartByKey(cartKey,delta) {
+  const item=cart.find(c=>(c.cartKey||c.id)===cartKey); if(!item)return;
+  if(delta>0){
+    const latest=customProducts.find(x=>x.id===item.id);
+    const available=latest?.stock??0;
+    if(item.qty>=available){showToast('Only '+available+' available for '+item.name);return;}
+  }
+  item.qty+=delta; if(item.qty<=0)cart=cart.filter(c=>(c.cartKey||c.id)!==cartKey);
   updateCartBadge(); renderCart();
   if(currentPage==='browse')renderProducts();
   if(currentPage==='home')renderHomeProducts();
@@ -1853,14 +1945,17 @@ function renderCart() {
     empty.classList.add('hidden');
     list.innerHTML=cart.map(item=>{
       const fallback=catFallback(item.category); const src=item.imageUrl||fallback;
+      const ck=item.cartKey||item.id;
+      const weightLabel=item.selectedWeight?` · ${item.selectedWeight}`:item.unit?` · ${item.unit}`:'';
+      const updateFn=item.selectedWeight?`updateCartByKey('${ck}',`:`updateCart('${item.id}',`;
       return `<div class="glass-heavy rounded-xl p-4 border border-white/40 flex items-center gap-3">
         <div class="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 bg-surface-container-low"><img src="${src}" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='${fallback}'"></div>
-        <div class="flex-1 min-w-0"><h3 class="font-semibold text-sm truncate">${item.name}</h3><p class="text-secondary text-xs">${item.category}${item.unit?` · ${item.unit}`:''}</p>
+        <div class="flex-1 min-w-0"><h3 class="font-semibold text-sm truncate">${item.name}</h3><p class="text-secondary text-xs">${item.category}${weightLabel}</p>
           <div class="flex items-center justify-between mt-2"><span class="font-bold text-primary-container text-sm">₹${(item.price*item.qty).toFixed(2)}<span class="font-normal text-secondary text-xs ml-1">(₹${item.price} each)</span></span>
-            <div class="flex items-center gap-2 bg-surface-container rounded-full px-2.5 py-1"><button onclick="updateCart('${item.id}',-1)" class="btn text-primary-container"><span class="material-symbols-outlined" style="font-size:14px">remove</span></button><span class="font-bold text-xs">${item.qty}</span><button onclick="updateCart('${item.id}',1)" class="btn text-primary-container"><span class="material-symbols-outlined" style="font-size:14px">add</span></button></div>
+            <div class="flex items-center gap-2 bg-surface-container rounded-full px-2.5 py-1"><button onclick="${updateFn}-1)" class="btn text-primary-container"><span class="material-symbols-outlined" style="font-size:14px">remove</span></button><span class="font-bold text-xs">${item.qty}</span><button onclick="${updateFn}1)" class="btn text-primary-container"><span class="material-symbols-outlined" style="font-size:14px">add</span></button></div>
           </div>
         </div>
-        <button onclick="cart=cart.filter(c=>c.id!=='${item.id}');updateCartBadge();renderCart()" class="p-1.5 text-secondary hover:text-error btn flex-shrink-0"><span class="material-symbols-outlined" style="font-size:18px">delete</span></button>
+        <button onclick="cart=cart.filter(c=>(c.cartKey||c.id)!=='${ck}');updateCartBadge();renderCart()" class="p-1.5 text-secondary hover:text-error btn flex-shrink-0"><span class="material-symbols-outlined" style="font-size:18px">delete</span></button>
       </div>`;
     }).join('');
   }
