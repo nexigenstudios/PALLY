@@ -461,14 +461,14 @@ body{background:var(--cream);color:var(--ink);}
 #pdp{position:fixed;inset:0;z-index:450;display:none;flex-direction:column;justify-content:flex-end;background:rgba(20,28,22,.55);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);opacity:0;transition:opacity .2s;}
 #pdp.open{display:flex;}
 #pdp.show{opacity:1;}
-.pdp-track{display:flex;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scrollbar-width:none;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;height:82vh;max-height:680px;transform:translateY(40px);transition:transform .25s cubic-bezier(.32,1,.23,1);}
+.pdp-track{display:flex;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scrollbar-width:none;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;height:82vh;max-height:680px;transform:translateY(40px);transition:transform .25s cubic-bezier(.32,1,.23,1);touch-action:pan-x;}
 #pdp.show .pdp-track{transform:translateY(0);}
 .pdp-track::-webkit-scrollbar{display:none;}
-.pdp-slide{flex:0 0 100%;height:100%;box-sizing:border-box;padding:0 12px 12px;scroll-snap-align:center;scroll-snap-stop:always;}
-.pdp-sheet-wrap{width:100%;max-width:504px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:0;padding:0 12px 12px;}
+.pdp-slide{flex:0 0 100%;height:100%;box-sizing:border-box;padding:0 12px 12px;scroll-snap-align:center;scroll-snap-stop:always;display:flex;flex-direction:column;}
+.pdp-sheet-wrap{width:100%;max-width:504px;margin:0 auto;display:flex;flex-direction:column;align-items:stretch;gap:0;padding:0 12px 12px;flex:1;min-height:0;}
 .pdp-handle{width:40px;height:4px;border-radius:4px;background:rgba(255,255,255,.55);margin-bottom:8px;flex-shrink:0;}
-.pdp-card{position:relative;height:100%;width:100%;background:#fff;border-radius:24px 24px 20px 20px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 -4px 32px rgba(0,0,0,.18);}
-.pdp-scroll{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;background:#f1f3ef;}
+.pdp-card{position:relative;height:100%;width:100%;background:#fff;border-radius:24px 24px 20px 20px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 -4px 32px rgba(0,0,0,.18);min-height:0;}
+.pdp-scroll{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;background:#f1f3ef;touch-action:pan-y;-webkit-overflow-scrolling:touch;}
 .pdp-hero{position:relative;height:min(32vh,240px);background:#fbfcf8;}
 .pdp-hero img{width:100%;height:100%;object-fit:contain;mix-blend-mode:multiply;}
 .pdp-round{position:absolute;top:12px;width:42px;height:42px;border-radius:50%;border:0;display:grid;place-items:center;background:rgba(255,255,255,.85);color:var(--ink);box-shadow:0 2px 8px rgba(0,0,0,.12);z-index:2;}
@@ -1660,7 +1660,9 @@ function productCard(p, eager) {
     ? cart.filter(c=>c.id===p.id).reduce((s,c)=>s+c.qty,0)
     : (cart.find(c=>c.id===p.id)?.qty||0);
 
-  const priceDisplay=`₹${p.price}${p.unit?` <small>/ ${p.unit}</small>`:''}`;
+  const priceDisplay=p.weightBased
+    ? `₹${p.pricePerKg||p.price}<small> / kg</small>`
+    : `₹${p.price}${p.unit?` <small>/ ${p.unit}</small>`:''}`;
 
   let action;
   if(oos){
@@ -1671,13 +1673,16 @@ function productCard(p, eager) {
         <span class="ss-q">${cartQty}</span>
         <button class="btn" onclick="${p.weightBased?`openProduct('${p.id}')`:`updateCart('${p.id}',1)`}" aria-label="Increase"><span class="material-symbols-outlined" style="font-size:15px;color:white;">${p.weightBased?'add_shopping_cart':'add'}</span></button>
       </div>`;
-  } else {
+  } else if(p.weightBased) {
     action=`<button onclick="event.stopPropagation();openProduct('${p.id}')" class="ss-add-btn btn">+ Add</button>`;
+  } else {
+    action=`<button onclick="event.stopPropagation();addToCart(customProducts.find(x=>x.id==='${p.id}'),null)" class="ss-add-btn btn">+ Add</button>`;
   }
 
   // Weight chips shown between name and bottom bar
-  const weightChips=p.weightBased&&(p.weightOptions||[]).length
-    ?`<div class="ss-weight-chips">${(p.weightOptions).map(w=>`<span class="ss-wchip">${w}</span>`).join('')}</div>`
+  const _wOpts=p.weightBased?(p.weightOptions&&p.weightOptions.length?p.weightOptions:WB_DEFAULT_WEIGHTS):[];
+  const weightChips=_wOpts.length
+    ?`<div class="ss-weight-chips">${_wOpts.map(w=>`<span class="ss-wchip">${w}</span>`).join('')}</div>`
     :'';
 
   return `<article class="ss-product${oos?' ss-oos':''}" onclick="openProduct('${p.id}')">
