@@ -428,6 +428,14 @@ body{background:var(--cream);color:var(--ink);}
 .ss-qty{display:flex;align-items:center;gap:6px;border-radius:30px;background:var(--green);padding:5px 9px;color:#fff;}
 .ss-qty button{color:#fff;display:flex;align-items:center;min-height:0 !important;background:none;border:0;padding:0;cursor:pointer;}
 .ss-qty span.ss-q{font-size:13px;font-weight:800;min-width:14px;text-align:center;}
+/* Card weight chips */
+.ss-wchips{display:flex;flex-wrap:wrap;gap:5px;margin:4px 0 6px;}
+.ss-wchip{border:1.5px solid #d4e8d9;border-radius:20px;padding:4px 10px;font-size:11px;font-weight:700;color:var(--ink);background:#fff;cursor:pointer;transition:all .15s;white-space:nowrap;}
+.ss-wchip.sel{border-color:var(--green);background:#e8f5ec;color:var(--green-dark);}
+/* PDP weight chips inline (below name) */
+.pdp-wchips-name{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0 4px;}
+.pdp-wchip-name{border:2px solid #d4e8d9;border-radius:20px;padding:7px 14px;font-size:13px;font-weight:700;color:var(--ink);background:#fff;cursor:pointer;transition:all .15s;white-space:nowrap;}
+.pdp-wchip-name.sel{border-color:var(--green);background:#e8f5ec;color:var(--green-dark);}
 @media(min-width:760px){
   .ss-product{padding:12px;}
   .ss-product-image{height:165px;}
@@ -1669,30 +1677,94 @@ function renderCategories() {
 }
 
 // ─────────────── PRODUCTS ───────────────
+// Per-card selected weight state (card-level, mirrors PDP state)
+const _cardWeightSel = {};
+function cardSelectWeight(id, w, event) {
+  if(event){event.stopPropagation();}
+  _cardWeightSel[id]=w;
+  // Also sync with PDP weight state
+  _pdpWeightSel[id]=w;
+  // Re-render just the bottom of this card
+  const card=document.querySelector(`.ss-product[data-id="${id}"]`);
+  if(!card)return;
+  const p=customProducts.find(x=>x.id===id); if(!p)return;
+  // Update chip selected states
+  card.querySelectorAll('.ss-wchip').forEach(el=>{
+    el.classList.toggle('sel', el.dataset.w===w);
+  });
+  // Update price
+  const priceEl=card.querySelector('.ss-price');
+  if(priceEl){
+    const price=cardEffectivePrice(p,w);
+    const oos=(p.stock??0)<=0, low=(p.stock??0)<=5&&(p.stock??0)>0&&!oos;
+    priceEl.innerHTML=`₹${price}<small> / ${w}</small>${low?`<div class="ss-low">${p.stock} left!</div>`:''}`;
+  }
+  // Update action button
+  const actWrap=card.querySelector('.ss-card-action');
+  if(actWrap){actWrap.innerHTML=cardActionHtml(p,w);}
+}
+function cardEffectivePrice(p,w){
+  if(!p.weightBased||!p.pricePerKg) return p.price;
+  const selW=w||_cardWeightSel[p.id]||(p.weightOptions&&p.weightOptions[0]);
+  if(!selW)return p.price;
+  return Math.round((p.pricePerKg*woptToGrams(selW)/1000)*100)/100;
+}
+// Safe card-level add: avoids inlining JSON in onclick attributes
+function cardAddWeighted(id, event) {
+  if(event) event.stopPropagation();
+  const p=customProducts.find(x=>x.id===id); if(!p)return;
+  const selW=_cardWeightSel[id]||(p.weightOptions&&p.weightOptions[0]);
+  if(!selW){addToCart(p);return;}
+  const price=cardEffectivePrice(p,selW);
+  const cartKey=id+'__'+selW;
+  addToCart({...p,selectedWeight:selW,price,cartKey,displayName:p.name+' ('+selW+')'});
+}
+function cardActionHtml(p,selW){
+  const oos=(p.stock??0)<=0;
+  if(p.weightBased&&selW){
+    const cartKey=p.id+'__'+selW;
+    const ex=cart.find(c=>c.cartKey===cartKey);
+    const qty=ex?ex.qty:0;
+    if(oos) return `<button disabled class="ss-add-btn">Unavailable</button>`;
+    if(qty>0) return `<div class="ss-qty">
+      <button class="btn" onclick="event.stopPropagation();updateCartByKey('${cartKey}',-1);renderProducts();renderHomeProducts();" aria-label="Decrease"><span class="material-symbols-outlined" style="font-size:15px;color:white;">remove</span></button>
+      <span class="ss-q">${qty}</span>
+      <button class="btn" onclick="event.stopPropagation();updateCartByKey('${cartKey}',1);renderProducts();renderHomeProducts();" aria-label="Increase"><span class="material-symbols-outlined" style="font-size:15px;color:white;">add</span></button>
+    </div>`;
+    return `<button onclick="cardAddWeighted('${p.id}',event)" class="ss-add-btn btn">+ Add</button>`;
+  }
+  const inCart=cart.find(c=>c.id===p.id&&!c.selectedWeight); const qty=inCart?inCart.qty:0;
+  if(oos) return `<button disabled class="ss-add-btn">Unavailable</button>`;
+  if(qty>0) return `<div class="ss-qty">
+    <button class="btn" onclick="event.stopPropagation();updateCart('${p.id}',-1)" aria-label="Decrease"><span class="material-symbols-outlined" style="font-size:15px;color:white;">remove</span></button>
+    <span class="ss-q">${qty}</span>
+    <button class="btn" onclick="event.stopPropagation();updateCart('${p.id}',1)" aria-label="Increase"><span class="material-symbols-outlined" style="font-size:15px;color:white;">add</span></button>
+  </div>`;
+  return `<button onclick="event.stopPropagation();addToCart(customProducts.find(x=>x.id==='${p.id}'))" class="ss-add-btn btn">+ Add</button>`;
+}
 function productCard(p, eager) {
-  const inCart=cart.find(c=>c.id===p.id); const qty=inCart?inCart.qty:0;
   const fallback=catFallback(p.category); const src=p.imageUrl||fallback;
   const oos=(p.stock??0)<=0;
   const low=(p.stock??0)<=5&&(p.stock??0)>0&&!oos;
-  const action=!oos&&qty>0
-    ?`<div class="ss-qty">
-        <button class="btn" onclick="updateCart('${p.id}',-1)" aria-label="Decrease"><span class="material-symbols-outlined" style="font-size:15px;color:white;">remove</span></button>
-        <span class="ss-q">${qty}</span>
-        <button class="btn" onclick="updateCart('${p.id}',1)" aria-label="Increase"><span class="material-symbols-outlined" style="font-size:15px;color:white;">add</span></button>
-      </div>`
-    :oos
-      ?`<button disabled class="ss-add-btn">Unavailable</button>`
-      :`<button onclick='addToCart(${JSON.stringify(p)})' class="ss-add-btn btn">+ Add</button>`;
+  const isWB=p.weightBased&&p.weightOptions&&p.weightOptions.length>0;
+  const selW=isWB?(_cardWeightSel[p.id]||_pdpWeightSel[p.id]||p.weightOptions[0]):null;
+  if(isWB&&!_cardWeightSel[p.id])_cardWeightSel[p.id]=selW;
 
-  return `<article class="ss-product${oos?' ss-oos':''}" onclick="openProduct('${p.id}')">
+  const displayPrice=isWB?cardEffectivePrice(p,selW):p.price;
+  const priceUnit=isWB?selW:p.unit;
+  const wchipsHtml=isWB?`<div class="ss-wchips" onclick="event.stopPropagation()">${p.weightOptions.map(w=>`<button class="ss-wchip btn${(_cardWeightSel[p.id]||p.weightOptions[0])===w?' sel':''}" data-w="${w}" onclick="cardSelectWeight('${p.id}','${w}',event)">${w}</button>`).join('')}</div>`:'';
+  const action=cardActionHtml(p,selW);
+
+  return `<article class="ss-product${oos?' ss-oos':''}" data-id="${p.id}" onclick="openProduct('${p.id}')">
     <div class="ss-product-image">
       <img src="${src}" alt="${p.name}" loading="${eager?'eager':'lazy'}" decoding="async"${eager?' fetchpriority="high"':''} onerror="this.onerror=null;this.src='${fallback}'">
       ${oos?`<span class="ss-fresh ss-fresh-oos">Out of Stock</span>`:`<span class="ss-fresh">✓ ${p.badge||'Fresh'}</span>`}
     </div>
     <h3>${p.name}</h3>
+    ${wchipsHtml}
     <div class="ss-product-bottom">
-      <div class="ss-price">₹${p.price}${p.unit?` <small>/ ${p.unit}</small>`:''}${low?`<div class="ss-low">${p.stock} left!</div>`:''}</div>
-      <div style="display:contents" onclick="event.stopPropagation()">${action}</div>
+      <div class="ss-price">₹${displayPrice}${priceUnit?` <small>/ ${priceUnit}</small>`:''}${low?`<div class="ss-low">${p.stock} left!</div>`:''}</div>
+      <div class="ss-card-action" onclick="event.stopPropagation()">${action}</div>
     </div>
   </article>`;
 }
@@ -1752,11 +1824,12 @@ function pdpEffectivePrice(p){
 // Select a weight option for a product and re-render
 function pdpSelectWeight(id,w){
   _pdpWeightSel[id]=w;
+  _cardWeightSel[id]=w;
   pdpRefreshBar(id);
-  // Re-render weight chips
+  // Re-render weight chips in PDP
   const chips=document.getElementById('pdp-wchips-'+id);
   if(chips){
-    chips.querySelectorAll('.pdp-wchip').forEach(el=>{
+    chips.querySelectorAll('.pdp-wchip,.pdp-wchip-name').forEach(el=>{
       el.classList.toggle('sel',el.dataset.w===w);
     });
   }
@@ -1766,6 +1839,22 @@ function pdpSelectWeight(id,w){
     const p=pdpProduct(id); if(!p)return;
     const price=pdpEffectivePrice(p);
     priceEl.textContent='₹'+price;
+  }
+  // Sync back to product card chips
+  const card=document.querySelector(`.ss-product[data-id="${id}"]`);
+  if(card){
+    card.querySelectorAll('.ss-wchip').forEach(el=>{
+      el.classList.toggle('sel',el.dataset.w===w);
+    });
+    const priceElCard=card.querySelector('.ss-price');
+    const p=pdpProduct(id);
+    if(priceElCard&&p){
+      const price=cardEffectivePrice(p,w);
+      const oos=(p.stock??0)<=0, low=(p.stock??0)<=5&&(p.stock??0)>0&&!oos;
+      priceElCard.innerHTML=`₹${price}<small> / ${w}</small>${low?`<div class="ss-low">${p.stock} left!</div>`:''}`;
+    }
+    const actWrap=card.querySelector('.ss-card-action');
+    if(actWrap&&p){actWrap.innerHTML=cardActionHtml(p,w);}
   }
 }
 function pdpBarHtml(p){
@@ -1797,14 +1886,13 @@ function pdpSlideHtml(p){
         <h2 class="pdp-name">${_pa(p.name)}</h2>
         ${p.desc?`<p class="pdp-desc">${escapeHtml(p.desc)}</p>`:''}
         <div class="pdp-meta"><span><span class="star">★</span> ${p.rating||4.5}</span>${low?`<span class="pdp-low">Only ${stock} left</span>`:''}</div>
-        ${p.unit?`<div class="pdp-label">Quantity: ${_pa(p.unit)}</div><span class="pdp-chip">${_pa(p.unit)}</span>`:''}
         ${p.weightBased&&p.weightOptions&&p.weightOptions.length?`
-          <div class="pdp-label" style="margin-top:14px;">Select Weight</div>
-          <div class="pdp-wchips" id="pdp-wchips-${p.id}">${p.weightOptions.map((w,i)=>{
+          <div class="pdp-wchips-name" id="pdp-wchips-${p.id}">${p.weightOptions.map((w,i)=>{
             const sel=(_pdpWeightSel[p.id]||p.weightOptions[0])===w;
             const price=Math.round((p.pricePerKg*woptToGrams(w)/1000)*100)/100;
-            return `<button class="pdp-wchip btn${sel?' sel':''}" data-w="${w}" onclick="pdpSelectWeight('${p.id}','${w}')">${w}<span style="display:block;font-size:11px;font-weight:600;color:#5a7a62;">₹${price}</span></button>`;
+            return `<button class="pdp-wchip-name btn${sel?' sel':''}" data-w="${w}" onclick="pdpSelectWeight('${p.id}','${w}')">${w}</button>`;
           }).join('')}</div>`:''}
+        ${p.unit?`<div class="pdp-label">Quantity: ${_pa(p.unit)}</div><span class="pdp-chip">${_pa(p.unit)}</span>`:''}
       </div>
     </div>
     <div class="pdp-bar" id="pdp-bar-${p.id}">${pdpBarHtml(p)}</div>
