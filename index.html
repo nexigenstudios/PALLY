@@ -1684,24 +1684,24 @@ function cardSelectWeight(id, w, event) {
   _cardWeightSel[id]=w;
   // Also sync with PDP weight state
   _pdpWeightSel[id]=w;
-  // Re-render just the bottom of this card
-  const card=document.querySelector(`.ss-product[data-id="${id}"]`);
-  if(!card)return;
+  // Re-render ALL card instances with this product ID (home grid + categories grid)
   const p=customProducts.find(x=>x.id===id); if(!p)return;
-  // Update chip selected states
-  card.querySelectorAll('.ss-wchip').forEach(el=>{
-    el.classList.toggle('sel', el.dataset.w===w);
+  document.querySelectorAll(`.ss-product[data-id="${id}"]`).forEach(card=>{
+    // Update chip selected states
+    card.querySelectorAll('.ss-wchip').forEach(el=>{
+      el.classList.toggle('sel', el.dataset.w===w);
+    });
+    // Update price
+    const priceEl=card.querySelector('.ss-price');
+    if(priceEl){
+      const price=cardEffectivePrice(p,w);
+      const oos=(p.stock??0)<=0, low=(p.stock??0)<=5&&(p.stock??0)>0&&!oos;
+      priceEl.innerHTML=`₹${price}<small> / ${w}</small>${low?`<div class="ss-low">${p.stock} left!</div>`:''}`;
+    }
+    // Update action button
+    const actWrap=card.querySelector('.ss-card-action');
+    if(actWrap){actWrap.innerHTML=cardActionHtml(p,w);}
   });
-  // Update price
-  const priceEl=card.querySelector('.ss-price');
-  if(priceEl){
-    const price=cardEffectivePrice(p,w);
-    const oos=(p.stock??0)<=0, low=(p.stock??0)<=5&&(p.stock??0)>0&&!oos;
-    priceEl.innerHTML=`₹${price}<small> / ${w}</small>${low?`<div class="ss-low">${p.stock} left!</div>`:''}`;
-  }
-  // Update action button
-  const actWrap=card.querySelector('.ss-card-action');
-  if(actWrap){actWrap.innerHTML=cardActionHtml(p,w);}
 }
 function cardEffectivePrice(p,w){
   if(!p.weightBased||!p.pricePerKg) return p.price;
