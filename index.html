@@ -421,7 +421,9 @@ body{background:var(--cream);color:var(--ink);}
 .ss-product h3{font-size:13px;font-weight:700;margin:12px 2px 7px;line-height:1.3;color:var(--ink);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
 .ss-product-bottom{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-top:auto;}
 .ss-weight-chips{display:flex;flex-wrap:wrap;gap:4px;margin:0 2px 7px;}
-.ss-wchip{font-size:10px;font-weight:700;color:var(--green-dark);background:#e8f5e9;border-radius:20px;padding:2px 7px;white-space:nowrap;}
+.ss-wchip{font-size:10px;font-weight:700;color:var(--green-dark);background:#e8f5e9;border-radius:20px;padding:4px 9px;white-space:nowrap;border:1.5px solid transparent;cursor:pointer;transition:background .12s,border-color .12s,color .12s;}
+.ss-wchip.active{background:var(--green);color:#fff;border-color:var(--green);}
+.ss-wchip:hover:not(.active){border-color:var(--green);}
 .ss-price{font-size:17px;font-weight:800;color:var(--green-dark);white-space:nowrap;}
 .ss-price small{color:var(--muted);font-size:12px;font-weight:500;}
 .ss-low{font-size:10px;color:#dc2626;font-weight:700;margin-top:2px;}
@@ -1652,40 +1654,75 @@ function renderCategories() {
 }
 
 // ─────────────── PRODUCTS ───────────────
+// Per-card selected weight state (card-level, independent of PDP)
+var cardSelectedWeights={};
+
+function cardSelectWeight(pid, w, event) {
+  if(event){event.stopPropagation();}
+  cardSelectedWeights[pid]=w;
+  // Re-render only the affected card in whichever grid it lives in
+  ['home-products','products-grid'].forEach(function(gid){
+    var grid=document.getElementById(gid); if(!grid)return;
+    var art=grid.querySelector('article[data-pid="'+pid+'"]'); if(!art)return;
+    var p=customProducts.find(function(x){return x.id===pid;}); if(!p)return;
+    var eager=gid==='home-products';
+    art.outerHTML=productCard(p,eager);
+  });
+}
+
 function productCard(p, eager) {
   const oos=(p.stock??0)<=0;
   const low=(p.stock??0)<=5&&(p.stock??0)>0&&!oos;
   const fallback=catFallback(p.category); const src=p.imageUrl||fallback;
+
+  // Weight-based: determine the selected weight for this card
+  const _wOpts=p.weightBased?(p.weightOptions&&p.weightOptions.length?p.weightOptions:WB_DEFAULT_WEIGHTS):[];
+  const selW=p.weightBased?(cardSelectedWeights[p.id]||_wOpts[0]||null):null;
+  const cartKey=p.weightBased?(p.id+'::'+(selW||'')):p.id;
+
   const cartQty=p.weightBased
-    ? cart.filter(c=>c.id===p.id).reduce((s,c)=>s+c.qty,0)
+    ? (cart.find(c=>c.cartKey===cartKey)?.qty||0)
     : (cart.find(c=>c.id===p.id)?.qty||0);
 
-  const priceDisplay=p.weightBased
-    ? `₹${p.pricePerKg||p.price}<small> / kg</small>`
-    : `₹${p.price}${p.unit?` <small>/ ${p.unit}</small>`:''}`;
+  // Price display: for weighted, show price for the selected/cheapest weight (not per-kg)
+  let priceDisplay;
+  if(p.weightBased && selW){
+    const wPrice=calcWeightPrice(p.pricePerKg||p.price, selW);
+    const pStr=wPrice%1===0?String(wPrice):wPrice.toFixed(2);
+    priceDisplay=`₹${pStr}<small> / ${selW}</small>`;
+  } else {
+    priceDisplay=`₹${p.price}${p.unit?` <small>/ ${p.unit}</small>`:''}`;
+  }
 
   let action;
   if(oos){
     action=`<button disabled class="ss-add-btn">Unavailable</button>`;
-  } else if(cartQty>0){
+  } else if(cartQty>0 && p.weightBased){
+    // Show stepper for the selected weight
     action=`<div class="ss-qty">
-        <button class="btn" onclick="updateCart('${p.weightBased?p.id+'::'+cart.find(c=>c.id===p.id)?.selectedWeight:p.id}',-1)" aria-label="Decrease"><span class="material-symbols-outlined" style="font-size:15px;color:white;">remove</span></button>
+        <button class="btn" onclick="updateCart('${p.id+'::'+(selW||'')}', -1)" aria-label="Decrease"><span class="material-symbols-outlined" style="font-size:15px;color:white;">remove</span></button>
         <span class="ss-q">${cartQty}</span>
-        <button class="btn" onclick="${p.weightBased?`openProduct('${p.id}')`:`updateCart('${p.id}',1)`}" aria-label="Increase"><span class="material-symbols-outlined" style="font-size:15px;color:white;">${p.weightBased?'add_shopping_cart':'add'}</span></button>
+        <button class="btn" onclick="event.stopPropagation();addToCart(customProducts.find(x=>x.id==='${p.id}'),'${selW||''}')" aria-label="Increase"><span class="material-symbols-outlined" style="font-size:15px;color:white;">add</span></button>
       </div>`;
-  } else if(p.weightBased) {
-    action=`<button onclick="event.stopPropagation();openProduct('${p.id}')" class="ss-add-btn btn">+ Add</button>`;
+  } else if(cartQty>0 && !p.weightBased){
+    action=`<div class="ss-qty">
+        <button class="btn" onclick="updateCart('${p.id}',-1)" aria-label="Decrease"><span class="material-symbols-outlined" style="font-size:15px;color:white;">remove</span></button>
+        <span class="ss-q">${cartQty}</span>
+        <button class="btn" onclick="updateCart('${p.id}',1)" aria-label="Increase"><span class="material-symbols-outlined" style="font-size:15px;color:white;">add</span></button>
+      </div>`;
+  } else if(p.weightBased){
+    // Direct add to cart with selected weight — no PDP needed
+    action=`<button onclick="event.stopPropagation();addToCart(customProducts.find(x=>x.id==='${p.id}'),'${selW||''}')" class="ss-add-btn btn">+ Add</button>`;
   } else {
     action=`<button onclick="event.stopPropagation();addToCart(customProducts.find(x=>x.id==='${p.id}'),null)" class="ss-add-btn btn">+ Add</button>`;
   }
 
-  // Weight chips shown between name and bottom bar
-  const _wOpts=p.weightBased?(p.weightOptions&&p.weightOptions.length?p.weightOptions:WB_DEFAULT_WEIGHTS):[];
+  // Interactive weight chips
   const weightChips=_wOpts.length
-    ?`<div class="ss-weight-chips">${_wOpts.map(w=>`<span class="ss-wchip">${w}</span>`).join('')}</div>`
+    ?`<div class="ss-weight-chips" onclick="event.stopPropagation()">${_wOpts.map(w=>`<button class="ss-wchip btn${w===selW?' active':''}" onclick="cardSelectWeight('${p.id}','${w}',event)">${w}</button>`).join('')}</div>`
     :'';
 
-  return `<article class="ss-product${oos?' ss-oos':''}" onclick="openProduct('${p.id}')">
+  return `<article class="ss-product${oos?' ss-oos':''}" data-pid="${p.id}" onclick="openProduct('${p.id}')">
     <div class="ss-product-image">
       <img src="${src}" alt="${p.name}" loading="${eager?'eager':'lazy'}" decoding="async"${eager?' fetchpriority="high"':''} onerror="this.onerror=null;this.src='${fallback}'">
       ${oos?`<span class="ss-fresh ss-fresh-oos">Out of Stock</span>`:`<span class="ss-fresh">✓ ${p.badge||'Fresh'}</span>`}
