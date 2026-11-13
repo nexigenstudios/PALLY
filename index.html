@@ -1024,17 +1024,24 @@ let customProducts = [], cart = [], orders = [], allHostels = [], allPickupPoint
 let rawProducts = [];
 let hiddenCategoryNames = new Set();
 // ── Fruit pre-order window (admin sets it in settings/preorder) ──
-// While open: fruits show, with no stock limit. After closing time: fruits are hidden.
-let preorderKnown = false; // fruits stay hidden until the pre-order window state is known
-let preorder = { open:false, closesAt:0, windowId:'', categories:['Fruits'] };
-function isPreorderCat(c){ return (preorder.categories||['Fruits']).includes(c); }
+// While open: selected products/categories show with no stock limit. After closing time they are hidden.
+let preorderKnown = false; // products stay hidden until the pre-order window state is known
+let preorder = { open:false, closesAt:0, windowId:'', mode:'categories', products:[], categories:[], catNames:['Fruits'] };
+// catNames is derived: category names matching the selected category IDs, used for name-based checks
+function _poIsPreorderProduct(p){
+  if(!preorder.open) return false;
+  if(preorder.mode==='products') return (preorder.products||[]).includes(p.id);
+  // mode='categories': match by category name against catNames (resolved from category IDs)
+  return (preorder.catNames||[]).includes(p.category);
+}
+function isPreorderCat(catName){ return (preorder.catNames||['Fruits']).includes(catName); }
 function preorderOpen(){ return preorderKnown && !!preorder.open && (!preorder.closesAt || Date.now() < preorder.closesAt); }
 function applyProductVisibility(){
   if(!preorderKnown) return; // wait — preorder listener will call refreshPreorderUI once state is known
   const po = preorderOpen();
   customProducts = rawProducts
-    .filter(p => !p.hidden && !hiddenCategoryNames.has(p.category) && (po || !isPreorderCat(p.category)))
-    .map(p => isPreorderCat(p.category) ? {...p, stock:9999, preorder:true} : p);
+    .filter(p => !p.hidden && (po && _poIsPreorderProduct(p) || !hiddenCategoryNames.has(p.category)) && (po || !_poIsPreorderProduct(p)))
+    .map(p => _poIsPreorderProduct(p) ? {...p, stock:9999, preorder:true} : p);
 }
 function refreshPreorderUI(){
   applyProductVisibility();
@@ -1052,14 +1059,32 @@ function renderPreorderBanner(){
   if(!preorderOpen()){el.style.display='none';el.innerHTML='';return;}
   const d=preorder.closesAt?new Date(preorder.closesAt).toLocaleString('en-IN',{weekday:'short',day:'numeric',month:'short',hour:'numeric',minute:'2-digit'}):'';
   el.style.display='block';
-  el.innerHTML=`<div style="display:flex;align-items:flex-start;gap:12px;padding:12px 16px;background:#fff;border:1px solid #dde2d8;border-left:3px solid #176b35;border-radius:8px;color:#1f2937;font-size:13px;line-height:1.45"><span class="material-symbols-outlined" style="font-size:20px;color:#176b35;margin-top:1px">schedule</span><div><div style="font-weight:700">Fruit pre-order open</div><div style="color:#555f6f">${d?`Order before ${d}. `:''}Fruits are delivered after ordering closes.</div></div></div>`;
+  const what=preorder.mode==='products'?'Selected items are':'Pre-order is';
+  const subject=preorder.mode==='categories'&&preorder.catNames.length?preorder.catNames.join(', ')+' are':'Items are';
+  el.innerHTML=`<div style="display:flex;align-items:flex-start;gap:12px;padding:12px 16px;background:#fff;border:1px solid #dde2d8;border-left:3px solid #176b35;border-radius:8px;color:#1f2937;font-size:13px;line-height:1.45"><span class="material-symbols-outlined" style="font-size:20px;color:#176b35;margin-top:1px">schedule</span><div><div style="font-weight:700">Pre-order open</div><div style="color:#555f6f">${d?`Order before ${d}. `:''}${subject} delivered after ordering closes.</div></div></div>`;
 }
 function subscribePreorder(){
   try{
     const{db,doc,onSnapshot}=window._fb;
     onSnapshot(doc(db,'settings','preorder'),snap=>{
       const d=snap.exists()?snap.data():{};
-      preorder={open:!!d.open,closesAt:Number(d.closesAt)||0,windowId:d.windowId||'',categories:Array.isArray(d.categories)&&d.categories.length?d.categories:['Fruits']};
+      const mode=d.mode||'categories';
+      const products=Array.isArray(d.products)?d.products:[];
+      const catIds=Array.isArray(d.categories)?d.categories:[];
+      // Resolve category IDs → names using storeCategories (populated by subscribeCategories)
+      // Fall back to 'Fruits' name if no match found (backwards compat with old format)
+      let catNames;
+      if(mode==='categories'){
+        if(catIds.length&&storeCategories&&storeCategories.length){
+          catNames=storeCategories.filter(c=>catIds.includes(c.id)).map(c=>c.name);
+          if(!catNames.length) catNames=catIds; // catIds might already be names in old data
+        } else {
+          catNames=catIds.length?catIds:['Fruits']; // old format stored names directly
+        }
+      } else {
+        catNames=[];
+      }
+      preorder={open:!!d.open,closesAt:Number(d.closesAt)||0,windowId:d.windowId||'',mode,products,categories:catIds,catNames};
       preorderKnown=true; saveVisCache();
       refreshPreorderUI();
     },e=>console.error('Preorder listener:',e));
@@ -1573,7 +1598,13 @@ function subscribeCategories() {
         const cats=Array.isArray(list)?list:(snap.exists()?[]:DEFAULT_STORE_CATEGORIES);
         const validCats=[...cats].filter(c=>c&&c.name);
         hiddenCategoryNames=new Set(validCats.filter(c=>c.hidden).map(c=>c.name));
-        storeCategories=validCats.filter(c=>!c.hidden).sort((a,b)=>(a.sortOrder??99)-(b.sortOrder??99));
+        // Re-resolve preorder catNames now that storeCategories is known/updated
+        if(preorderKnown && preorder.mode==='categories' && preorder.categories.length){
+          const resolved=validCats.filter(c=>preorder.categories.includes(c.id)).map(c=>c.name);
+          if(resolved.length) preorder.catNames=resolved;
+        }
+        // Keep preorder categories in storeCategories even if hidden — renderCategories filters them by preorderOpen()
+        storeCategories=validCats.filter(c=>!c.hidden||isPreorderCat(c.name)).sort((a,b)=>(a.sortOrder??99)-(b.sortOrder??99));
         applyProductVisibility(); // category hide/show changes which products are visible
         saveVisCache();
         renderCategories();
@@ -1946,8 +1977,18 @@ async function placeOrder() {
       const poSnap=await txn.get(doc(db,'settings','preorder'));
       const poD=poSnap.exists()?poSnap.data():{};
       const poOpen=!!poD.open&&(!poD.closesAt||Date.now()<poD.closesAt);
-      const poCats=Array.isArray(poD.categories)&&poD.categories.length?poD.categories:['Fruits'];
-      const isPre=cart.map((c,i)=>productSnaps[i].exists()&&poCats.includes(productSnaps[i].data().category));
+      const poMode=poD.mode||'categories';
+      const poProductIds=Array.isArray(poD.products)?poD.products:[];
+      const poCatIds=Array.isArray(poD.categories)?poD.categories:[];
+      // Resolve category IDs → names for category-mode check
+      const poCatNames=poMode==='categories'&&poCatIds.length
+        ?storeCategories.filter(c=>poCatIds.includes(c.id)).map(c=>c.name)
+        :poCatIds; // fallback: old format stored names directly
+      const isPre=cart.map((c,i)=>{
+        if(!productSnaps[i].exists()) return false;
+        if(poMode==='products') return poProductIds.includes(c.id);
+        return poCatNames.length?poCatNames.includes(productSnaps[i].data().category):['Fruits'].includes(productSnaps[i].data().category);
+      });
 
       // ── VALIDATE STOCK ──
       for(let i=0;i<cart.length;i++){
