@@ -2190,7 +2190,7 @@ async function placeOrder() {
       // 1. Create the order
       txn.set(orderRef,{
         orderId, userId:user.uid, userEmail:user.email,
-        items:cart.map((i,k)=>({id:i.id,name:i.name,price:i.price,qty:i.qty,unit:i.unit||'',category:i.category||'',imageUrl:i.imageUrl||'',preorder:!!isPre[k]})),
+        items:cart.map((i,k)=>({id:i.id,name:i.name,price:i.price,qty:i.qty,unit:i.selectedWeight||i.unit||'',category:i.category||'',imageUrl:i.imageUrl||'',preorder:!!isPre[k]})),
         preorder:isPre.some(Boolean), preorderWindowId:isPre.some(Boolean)?(poD.windowId||''):'',
         total, status:'Pending', name, phone, notes, payment,
         deliveryMode: 'pickup',
