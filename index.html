@@ -1359,17 +1359,24 @@ let preorder = { open:false, closesAt:0, windowId:'', mode:'categories', product
 function _poIsPreorderProduct(p){
   if(!preorder.open) return false;
   if(preorder.mode==='products') return (preorder.products||[]).includes(p.id);
-  // mode='categories': match by category name against catNames (resolved from category IDs)
-  return (preorder.catNames||[]).includes(p.category);
+  // mode='categories': match by resolved name OR raw category ID (fallback before categories load)
+  if((preorder.catNames||[]).includes(p.category)) return true;
+  if((preorder.categories||[]).includes(p.category)) return true;
+  return false;
 }
 function isPreorderCat(catName){ return (preorder.catNames||['Fruits']).includes(catName); }
 function preorderOpen(){ return preorderKnown && !!preorder.open && (!preorder.closesAt || Date.now() < preorder.closesAt); }
 function applyProductVisibility(){
   if(!preorderKnown) return; // wait — preorder listener will call refreshPreorderUI once state is known
   const po = preorderOpen();
-  customProducts = rawProducts
-    .filter(p => !p.hidden && (po && _poIsPreorderProduct(p) || !hiddenCategoryNames.has(p.category)) && (po || !_poIsPreorderProduct(p)))
-    .map(p => _poIsPreorderProduct(p) ? {...p, stock:9999, preorder:true} : p);
+  customProducts = rawProducts.reduce((acc,p)=>{
+    if(p.hidden) return acc;
+    const isPo = po && _poIsPreorderProduct(p);
+    if(!isPo && hiddenCategoryNames.has(p.category)) return acc;
+    if(!po && _poIsPreorderProduct(p)) return acc;
+    acc.push(isPo ? {...p, stock:9999, preorder:true} : p);
+    return acc;
+  },[]);
 }
 function refreshPreorderUI(){
   applyProductVisibility();
@@ -1406,6 +1413,12 @@ function subscribePreorder(){
         if(catIds.length&&storeCategories&&storeCategories.length){
           catNames=storeCategories.filter(c=>catIds.includes(c.id)).map(c=>c.name);
           if(!catNames.length) catNames=catIds; // catIds might already be names in old data
+        } else if(catIds.length&&(!storeCategories||!storeCategories.length)){
+          // storeCategories not loaded yet — preserve existing catNames if windowId matches,
+          // otherwise fall back to raw IDs (subscribeCategories will re-resolve shortly)
+          catNames=(preorder.windowId===d.windowId&&preorder.catNames&&preorder.catNames.length)
+            ? preorder.catNames
+            : catIds;
         } else {
           catNames=catIds.length?catIds:['Fruits']; // old format stored names directly
         }
@@ -1675,7 +1688,7 @@ function subscribeProducts() {
         productsLoaded=true;
         saveProductsCache();
         if(cart.length){ // refresh saved cart with latest price/stock; drop removed or sold-out items
-          cart=cart.map(ci=>{const lp=customProducts.find(x=>x.id===ci.id);if(!lp)return null;const st=lp.stock??0;if(st<=0)return null;const{createdAt,updatedAt,...fresh}=lp;return{...ci,...fresh,qty:Math.min(ci.qty,st)};}).filter(Boolean);
+          cart=cart.map(ci=>{const lp=customProducts.find(x=>x.id===ci.id);if(!lp)return null;const st=lp.stock??0;if(st<=0&&!lp.preorder)return null;const{createdAt,updatedAt,...fresh}=lp;return{...ci,...fresh,qty:lp.preorder?ci.qty:Math.min(ci.qty,st)};}).filter(Boolean);
           updateCartBadge();
         }
         const cnt=document.getElementById('home-product-count');
@@ -2012,7 +2025,7 @@ function cardSelectWeight(id, w, event) {
     const priceEl=card.querySelector('.ss-price');
     if(priceEl){
       const price=cardEffectivePrice(p,w);
-      const oos=(p.stock??0)<=0, low=(p.stock??0)<=5&&(p.stock??0)>0&&!oos;
+      const oos=!p.preorder&&(p.stock??0)<=0, low=!p.preorder&&(p.stock??0)<=5&&(p.stock??0)>0&&!oos;
       priceEl.innerHTML=`₹${price}<small> / ${w}</small>${low?`<div class="ss-low">${p.stock} left!</div>`:''}`;
     }
     // Update action button
@@ -2037,7 +2050,7 @@ function cardAddWeighted(id, event) {
   addToCart({...p,selectedWeight:selW,price,cartKey,displayName:p.name+' ('+selW+')'});
 }
 function cardActionHtml(p,selW){
-  const oos=(p.stock??0)<=0;
+  const oos=!p.preorder&&(p.stock??0)<=0;
   if(p.weightBased&&selW){
     const cartKey=p.id+'__'+selW;
     const ex=cart.find(c=>c.cartKey===cartKey);
@@ -2061,8 +2074,8 @@ function cardActionHtml(p,selW){
 }
 function productCard(p, eager) {
   const fallback=catFallback(p.category); const src=p.imageUrl||fallback;
-  const oos=(p.stock??0)<=0;
-  const low=(p.stock??0)<=5&&(p.stock??0)>0&&!oos;
+  const oos=!p.preorder&&(p.stock??0)<=0;
+  const low=!p.preorder&&(p.stock??0)<=5&&(p.stock??0)>0&&!oos;
   const isWB=p.weightBased&&p.weightOptions&&p.weightOptions.length>0;
   const selW=isWB?(_cardWeightSel[p.id]||_pdpWeightSel[p.id]||p.weightOptions[0]):null;
   if(isWB&&!_cardWeightSel[p.id])_cardWeightSel[p.id]=selW;
@@ -2314,7 +2327,7 @@ function pdpSelectWeight(id,w){
     const p=pdpProduct(id);
     if(priceElCard&&p){
       const price=cardEffectivePrice(p,w);
-      const oos=(p.stock??0)<=0, low=(p.stock??0)<=5&&(p.stock??0)>0&&!oos;
+      const oos=!p.preorder&&(p.stock??0)<=0, low=!p.preorder&&(p.stock??0)<=5&&(p.stock??0)>0&&!oos;
       priceElCard.innerHTML=`₹${price}<small> / ${w}</small>${low?`<div class="ss-low">${p.stock} left!</div>`:''}`;
     }
     const actWrap=card.querySelector('.ss-card-action');
@@ -2322,7 +2335,7 @@ function pdpSelectWeight(id,w){
   }
 }
 function pdpBarHtml(p){
-  const stock=p.stock??0, oos=stock<=0;
+  const stock=p.stock??0, oos=!p.preorder&&stock<=0;
   const selW=p.weightBased?(_pdpWeightSel[p.id]||(p.weightOptions&&p.weightOptions[0])):null;
   // For weight-based, match cart by id+weight combo key; otherwise plain id
   const cartKey=p.weightBased&&selW?p.id+'__'+selW:p.id;
@@ -2338,7 +2351,7 @@ function pdpBarHtml(p){
     <div class="pdp-bar-price" id="pdp-wprice-${p.id}">₹${price}${off?`<s>₹${p.mrp}</s><span class="pdp-off">${off}% OFF</span>`:''}</div></div>${act}`;
 }
 function pdpSlideHtml(p){
-  const fb=catFallback(p.category), src=p.imageUrl||fb, stock=p.stock??0, oos=stock<=0, low=!oos&&stock<=5;
+  const fb=catFallback(p.category), src=p.imageUrl||fb, stock=p.stock??0, oos=!p.preorder&&stock<=0, low=!oos&&stock<=5;
   return `<div class="pdp-slide" data-id="${p.id}"><div class="pdp-card">
     <button class="pdp-round" style="left:12px" onclick="closeProduct()" aria-label="Close"><span class="material-symbols-outlined">keyboard_arrow_down</span></button>
     <button class="pdp-round" style="right:12px" onclick="pdpShare('${p.id}')" aria-label="Share"><span class="material-symbols-outlined" style="font-size:22px">ios_share</span></button>
@@ -2445,12 +2458,12 @@ function addToCart(p) {
   // Get latest stock from customProducts (updated in real-time)
   const latest=customProducts.find(x=>x.id===p.id)||p;
   const available=latest.stock??0;
-  if(available<=0){showToast(p.name+' is out of stock');return;}
+  if(!latest.preorder&&available<=0){showToast(p.name+' is out of stock');return;}
   // For weight-based, use cartKey; otherwise id
   const key=p.cartKey||p.id;
   const ex=cart.find(c=>(c.cartKey||c.id)===key);
   const currentQty=ex?ex.qty:0;
-  if(currentQty>=available){showToast('Only '+available+' in stock for '+p.name);return;}
+  if(!latest.preorder&&currentQty>=available){showToast('Only '+available+' in stock for '+p.name);return;}
   if(ex)ex.qty++; else cart.push({...p,qty:1,cartKey:key});
   updateCartBadge(); renderCart();
   if(currentPage==='browse')renderProducts();
@@ -2463,7 +2476,7 @@ function updateCart(id,delta) {
   if(delta>0){
     const latest=customProducts.find(x=>x.id===id);
     const available=latest?.stock??0;
-    if(item.qty>=available){showToast('Only '+available+' available for '+item.name);return;}
+    if(!latest?.preorder&&item.qty>=available){showToast('Only '+available+' available for '+item.name);return;}
   }
   item.qty+=delta; if(item.qty<=0)cart=cart.filter(c=>(c.cartKey||c.id)!==id||c.selectedWeight);
   updateCartBadge(); renderCart();
@@ -2476,7 +2489,7 @@ function updateCartByKey(cartKey,delta) {
   if(delta>0){
     const latest=customProducts.find(x=>x.id===item.id);
     const available=latest?.stock??0;
-    if(item.qty>=available){showToast('Only '+available+' available for '+item.name);return;}
+    if(!latest?.preorder&&item.qty>=available){showToast('Only '+available+' available for '+item.name);return;}
   }
   item.qty+=delta; if(item.qty<=0)cart=cart.filter(c=>(c.cartKey||c.id)!==cartKey);
   updateCartBadge(); renderCart();
