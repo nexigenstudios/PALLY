@@ -540,7 +540,6 @@ body{background:#fff;color:var(--ink);}
   min-width:0;
   display:flex;
   flex-direction:column;
-  overflow:hidden;
   transition:box-shadow .18s, transform .18s;
 }
 .ss-product:hover{
@@ -549,7 +548,7 @@ body{background:#fff;color:var(--ink);}
 }
 .ss-product-image{
   height:130px;
-  border-radius:0;
+  border-radius:16px 16px 0 0;
   background:#f7f9f5;
   overflow:hidden;
   position:relative;
@@ -1091,7 +1090,7 @@ body{background:#fff;color:var(--ink);}
         <h2><span>🌿</span>Popular Products</h2>
         <button onclick="nav('browse')" class="ss-text-link btn">View All&nbsp; →</button>
       </div>
-      <section class="grid grid-cols-2 md:grid-cols-4 gap-[15px]" id="home-products">
+      <section class="grid grid-cols-2 md:grid-cols-4 gap-[15px]" style="align-items:start" id="home-products">
         <div class="col-span-2 md:col-span-4 text-center py-10 text-secondary"><span class="material-symbols-outlined text-4xl block mb-2 text-outline">hourglass_top</span><div class="text-sm">Loading products...</div></div>
       </section>
 
@@ -1121,7 +1120,7 @@ body{background:#fff;color:var(--ink);}
     </div>
     <div class="flex gap-2 overflow-x-auto pb-3 mb-4 scrollbar-hide" id="cat-pills"></div>
     <div id="cat-banner" style="display:none" class="mb-5"></div>
-    <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-4" id="products-grid">
+    <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-4" style="align-items:start" id="products-grid">
       <div class="col-span-2 lg:col-span-4 text-center py-16 text-secondary"><span class="material-symbols-outlined text-4xl block mb-2 text-outline">hourglass_top</span><div class="text-sm">Loading...</div></div>
     </div>
   </div>
