@@ -1947,8 +1947,12 @@ function openProduct(id){
   th.innerHTML=pdpIds.map((i,n)=>{const p=pdpProduct(i);return `<button class="pdp-th btn" onclick="pdpTo(${n})" aria-label="${_pa(p.name)}"><img src="${_pa(p.imageUrl||catFallback(p.category))}" alt="" loading="lazy" onerror="this.onerror=null;this.src='${catFallback(p.category)}'"></button>`;}).join('');
   document.body.style.overflow='hidden';
   el.classList.add('open'); void el.offsetWidth; el.classList.add('show');
-  track.style.scrollBehavior='auto'; track.scrollLeft=pdpIdx*track.clientWidth; track.style.scrollBehavior='';
-  pdpMark(true);
+  requestAnimationFrame(()=>{
+    track.style.scrollBehavior='auto';
+    track.scrollLeft=pdpIdx*track.clientWidth;
+    track.style.scrollBehavior='';
+    pdpMark(true);
+  });
 }
 function closeProduct(){
   const el=document.getElementById('pdp'); if(!el.classList.contains('open'))return;
