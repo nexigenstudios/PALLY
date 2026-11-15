@@ -494,13 +494,15 @@ body{background:var(--cream);color:var(--ink);}
   box-shadow:0 8px 22px rgba(10,30,15,.1);
 }
 .ss-category:active{transform:translateY(-1px);}
-.ss-category .ss-emoji{display:flex;align-items:center;justify-content:center;height:38px;font-size:30px;margin-bottom:7px;}
+.ss-category .ss-emoji{display:flex;align-items:center;justify-content:center;height:38px;font-size:30px;margin-bottom:7px;color:#0a5e30;}
 .ss-category .ss-emoji img{width:36px;height:36px;object-fit:contain;border-radius:8px;}
+.ss-category .ss-emoji svg{width:26px;height:26px;}
 @media(min-width:760px){
   .ss-categories{grid-template-columns:repeat(6,minmax(0,1fr));gap:14px;}
   .ss-category{padding:18px 8px 15px;font-size:13px;border-radius:20px;}
   .ss-category .ss-emoji{font-size:36px;height:44px;}
   .ss-category .ss-emoji img{width:44px;height:44px;}
+  .ss-category .ss-emoji svg{width:30px;height:30px;}
 }
 
 /* Offer */
@@ -513,7 +515,7 @@ body{background:var(--cream);color:var(--ink);}
   box-shadow:0 8px 28px rgba(10,40,20,.18);
 }
 .ss-offer::before{content:"";position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.025'%3E%3Ccircle cx='30' cy='30' r='28'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;opacity:.4;}
-.ss-offer::after{content:"🥬";position:absolute;right:10px;bottom:-12px;font-size:76px;opacity:.18;transform:rotate(-15deg);}
+.ss-offer::after{display:none;}
 .ss-offer-badge{
   background:rgba(255,255,255,.12);
   backdrop-filter:blur(10px);
@@ -565,9 +567,10 @@ body{background:var(--cream);color:var(--ink);}
   min-width:0;display:flex;flex-direction:column;
   transition:all .25s cubic-bezier(.16,1,.3,1);
   cursor:pointer;
-  overflow:hidden;
+  overflow:visible;
   position:relative;
 }
+.ss-product .ss-product-image{overflow:hidden;}
 .ss-product:hover{
   transform:translateY(-4px);
   box-shadow:var(--ss-shadow-lg);
@@ -834,7 +837,7 @@ body{background:var(--cream);color:var(--ink);}
 
 /* Search bar */
 .cats-page-search-wrap{position:relative;margin-bottom:18px;}
-.cats-page-search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:18px;height:18px;pointer-events:none;color:#9eada4;z-index:1;}
+.cats-page-search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:20px !important;line-height:1;pointer-events:none;color:#9eada4;z-index:1;user-select:none;}
 .cats-page-search{
   width:100%;background:#fff;
   border:1.5px solid rgba(0,0,0,.08);border-radius:16px;
@@ -883,8 +886,9 @@ body{background:var(--cream);color:var(--ink);}
 }
 .cats-tile-emoji{
   width:52px;height:52px;border-radius:14px;
-  background:#f0fbf4;display:flex;align-items:center;
-  justify-content:center;font-size:26px;margin-bottom:7px;
+  background:linear-gradient(135deg,#c8f0d6,#aae3bf);display:flex;align-items:center;
+  justify-content:center;font-size:20px;font-weight:800;color:#0a5e30;margin-bottom:7px;
+  font-family:'Plus Jakarta Sans',sans-serif;
 }
 .cats-tile-name{
   font-size:10px;font-weight:700;color:#0d0f0e;
@@ -1025,10 +1029,11 @@ body{background:var(--cream);color:var(--ink);}
 }
 .catdetail-side-emoji{
   width:50px;height:50px;border-radius:14px;
-  background:#f0fbf4;display:flex;align-items:center;
-  justify-content:center;font-size:24px;flex-shrink:0;
+  background:linear-gradient(135deg,#c8f0d6,#aae3bf);display:flex;align-items:center;
+  justify-content:center;font-size:18px;font-weight:800;color:#0a5e30;flex-shrink:0;
+  font-family:'Plus Jakarta Sans',sans-serif;
 }
-.catdetail-side-btn.active .catdetail-side-emoji{background:#d8f3e3;}
+.catdetail-side-btn.active .catdetail-side-emoji{background:linear-gradient(135deg,#aae3bf,#7dd3a8);}
 .catdetail-side-label{
   font-size:10px;font-weight:700;color:#637068;
   text-align:center;line-height:1.3;
@@ -1062,6 +1067,23 @@ body{background:var(--cream);color:var(--ink);}
 #page-catdetail .catdetail-layout.show-all .catdetail-products-grid{grid-template-columns:repeat(2,1fr);}
 @media(min-width:480px){#page-catdetail .catdetail-layout.show-all .catdetail-products-grid{grid-template-columns:repeat(3,1fr);}}
 @media(min-width:800px){#page-catdetail .catdetail-layout.show-all .catdetail-products-grid{grid-template-columns:repeat(4,1fr);}}
+
+/* Compact add/qty buttons for narrow cards inside the sidebar layout */
+.catdetail-products .ss-add-btn{
+  padding:7px 9px;
+  font-size:10.5px;
+  min-width:0;
+}
+.catdetail-products .ss-product-bottom{
+  gap:3px;
+}
+.catdetail-products .ss-qty{
+  padding:4px 6px;
+  gap:3px;
+}
+.catdetail-products .ss-price{
+  font-size:14px;
+}
 
 </style>
 
@@ -1858,14 +1880,14 @@ body { background: var(--prem-bg) !important; }
       <!-- ── ORDER AGAIN ── -->
       <div id="order-again-section" style="display:none;margin-bottom:28px;">
         <div class="ss-section-head" style="margin-bottom:14px;">
-          <h2><span>🔄</span>Order Again</h2>
+          <h2>Order Again</h2>
         </div>
         <div id="order-again-cards" class="order-again-scroll"></div>
       </div>
 
       <!-- ── POPULAR PRODUCTS ── -->
       <div class="ss-section-head">
-        <h2><span>🌿</span>Popular Products</h2>
+        <h2>Popular Products</h2>
         <button onclick="nav('browse')" class="ss-text-link btn">View All&nbsp; →</button>
       </div>
       <section class="grid grid-cols-2 md:grid-cols-4 gap-[15px]" id="home-products">
@@ -1874,7 +1896,9 @@ body { background: var(--prem-bg) !important; }
 
       <!-- ── SUNDAY ESSENTIALS STRIP ── -->
       <aside class="ss-sunday">
-        <div class="ss-sunday-icon">🗓️</div>
+        <div class="ss-sunday-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0a5e30" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </div>
         <div><h3>Your Sunday Essentials</h3><p>Everything you need, all in one place.</p></div>
         <div class="ss-sunday-status">✓ Available<br>Every Sunday</div>
       </aside>
@@ -1912,7 +1936,7 @@ body { background: var(--prem-bg) !important; }
       <span>Home</span>
     </button>
     <div class="cats-page-search-wrap">
-      <svg class="cats-page-search-icon" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35" stroke-linecap="round"/></svg>
+      <span class="material-symbols-outlined cats-page-search-icon">search</span>
       <input id="cats-search" class="cats-page-search" type="text" placeholder="Search categories..." oninput="filterCatsPage(this.value)" aria-label="Search categories">
     </div>
     <div id="cats-page-groups"></div>
@@ -2763,8 +2787,8 @@ const DEFAULT_STORE_CATEGORIES = [
   {id:'cat-personal',name:'Personal Care',imageUrl:'',sortOrder:7},
   {id:'cat-other',name:'Other Products',imageUrl:'',sortOrder:99},
 ];
-const catEmojis = {'fruits':'🍎','vegetables':'🥦','groceries':'🛒','rice & grains':'🌾','dairy products':'🥛','snacks':'🍿','household essentials':'🏠','personal care':'🧴'};
-function catEmoji(name){ return catEmojis[(name||'').toLowerCase()]||'🏷️'; }
+const catEmojis = {};
+function catEmoji(name){ return ''; }
 function catArg(name){ return encodeURIComponent(name); }
 function filterAndBrowseEnc(enc){ filterAndBrowse(decodeURIComponent(enc)); }
 function setCatFilter(enc){ currentFilter=decodeURIComponent(enc); renderProducts(); }
@@ -2826,13 +2850,13 @@ function renderCategories() {
   const pills=document.getElementById('home-cat-pills');
   if(pills){
     const allChips=[
-      {label:'All',emoji:'🛒',img:'',fn:"filterAndBrowse('All')"},
-      ...cats.map(c=>({label:c.name,emoji:catEmoji(c.name),img:c.imageUrl||'',fn:`filterAndBrowseEnc('${catArg(c.name)}')`}))
+      {label:'All',img:'',fn:"filterAndBrowse('All')"},
+      ...cats.map(c=>({label:c.name,img:c.imageUrl||'',fn:`filterAndBrowseEnc('${catArg(c.name)}')`}))
     ];
     pills.innerHTML=allChips.map(ch=>{
       const inner=ch.img
-        ?`<img src="${escapeHtml(ch.img)}" alt="" onerror="this.parentNode.textContent='${ch.emoji}'">`
-        :ch.emoji;
+        ?`<img src="${escapeHtml(ch.img)}" alt="">`
+        :`<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>`;
       return `<button onclick="${ch.fn}" class="ss-category btn"><span class="ss-emoji">${inner}</span>${escapeHtml(ch.label)}</button>`;
     }).join('');
   }
@@ -3835,7 +3859,7 @@ function renderOrderAgain() {
   sec.style.display = '';
   const userName = (window._currentUser?.displayName || savedDelivery?.deliveryName || '').split(' ')[0];
   const headEl = sec.querySelector('.ss-section-head h2');
-  if (headEl && userName) headEl.innerHTML = `<span>🔄</span> ${escapeHtml(userName)}, Order Again`;
+  if (headEl && userName) headEl.textContent = userName + ', Order Again';
 
   cards.innerHTML = recentItems.map(item => {
     const liveProduct = customProducts.find(p => p.id === item.id);
@@ -3870,9 +3894,9 @@ function _catGroupOf(name) {
 
 function _catTileHtml(c) {
   const img = c.imageUrl;
-  const emoji = catEmoji(c.name);
+  const initial = (c.name || '?').charAt(0).toUpperCase();
   const imgEl = img ? `<img class="cats-tile-img" src="${escapeHtml(img)}" alt="${escapeHtml(c.name)}" loading="lazy" onerror="this.onerror=null;this.style.display='none';this.nextElementSibling.style.display='flex'">` : '';
-  const emojiEl = `<div class="cats-tile-emoji"${img ? ' style="display:none"' : ''}>${emoji}</div>`;
+  const emojiEl = `<div class="cats-tile-emoji"${img ? ' style="display:none"' : ''}>${initial}</div>`;
   return `<div class="cats-tile btn" onclick="openCatDetail('${encodeURIComponent(c.name)}')">${imgEl}${emojiEl}<div class="cats-tile-name">${escapeHtml(c.name)}</div></div>`;
 }
 
@@ -4039,6 +4063,7 @@ function renderCatDetail() {
       ? '<div style="text-align:center;padding:40px 16px;color:#9eada4;font-size:14px;">No products yet.</div>'
       : `<div class="catdetail-products-grid">${prods.map(p => productCard(p)).join('')}</div>`;
     layout.innerHTML = `<div class="catdetail-products">${countLabel}${gridHtml}</div>`;
+    requestAnimationFrame(() => { const p = layout.querySelector('.catdetail-products'); if (p) p.scrollTop = 0; });
     return;
   }
 
@@ -4059,10 +4084,10 @@ function renderCatDetail() {
 
   const sideHtml = sidebarCats.map(c => {
     const img = c.imageUrl;
-    const emoji = catEmoji(c.name);
+    const initial = (c.name || '?').charAt(0).toUpperCase();
     const isActive = c.name === _catDetailName;
     const imgEl = img ? `<img class="catdetail-side-img" src="${escapeHtml(img)}" alt="${escapeHtml(c.name)}" onerror="this.onerror=null;this.style.display='none';this.nextElementSibling.style.display='flex'">` : '';
-    const emojiEl = `<div class="catdetail-side-emoji"${img ? ' style="display:none"' : ''}>${emoji}</div>`;
+    const emojiEl = `<div class="catdetail-side-emoji"${img ? ' style="display:none"' : ''}>${initial}</div>`;
     return `<button class="catdetail-side-btn btn${isActive ? ' active' : ''}" onclick="switchCatDetail('${encodeURIComponent(c.name)}')">
       ${imgEl}${emojiEl}
       <span class="catdetail-side-label">${escapeHtml(c.name)}</span>
@@ -4084,6 +4109,9 @@ function renderCatDetail() {
     <div class="catdetail-sidebar" id="catdetail-sidebar">${sideHtml}</div>
     <div class="catdetail-products">${countLabel}${gridHtml}</div>`;
 
+  // Reset products panel scroll to top on every render
+  requestAnimationFrame(() => { const p = layout.querySelector('.catdetail-products'); if (p) p.scrollTop = 0; });
+
   // Scroll active sidebar item into view
   requestAnimationFrame(() => {
     const activeBtn = document.querySelector('.catdetail-side-btn.active');
@@ -4098,6 +4126,9 @@ function switchCatDetail(encName) {
   document.getElementById('catdetail-title').textContent = _catDetailName;
   const toggle = document.getElementById('catdetail-seeall-toggle');
   if (toggle) toggle.textContent = 'See All';
+  // Reset products panel scroll to top before re-render
+  const _prevPanel = document.querySelector('.catdetail-products');
+  if (_prevPanel) _prevPanel.scrollTop = 0;
   renderCatDetail();
 }
 
