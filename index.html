@@ -721,6 +721,496 @@ body{background:var(--cream);color:var(--ink);}
 .ss-skel{height:210px;border-radius:var(--radius-card);background:linear-gradient(90deg,#eef2ee 25%,#f4f8f4 37%,#eef2ee 63%);background-size:400% 100%;animation:ss-shimmer 1.3s ease infinite}
 @keyframes ss-shimmer{0%{background-position:100% 0}100%{background-position:0 0}}
 </style>
+
+<!-- ═══════════════════════════════════════════
+     PREMIUM UPGRADE LAYER — Santhom Store v2
+     "Feel the freshness the moment you open it"
+═══════════════════════════════════════════ -->
+<style id="premium-upgrade">
+
+/* ── Google Font: add DM Serif Display for punchy headings ── */
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
+
+/* ── Premium token overrides ── */
+:root {
+  /* Richer surface: near-white with a warm hint instead of cool green-tinted */
+  --prem-bg:        #f8f8f6;
+  --prem-surface:   #ffffff;
+  /* Deeper, warmer green */
+  --prem-green:     #0a5e30;
+  --prem-green-mid: #0d7a3e;
+  --prem-green-vib: #12934a;
+  /* Gold accent — the "Swiggy orange" equivalent for a fresh-food premium feel */
+  --prem-gold:      #f5a623;
+  --prem-gold-deep: #d4891b;
+  --prem-gold-glow: rgba(245,166,35,.22);
+  /* Ink: true near-black */
+  --prem-ink:       #0d0f0e;
+  --prem-ink-soft:  #2f3630;
+  --prem-muted:     #6b7570;
+  /* Elevation shadows — deeper, warmer */
+  --prem-shadow-sm: 0 2px 10px rgba(0,0,0,.07), 0 1px 3px rgba(0,0,0,.05);
+  --prem-shadow-md: 0 8px 28px rgba(0,0,0,.10), 0 2px 8px rgba(0,0,0,.06);
+  --prem-shadow-lg: 0 20px 50px rgba(0,0,0,.13), 0 6px 18px rgba(0,0,0,.08);
+  --prem-shadow-xl: 0 32px 70px rgba(0,0,0,.18), 0 10px 24px rgba(0,0,0,.10);
+}
+
+/* ── Body: warmer base ── */
+body { background: var(--prem-bg) !important; }
+
+/* ═══════════════════════════════════════════
+   HEADER — cinematic floating bar
+═══════════════════════════════════════════ */
+#main-header {
+  background: rgba(10, 10, 9, 0.0) !important;
+  border-bottom: none !important;
+  box-shadow: none !important;
+  transition: background .4s ease, box-shadow .4s ease !important;
+}
+#main-header.scrolled,
+#main-header.prem-solid {
+  background: rgba(8, 14, 10, 0.92) !important;
+  box-shadow: 0 1px 0 rgba(255,255,255,.04), 0 8px 32px rgba(0,0,0,.35) !important;
+  backdrop-filter: blur(24px) saturate(200%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(200%) !important;
+}
+
+/* When header is dark, invert brand wordmark & icons */
+#main-header .b-navy { color: #f0f7f2 !important; transition: color .3s; }
+#main-header .b-teal  { color: var(--prem-gold) !important; transition: color .3s; }
+#main-header .ss-icon-btn {
+  background: rgba(255,255,255,.08) !important;
+  border-color: rgba(255,255,255,.12) !important;
+  color: rgba(255,255,255,.85) !important;
+}
+#main-header .ss-icon-btn:hover {
+  background: rgba(255,255,255,.14) !important;
+  transform: translateY(-1px) !important;
+}
+#main-header #hostel-switch-btn {
+  background: rgba(245,166,35,.12) !important;
+  border: 1px solid rgba(245,166,35,.28) !important;
+}
+#main-header #hostel-switch-label { color: var(--prem-gold) !important; }
+#main-header .material-symbols-outlined[style*="location"] { color: var(--prem-gold) !important; }
+
+/* Cart badge — gold ring */
+.ss-count {
+  background: var(--prem-gold) !important;
+  box-shadow: 0 2px 8px rgba(245,166,35,.5) !important;
+  border-color: transparent !important;
+}
+
+/* ═══════════════════════════════════════════
+   HERO — cinematic, tall, editorial
+═══════════════════════════════════════════ */
+.ss-hero {
+  min-height: 520px !important;
+  padding: 56px 24px 56px !important;
+  background: #060e09 !important;
+}
+@media(min-width:760px){
+  .ss-hero { min-height: 580px !important; padding: 72px 7% 72px max(7%, calc((100% - 1050px)/2)) !important; }
+}
+
+/* Deeper, more cinematic overlay */
+.ss-hero-slides::after {
+  background: linear-gradient(
+    110deg,
+    rgba(4,12,7,.97) 0%,
+    rgba(4,12,7,.88) 32%,
+    rgba(4,12,7,.55) 60%,
+    rgba(4,12,7,.2) 100%
+  ) !important;
+}
+/* Subtle vignette from bottom */
+.ss-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 110%, rgba(10,94,48,.4) 0%, transparent 65%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Eyebrow — gold pill */
+.ss-eyebrow {
+  color: var(--prem-gold) !important;
+  background: rgba(245,166,35,.10) !important;
+  border-color: rgba(245,166,35,.30) !important;
+  letter-spacing: .9px !important;
+  font-size: 11px !important;
+}
+
+/* Hero headline — mixed font for editorial feel */
+.ss-hero h1 {
+  font-family: 'DM Serif Display', 'Plus Jakarta Sans', serif !important;
+  font-size: clamp(38px, 8.5vw, 68px) !important;
+  font-weight: 400 !important; /* Serif Display is bold at 400 */
+  letter-spacing: -1.5px !important;
+  line-height: .97 !important;
+  color: #f4fbf5 !important;
+}
+.ss-hero h1 span {
+  color: var(--prem-gold) !important;
+  font-style: italic !important;
+}
+
+/* Hero body text */
+.ss-hero p {
+  color: rgba(210,235,218,.72) !important;
+  font-size: 14px !important;
+  line-height: 1.65 !important;
+  max-width: 270px !important;
+}
+@media(min-width:760px){ .ss-hero p { max-width: 380px !important; font-size: 16px !important; } }
+
+/* CTA — gold primary on hero */
+.ss-hero .ss-primary-btn {
+  background: linear-gradient(135deg, var(--prem-gold) 0%, var(--prem-gold-deep) 100%) !important;
+  color: #0d0f0e !important;
+  font-weight: 800 !important;
+  box-shadow: 0 8px 28px rgba(245,166,35,.4), 0 2px 8px rgba(0,0,0,.2) !important;
+  letter-spacing: -.1px !important;
+}
+.ss-hero .ss-primary-btn:hover {
+  box-shadow: 0 12px 36px rgba(245,166,35,.5) !important;
+  transform: translateY(-3px) !important;
+}
+
+/* Hero dots — gold */
+.ss-hero-dots i.active { background: var(--prem-gold) !important; }
+
+/* ═══════════════════════════════════════════
+   SEARCH BAR — elevated, premium
+═══════════════════════════════════════════ */
+.ss-search-wrap { margin: -24px 0 20px !important; padding: 0 0px; position: relative; z-index: 10; }
+.ss-search-wrap .ss-search {
+  background: #ffffff !important;
+  border: 1.5px solid rgba(0,0,0,.07) !important;
+  box-shadow: 0 8px 30px rgba(0,0,0,.12), 0 2px 8px rgba(0,0,0,.06) !important;
+  border-radius: 18px !important;
+  font-size: 14.5px !important;
+  font-weight: 500 !important;
+  padding: 18px 56px !important;
+}
+.ss-search-wrap .ss-search:focus {
+  border-color: var(--prem-green-mid) !important;
+  box-shadow: 0 8px 30px rgba(0,0,0,.12), 0 0 0 3px rgba(10,94,48,.12) !important;
+}
+.ss-search-wrap .ss-search::placeholder { color: #9eada4 !important; }
+.ss-filter-icon {
+  background: linear-gradient(135deg, var(--prem-green-vib), var(--prem-green)) !important;
+  box-shadow: 0 4px 14px rgba(10,94,48,.35) !important;
+  right: 10px !important;
+  width: 42px !important;
+  height: 42px !important;
+  border-radius: 14px !important;
+}
+
+/* ═══════════════════════════════════════════
+   CATEGORIES — glassmorphic, deeper shadow
+═══════════════════════════════════════════ */
+.ss-category {
+  background: #ffffff !important;
+  border: 1px solid rgba(0,0,0,.055) !important;
+  border-radius: 20px !important;
+  box-shadow: 0 3px 12px rgba(0,0,0,.06) !important;
+  padding: 15px 4px 12px !important;
+  transition: all .22s cubic-bezier(.16,1,.3,1) !important;
+}
+.ss-category:hover {
+  background: linear-gradient(145deg, #f0fbf5, #e8f7ee) !important;
+  border-color: rgba(10,94,48,.18) !important;
+  box-shadow: 0 10px 30px rgba(10,94,48,.12) !important;
+  transform: translateY(-4px) scale(1.025) !important;
+}
+.ss-category .ss-emoji { height: 42px !important; font-size: 32px !important; }
+.ss-category div:last-child { font-size: 11.5px !important; color: var(--prem-ink-soft) !important; font-weight: 700 !important; }
+
+/* ═══════════════════════════════════════════
+   PROMO BANNER — deeper, more premium
+═══════════════════════════════════════════ */
+.ss-offer {
+  background: linear-gradient(130deg, #030f07 0%, #0a3d1e 45%, #083319 100%) !important;
+  box-shadow: 0 16px 44px rgba(0,0,0,.24), 0 4px 14px rgba(0,0,0,.12) !important;
+  border-radius: 24px !important;
+  border: 1px solid rgba(255,255,255,.04) !important;
+  min-height: 150px !important;
+}
+.ss-offer::before { opacity: .3 !important; }
+.ss-offer-badge {
+  background: rgba(245,166,35,.14) !important;
+  border: 1.5px solid rgba(245,166,35,.35) !important;
+  box-shadow: 0 4px 16px rgba(245,166,35,.18), inset 0 1px 0 rgba(255,255,255,.12) !important;
+  width: 80px !important; height: 80px !important;
+}
+.ss-offer-badge strong { color: var(--prem-gold) !important; font-size: 26px !important; }
+.ss-offer-copy h2 { font-size: clamp(16px, 3.8vw, 26px) !important; letter-spacing: -.5px !important; }
+.ss-offer .ss-primary-btn {
+  background: linear-gradient(135deg, var(--prem-gold), var(--prem-gold-deep)) !important;
+  color: #0d0f0e !important;
+  font-weight: 800 !important;
+  border: none !important;
+  box-shadow: 0 4px 16px rgba(245,166,35,.35) !important;
+}
+.ss-offer .ss-primary-btn:hover {
+  box-shadow: 0 8px 24px rgba(245,166,35,.45) !important;
+  transform: scale(1.03) !important;
+}
+
+/* ═══════════════════════════════════════════
+   SECTION HEADER
+═══════════════════════════════════════════ */
+.ss-section-head h2 {
+  font-size: 22px !important;
+  letter-spacing: -.8px !important;
+  color: var(--prem-ink) !important;
+}
+.ss-text-link {
+  color: var(--prem-green-mid) !important;
+  font-weight: 700 !important;
+  font-size: 13px !important;
+  border: 1px solid rgba(10,94,48,.14) !important;
+  padding: 6px 14px !important;
+}
+.ss-text-link:hover {
+  background: rgba(10,94,48,.07) !important;
+  border-color: rgba(10,94,48,.22) !important;
+}
+
+/* ═══════════════════════════════════════════
+   PRODUCT CARD — elevated, richer
+═══════════════════════════════════════════ */
+.ss-product {
+  border: 1px solid rgba(0,0,0,.052) !important;
+  border-radius: 22px !important;
+  background: #ffffff !important;
+  box-shadow: 0 2px 10px rgba(0,0,0,.07), 0 1px 3px rgba(0,0,0,.04) !important;
+  overflow: hidden !important;
+  transition: transform .25s cubic-bezier(.16,1,.3,1), box-shadow .25s cubic-bezier(.16,1,.3,1) !important;
+}
+.ss-product:hover {
+  transform: translateY(-6px) !important;
+  box-shadow: 0 20px 50px rgba(0,0,0,.13), 0 6px 16px rgba(0,0,0,.08) !important;
+  border-color: rgba(10,94,48,.1) !important;
+}
+.ss-product-image {
+  border-radius: 16px !important;
+  background: linear-gradient(145deg, #f5f9f6, #eef5ef) !important;
+  height: 130px !important;
+}
+.ss-product h3 {
+  color: var(--prem-ink) !important;
+  font-size: 13px !important;
+  letter-spacing: -.2px !important;
+}
+.ss-price {
+  color: var(--prem-green) !important;
+  font-weight: 800 !important;
+  font-size: 17px !important;
+}
+.ss-fresh {
+  background: rgba(220,252,231,.98) !important;
+  color: #0a6632 !important;
+  font-size: 9px !important;
+  font-weight: 800 !important;
+  letter-spacing: .3px !important;
+}
+
+/* Add button — gold accent fill */
+.ss-add-btn {
+  background: linear-gradient(135deg, var(--prem-green-vib), var(--prem-green)) !important;
+  box-shadow: 0 4px 14px rgba(10,94,48,.28) !important;
+  border-radius: 12px !important;
+  font-size: 12px !important;
+  padding: 9px 13px !important;
+}
+.ss-add-btn:hover {
+  box-shadow: 0 7px 22px rgba(10,94,48,.38) !important;
+  transform: scale(1.06) !important;
+}
+.ss-qty {
+  background: linear-gradient(135deg, var(--prem-green-vib), var(--prem-green)) !important;
+  box-shadow: 0 4px 14px rgba(10,94,48,.28) !important;
+  border-radius: 12px !important;
+}
+
+/* ═══════════════════════════════════════════
+   SUNDAY ESSENTIALS STRIP
+═══════════════════════════════════════════ */
+.ss-sunday {
+  background: linear-gradient(130deg, #f5fbf7 0%, #eaf5ef 100%) !important;
+  border: 1px solid rgba(10,94,48,.1) !important;
+  box-shadow: 0 6px 24px rgba(10,94,48,.08) !important;
+  border-radius: 22px !important;
+}
+.ss-sunday-icon {
+  background: linear-gradient(135deg, #c9f0d7, #a3e4bc) !important;
+  box-shadow: 0 4px 14px rgba(10,94,48,.18) !important;
+  border-radius: 18px !important;
+}
+.ss-sunday h3 { color: var(--prem-green) !important; font-size: 15px !important; }
+
+/* ═══════════════════════════════════════════
+   BOTTOM NAV — deeper glass
+═══════════════════════════════════════════ */
+#mobile-nav > div {
+  background: rgba(8, 14, 10, 0.88) !important;
+  border: 1px solid rgba(255,255,255,.08) !important;
+  backdrop-filter: blur(32px) saturate(200%) !important;
+  -webkit-backdrop-filter: blur(32px) saturate(200%) !important;
+  box-shadow: 0 -1px 0 rgba(255,255,255,.04), 0 16px 50px rgba(0,0,0,.35) !important;
+}
+#mobile-nav button span:last-of-type { color: rgba(255,255,255,.6) !important; font-size: 10px !important; }
+#mobile-nav button .material-symbols-outlined { color: rgba(255,255,255,.6) !important; }
+#mobile-nav button#mn-home span { color: #ffffff !important; }
+#mobile-nav button.prem-active span { color: #ffffff !important; }
+
+/* ═══════════════════════════════════════════
+   CHAT FAB
+═══════════════════════════════════════════ */
+#chat-fab {
+  background: linear-gradient(135deg, var(--prem-green-vib), var(--prem-green)) !important;
+  box-shadow: 0 8px 28px rgba(10,94,48,.45), 0 3px 10px rgba(0,0,0,.18) !important;
+}
+
+/* ═══════════════════════════════════════════
+   TOAST
+═══════════════════════════════════════════ */
+#toast {
+  background: #0d0f0e !important;
+  box-shadow: 0 12px 36px rgba(0,0,0,.35) !important;
+  border: 1px solid rgba(255,255,255,.07) !important;
+}
+
+/* ═══════════════════════════════════════════
+   PDP (Product Detail) — cinematic modal
+═══════════════════════════════════════════ */
+.pdp-card {
+  box-shadow: 0 32px 80px rgba(0,0,0,.45), 0 10px 28px rgba(0,0,0,.22) !important;
+  border-radius: 32px !important;
+}
+.pdp-name { color: var(--prem-ink) !important; letter-spacing: -.5px !important; }
+.pdp-add {
+  background: linear-gradient(135deg, var(--prem-gold), var(--prem-gold-deep)) !important;
+  color: #0d0f0e !important;
+  box-shadow: 0 6px 24px rgba(245,166,35,.4) !important;
+  border-radius: 16px !important;
+}
+.pdp-add:hover { box-shadow: 0 10px 32px rgba(245,166,35,.5) !important; }
+
+/* ═══════════════════════════════════════════
+   GLASS CARDS (cart, order forms)
+═══════════════════════════════════════════ */
+.glass-heavy {
+  background: rgba(255,255,255,.92) !important;
+  box-shadow: 0 4px 20px rgba(0,0,0,.07) !important;
+  border: 1px solid rgba(0,0,0,.055) !important;
+  border-radius: 24px !important;
+}
+
+/* ═══════════════════════════════════════════
+   BUTTONS (global CTA upgrades)
+═══════════════════════════════════════════ */
+.ss-primary-btn {
+  box-shadow: 0 6px 22px rgba(10,94,48,.32), 0 2px 8px rgba(0,0,0,.12) !important;
+}
+.ss-primary-btn:hover {
+  box-shadow: 0 10px 30px rgba(10,94,48,.4) !important;
+  transform: translateY(-2px) !important;
+}
+
+/* ═══════════════════════════════════════════
+   HEADER MAKE-SOLID on non-home pages
+   (since transparent header looks bad on white bg)
+═══════════════════════════════════════════ */
+@media(max-width:759px){
+  /* Home only gets transparent header over hero */
+  .page:not(#page-home).active ~ * #main-header,
+  body.prem-not-home #main-header {
+    background: rgba(8,14,10,.92) !important;
+    box-shadow: 0 1px 0 rgba(255,255,255,.04), 0 8px 32px rgba(0,0,0,.35) !important;
+  }
+}
+
+/* ═══════════════════════════════════════════
+   SCROLL-DRIVEN HEADER TRANSPARENCY
+   (JS will add .prem-at-top class on home page)
+═══════════════════════════════════════════ */
+#main-header:not(.prem-at-top) {
+  background: rgba(8,14,10,.92) !important;
+  box-shadow: 0 1px 0 rgba(255,255,255,.04), 0 8px 32px rgba(0,0,0,.35) !important;
+  backdrop-filter: blur(24px) saturate(200%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(200%) !important;
+}
+#main-header.prem-at-top {
+  background: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* When header is transparent (at top of home), make brand text light */
+#main-header.prem-at-top .b-navy { color: #ffffff !important; }
+#main-header.prem-at-top .b-teal  { color: var(--prem-gold) !important; }
+
+/* Always keep brand wordmark white regardless of scroll state */
+#main-header .b-navy { color: #ffffff !important; }
+#main-header .b-teal  { color: var(--prem-gold) !important; }
+
+/* ═══════════════════════════════════════════
+   SKELETON — slightly warmer
+═══════════════════════════════════════════ */
+.ss-skel {
+  background: linear-gradient(90deg, #eeeeec 25%, #f5f5f3 37%, #eeeeec 63%) !important;
+  background-size: 400% 100% !important;
+}
+
+/* ═══════════════════════════════════════════
+   PILL CHIPS (categories filter row)
+═══════════════════════════════════════════ */
+#cat-pills button, #home-cat-pills .ss-category {
+  /* categories handle their own styles above */
+}
+
+/* Auth sheet — premium rounding */
+#auth-sheet {
+  border-radius: 32px 32px 0 0 !important;
+  box-shadow: 0 -8px 50px rgba(0,0,0,.18) !important;
+}
+@media(min-width:768px){ #auth-sheet { border-radius: 32px !important; } }
+
+</style>
+
+<script>
+/* ── Premium header behaviour:
+   transparent when at the very top of home page, solid otherwise ── */
+(function premiumHeader(){
+  var hdr = document.getElementById('main-header');
+  if(!hdr) return;
+  function update(){
+    var onHome = document.getElementById('page-home') && document.getElementById('page-home').classList.contains('active');
+    if(onHome && window.scrollY < 10){
+      hdr.classList.add('prem-at-top');
+    } else {
+      hdr.classList.remove('prem-at-top');
+    }
+  }
+  window.addEventListener('scroll', update, {passive:true});
+  document.addEventListener('DOMContentLoaded', update);
+  /* also re-check when pages switch (nav() function) */
+  var origNav = window.nav;
+  if(origNav){
+    window.nav = function(p){
+      origNav.apply(this,arguments);
+      setTimeout(update, 50);
+    };
+  }
+  update();
+})();
+</script>
+
 </head>
 <body class="bg-background text-on-surface overflow-x-hidden">
 
@@ -862,16 +1352,16 @@ body{background:var(--cream);color:var(--ink);}
         </svg>
       </div>
       <div class="leading-tight">
-        <div class="brand-word ss-brand-name">Santhom <span>Store</span></div>
+        <div class="brand-word ss-brand-name" style="color:#ffffff;">Santhom <span style="color:#ffffff;">Store</span></div>
         <div class="ss-brand-sub">THOMASLEEHA PALLY CHURCH STORE</div>
       </div>
     </div>
 
     <!-- Desktop nav links -->
     <div class="hidden md:flex items-center gap-5 flex-1 justify-center">
-      <a onclick="nav('home')" class="text-sm font-semibold cursor-pointer nav-link" data-page="home">Home</a>
-      <a onclick="nav('browse')" class="text-sm font-semibold cursor-pointer nav-link text-secondary hover:text-primary" data-page="browse">Browse</a>
-      <a onclick="nav('orders')" class="text-sm font-semibold cursor-pointer nav-link text-secondary hover:text-primary" data-page="orders">My Orders</a>
+      <a onclick="nav('home')" class="text-sm font-semibold cursor-pointer nav-link" data-page="home" style="color:#ffffff;">Home</a>
+      <a onclick="nav('browse')" class="text-sm font-semibold cursor-pointer nav-link" data-page="browse" style="color:rgba(255,255,255,.7);">Browse</a>
+      <a onclick="nav('orders')" class="text-sm font-semibold cursor-pointer nav-link" data-page="orders" style="color:rgba(255,255,255,.7);">My Orders</a>
     </div>
 
     <!-- RIGHT: Cart + User avatar -->
@@ -1142,11 +1632,11 @@ body{background:var(--cream);color:var(--ink);}
 <!-- MOBILE BOTTOM NAV -->
 <div id="mobile-nav" class="md:hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-50" style="width:calc(100% - 32px); max-width:400px">
   <div class="flex justify-around items-center">
-    <button class="flex flex-col items-center gap-0.5 btn min-w-[44px]" onclick="nav('home')" id="mn-home"><span class="material-symbols-outlined fill-icon" style="font-size:22px;color:#176b35">home</span><span class="text-[9px] font-bold" style="color:#176b35">Home</span></button>
-    <button class="flex flex-col items-center gap-0.5 btn min-w-[44px]" onclick="nav('browse')" id="mn-browse"><span class="material-symbols-outlined" style="font-size:22px;color:#6e7771">grid_view</span><span class="text-[9px] font-bold" style="color:#6e7771">Categories</span></button>
-    <button class="flex flex-col items-center gap-0.5 btn relative min-w-[44px]" onclick="nav('cart')" id="mn-cart"><span class="material-symbols-outlined" style="font-size:22px;color:#6e7771">shopping_cart</span><span class="text-[9px] font-bold" style="color:#6e7771">Cart</span><span style="background:#e34b43" id="mn-cart-badge" class="absolute -top-1 right-1 w-4 h-4 text-white text-[9px] font-bold rounded-full flex items-center justify-center hidden">0</span></button>
-    <button class="flex flex-col items-center gap-0.5 btn min-w-[44px]" onclick="nav('orders')" id="mn-orders"><span class="material-symbols-outlined" style="font-size:22px;color:#6e7771">package_2</span><span class="text-[9px] font-bold" style="color:#6e7771">My Orders</span></button>
-    <button class="flex flex-col items-center gap-0.5 btn min-w-[44px]" onclick="nav('profile')" id="mn-profile"><span class="material-symbols-outlined" style="font-size:22px;color:#6e7771">person</span><span class="text-[9px] font-bold" style="color:#6e7771">Profile</span></button>
+    <button class="flex flex-col items-center gap-0.5 btn min-w-[44px]" onclick="nav('home')" id="mn-home"><span class="material-symbols-outlined fill-icon" style="font-size:22px;color:#ffffff">home</span><span class="text-[9px] font-bold" style="color:#ffffff">Home</span></button>
+    <button class="flex flex-col items-center gap-0.5 btn min-w-[44px]" onclick="nav('browse')" id="mn-browse"><span class="material-symbols-outlined" style="font-size:22px;color:rgba(255,255,255,.6)">grid_view</span><span class="text-[9px] font-bold" style="color:rgba(255,255,255,.6)">Categories</span></button>
+    <button class="flex flex-col items-center gap-0.5 btn relative min-w-[44px]" onclick="nav('cart')" id="mn-cart"><span class="material-symbols-outlined" style="font-size:22px;color:rgba(255,255,255,.6)">shopping_cart</span><span class="text-[9px] font-bold" style="color:rgba(255,255,255,.6)">Cart</span><span style="background:#e34b43" id="mn-cart-badge" class="absolute -top-1 right-1 w-4 h-4 text-white text-[9px] font-bold rounded-full flex items-center justify-center hidden">0</span></button>
+    <button class="flex flex-col items-center gap-0.5 btn min-w-[44px]" onclick="nav('orders')" id="mn-orders"><span class="material-symbols-outlined" style="font-size:22px;color:rgba(255,255,255,.6)">package_2</span><span class="text-[9px] font-bold" style="color:rgba(255,255,255,.6)">My Orders</span></button>
+    <button class="flex flex-col items-center gap-0.5 btn min-w-[44px]" onclick="nav('profile')" id="mn-profile"><span class="material-symbols-outlined" style="font-size:22px;color:rgba(255,255,255,.6)">person</span><span class="text-[9px] font-bold" style="color:rgba(255,255,255,.6)">Profile</span></button>
   </div>
 </div>
 
