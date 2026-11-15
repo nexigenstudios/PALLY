@@ -1051,7 +1051,7 @@ function applyProductVisibility(){
   if(!preorderKnown) return; // wait — preorder listener will call refreshPreorderUI once state is known
   const po = preorderOpen();
   customProducts = rawProducts
-    .filter(p => !p.hidden && (po && _poIsPreorderProduct(p) || !hiddenCategoryNames.has(p.category)) && (po || !_poIsPreorderProduct(p)))
+    .filter(p => !p.hidden && !hiddenCategoryNames.has(p.category) && (po && _poIsPreorderProduct(p) || !_poIsPreorderProduct(p)))
     .map(p => _poIsPreorderProduct(p) ? {...p, stock:9999, preorder:true} : p);
 }
 function refreshPreorderUI(){
