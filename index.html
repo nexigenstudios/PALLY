@@ -645,16 +645,63 @@ body{background:var(--cream);color:var(--ink);}
 .ss-sunday-status{margin-left:auto;padding-left:14px;border-left:1px solid rgba(15,110,56,.15);color:var(--green);font-size:10px;font-weight:800;max-width:92px;}
 @media(min-width:760px){.ss-sunday{gap:16px;padding:18px;}.ss-sunday-status{font-size:12px;max-width:130px;}}
 
-/* Bottom nav */
+/* Bottom nav — liquid glass */
 #mobile-nav > div{
-  background:rgba(255,255,255,.97) !important;
-  -webkit-backdrop-filter:blur(28px) saturate(200%);
-  backdrop-filter:blur(28px) saturate(200%);
-  border:1px solid rgba(15,110,56,.08) !important;
+  position:relative !important;
+  background:
+    linear-gradient(135deg,rgba(255,255,255,.55) 0%,rgba(255,255,255,.18) 40%,rgba(255,255,255,.32) 100%) !important;
+  -webkit-backdrop-filter:blur(40px) saturate(240%) brightness(1.12) contrast(1.04);
+  backdrop-filter:blur(40px) saturate(240%) brightness(1.12) contrast(1.04);
   border-radius:30px !important;
   padding:8px 6px 7px !important;
-  box-shadow:0 8px 32px rgba(10,30,15,.16),0 2px 8px rgba(10,30,15,.06),inset 0 1px 0 rgba(255,255,255,.8) !important;
   height:auto !important;
+  border:none !important;
+  box-shadow:
+    0 2px 0 0 rgba(255,255,255,.75) inset,
+    0 -1px 0 0 rgba(255,255,255,.18) inset,
+    1px 0 0 0 rgba(255,255,255,.45) inset,
+    -1px 0 0 0 rgba(255,255,255,.45) inset,
+    0 12px 40px rgba(10,30,15,.18),
+    0 4px 12px rgba(10,30,15,.10),
+    0 1px 2px rgba(10,30,15,.08) !important;
+  overflow:hidden !important;
+}
+/* animated specular shimmer */
+#mobile-nav > div::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  border-radius:30px;
+  background:linear-gradient(
+    110deg,
+    rgba(255,255,255,0) 0%,
+    rgba(255,255,255,.55) 38%,
+    rgba(255,255,255,.12) 52%,
+    rgba(255,255,255,0) 100%
+  );
+  background-size:200% 100%;
+  animation:liqShimmer 3.6s ease-in-out infinite;
+  pointer-events:none;
+  z-index:1;
+}
+/* refraction edge highlight */
+#mobile-nav > div::after{
+  content:'';
+  position:absolute;
+  inset:0;
+  border-radius:30px;
+  border:1.5px solid transparent;
+  background:
+    linear-gradient(rgba(255,255,255,0),rgba(255,255,255,0)) padding-box,
+    linear-gradient(135deg,rgba(255,255,255,.9) 0%,rgba(255,255,255,.2) 35%,rgba(255,255,255,.0) 60%,rgba(255,255,255,.35) 100%) border-box;
+  pointer-events:none;
+  z-index:2;
+}
+#mobile-nav > div > *{position:relative;z-index:3;}
+@keyframes liqShimmer{
+  0%  {background-position:200% 0}
+  60% {background-position:-40% 0}
+  100%{background-position:-40% 0}
 }
 #mobile-nav button{gap:3px;}
 #mobile-nav button span:last-of-type{font-weight:700;font-family:'Plus Jakarta Sans',sans-serif;}
@@ -1053,14 +1100,22 @@ body { background: var(--prem-bg) !important; }
 .ss-sunday h3 { color: var(--prem-green) !important; font-size: 15px !important; }
 
 /* ═══════════════════════════════════════════
-   BOTTOM NAV — deeper glass
+   BOTTOM NAV — liquid glass (override)
 ═══════════════════════════════════════════ */
 #mobile-nav > div {
-  background: rgba(255,255,255,.97) !important;
-  border: 1px solid rgba(15,110,56,.08) !important;
-  backdrop-filter: blur(28px) saturate(200%) !important;
-  -webkit-backdrop-filter: blur(28px) saturate(200%) !important;
-  box-shadow: 0 8px 32px rgba(10,30,15,.16), 0 2px 8px rgba(10,30,15,.06), inset 0 1px 0 rgba(255,255,255,.8) !important;
+  background:
+    linear-gradient(135deg,rgba(255,255,255,.55) 0%,rgba(255,255,255,.18) 40%,rgba(255,255,255,.32) 100%) !important;
+  backdrop-filter: blur(40px) saturate(240%) brightness(1.12) contrast(1.04) !important;
+  -webkit-backdrop-filter: blur(40px) saturate(240%) brightness(1.12) contrast(1.04) !important;
+  border: none !important;
+  box-shadow:
+    0 2px 0 0 rgba(255,255,255,.75) inset,
+    0 -1px 0 0 rgba(255,255,255,.18) inset,
+    1px 0 0 0 rgba(255,255,255,.45) inset,
+    -1px 0 0 0 rgba(255,255,255,.45) inset,
+    0 12px 40px rgba(10,30,15,.18),
+    0 4px 12px rgba(10,30,15,.10),
+    0 1px 2px rgba(10,30,15,.08) !important;
 }
 
 /* ═══════════════════════════════════════════
