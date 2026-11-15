@@ -769,30 +769,30 @@ body { background: var(--prem-bg) !important; }
 }
 #main-header.scrolled,
 #main-header.prem-solid {
-  background: rgba(8, 14, 10, 0.92) !important;
-  box-shadow: 0 1px 0 rgba(255,255,255,.04), 0 8px 32px rgba(0,0,0,.35) !important;
-  backdrop-filter: blur(24px) saturate(200%) !important;
-  -webkit-backdrop-filter: blur(24px) saturate(200%) !important;
+  background: rgba(0, 0, 0, 0.20) !important;
+  box-shadow: 0 1px 0 rgba(255,255,255,.10), 0 4px 16px rgba(0,0,0,.08) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
 }
 
-/* When header is dark, invert brand wordmark & icons */
-#main-header .b-navy { color: #f0f7f2 !important; transition: color .3s; }
-#main-header .b-teal  { color: var(--prem-gold) !important; transition: color .3s; }
+/* Restore original header text/icon colors */
+#main-header .b-navy { color: #0f1f14 !important; }
+#main-header .b-teal  { color: #0f6e38 !important; }
 #main-header .ss-icon-btn {
-  background: rgba(255,255,255,.08) !important;
-  border-color: rgba(255,255,255,.12) !important;
-  color: rgba(255,255,255,.85) !important;
+  background: white !important;
+  border-color: rgba(15,110,56,.15) !important;
+  color: #0f1f14 !important;
 }
 #main-header .ss-icon-btn:hover {
-  background: rgba(255,255,255,.14) !important;
+  background: #f0fbf4 !important;
   transform: translateY(-1px) !important;
 }
 #main-header #hostel-switch-btn {
-  background: rgba(245,166,35,.12) !important;
-  border: 1px solid rgba(245,166,35,.28) !important;
+  background: rgba(15,110,56,.08) !important;
+  border: 1px solid rgba(15,110,56,.2) !important;
 }
-#main-header #hostel-switch-label { color: var(--prem-gold) !important; }
-#main-header .material-symbols-outlined[style*="location"] { color: var(--prem-gold) !important; }
+#main-header #hostel-switch-label { color: #0f6e38 !important; }
+#main-header .material-symbols-outlined[style*="location"] { color: #0f6e38 !important; }
 
 /* Cart badge — gold ring */
 .ss-count {
@@ -1129,8 +1129,8 @@ body { background: var(--prem-bg) !important; }
   /* Home only gets transparent header over hero */
   .page:not(#page-home).active ~ * #main-header,
   body.prem-not-home #main-header {
-    background: rgba(8,14,10,.92) !important;
-    box-shadow: 0 1px 0 rgba(255,255,255,.04), 0 8px 32px rgba(0,0,0,.35) !important;
+    background: rgba(0,0,0,.20) !important;
+    box-shadow: 0 1px 0 rgba(255,255,255,.10), 0 4px 16px rgba(0,0,0,.08) !important;
   }
 }
 
@@ -1139,10 +1139,10 @@ body { background: var(--prem-bg) !important; }
    (JS will add .prem-at-top class on home page)
 ═══════════════════════════════════════════ */
 #main-header:not(.prem-at-top) {
-  background: rgba(8,14,10,.92) !important;
-  box-shadow: 0 1px 0 rgba(255,255,255,.04), 0 8px 32px rgba(0,0,0,.35) !important;
-  backdrop-filter: blur(24px) saturate(200%) !important;
-  -webkit-backdrop-filter: blur(24px) saturate(200%) !important;
+  background: rgba(0,0,0,.20) !important;
+  box-shadow: 0 1px 0 rgba(255,255,255,.10), 0 4px 16px rgba(0,0,0,.08) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
 }
 #main-header.prem-at-top {
   background: transparent !important;
@@ -1151,13 +1151,13 @@ body { background: var(--prem-bg) !important; }
   -webkit-backdrop-filter: none !important;
 }
 
-/* When header is transparent (at top of home), make brand text light */
-#main-header.prem-at-top .b-navy { color: #ffffff !important; }
-#main-header.prem-at-top .b-teal  { color: var(--prem-gold) !important; }
+/* Keep original brand colors at top too */
+#main-header.prem-at-top .b-navy { color: #0f1f14 !important; }
+#main-header.prem-at-top .b-teal  { color: #0f6e38 !important; }
 
-/* Always keep brand wordmark white regardless of scroll state */
-#main-header .b-navy { color: #ffffff !important; }
-#main-header .b-teal  { color: var(--prem-gold) !important; }
+/* Brand always uses original colors */
+#main-header .b-navy { color: #0f1f14 !important; }
+#main-header .b-teal  { color: #0f6e38 !important; }
 
 /* ═══════════════════════════════════════════
    SKELETON — slightly warmer
@@ -1352,16 +1352,16 @@ body { background: var(--prem-bg) !important; }
         </svg>
       </div>
       <div class="leading-tight">
-        <div class="brand-word ss-brand-name" style="color:#ffffff;">Santhom <span style="color:#ffffff;">Store</span></div>
+        <div class="brand-word ss-brand-name" style="color:#0f1f14;">Santhom <span style="color:#0f6e38;">Store</span></div>
         <div class="ss-brand-sub">THOMASLEEHA PALLY CHURCH STORE</div>
       </div>
     </div>
 
     <!-- Desktop nav links -->
     <div class="hidden md:flex items-center gap-5 flex-1 justify-center">
-      <a onclick="nav('home')" class="text-sm font-semibold cursor-pointer nav-link" data-page="home" style="color:#ffffff;">Home</a>
-      <a onclick="nav('browse')" class="text-sm font-semibold cursor-pointer nav-link" data-page="browse" style="color:rgba(255,255,255,.7);">Browse</a>
-      <a onclick="nav('orders')" class="text-sm font-semibold cursor-pointer nav-link" data-page="orders" style="color:rgba(255,255,255,.7);">My Orders</a>
+      <a onclick="nav('home')" class="text-sm font-semibold cursor-pointer nav-link" data-page="home">Home</a>
+      <a onclick="nav('browse')" class="text-sm font-semibold cursor-pointer nav-link text-secondary hover:text-primary" data-page="browse">Browse</a>
+      <a onclick="nav('orders')" class="text-sm font-semibold cursor-pointer nav-link text-secondary hover:text-primary" data-page="orders">My Orders</a>
     </div>
 
     <!-- RIGHT: Cart + User avatar -->
@@ -1632,7 +1632,7 @@ body { background: var(--prem-bg) !important; }
 <!-- MOBILE BOTTOM NAV -->
 <div id="mobile-nav" class="md:hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-50" style="width:calc(100% - 32px); max-width:400px">
   <div class="flex justify-around items-center">
-    <button class="flex flex-col items-center gap-0.5 btn min-w-[44px]" onclick="nav('home')" id="mn-home"><span class="material-symbols-outlined fill-icon" style="font-size:22px;color:#ffffff">home</span><span class="text-[9px] font-bold" style="color:#ffffff">Home</span></button>
+    <button class="flex flex-col items-center gap-0.5 btn min-w-[44px]" onclick="nav('home')" id="mn-home"><span class="material-symbols-outlined fill-icon" style="font-size:22px;color:#f5a623">home</span><span class="text-[9px] font-bold" style="color:#f5a623">Home</span></button>
     <button class="flex flex-col items-center gap-0.5 btn min-w-[44px]" onclick="nav('browse')" id="mn-browse"><span class="material-symbols-outlined" style="font-size:22px;color:rgba(255,255,255,.6)">grid_view</span><span class="text-[9px] font-bold" style="color:rgba(255,255,255,.6)">Categories</span></button>
     <button class="flex flex-col items-center gap-0.5 btn relative min-w-[44px]" onclick="nav('cart')" id="mn-cart"><span class="material-symbols-outlined" style="font-size:22px;color:rgba(255,255,255,.6)">shopping_cart</span><span class="text-[9px] font-bold" style="color:rgba(255,255,255,.6)">Cart</span><span style="background:#e34b43" id="mn-cart-badge" class="absolute -top-1 right-1 w-4 h-4 text-white text-[9px] font-bold rounded-full flex items-center justify-center hidden">0</span></button>
     <button class="flex flex-col items-center gap-0.5 btn min-w-[44px]" onclick="nav('orders')" id="mn-orders"><span class="material-symbols-outlined" style="font-size:22px;color:rgba(255,255,255,.6)">package_2</span><span class="text-[9px] font-bold" style="color:rgba(255,255,255,.6)">My Orders</span></button>
@@ -2288,7 +2288,7 @@ function nav(page) {
   currentPage=page;
   document.querySelectorAll('.nav-link').forEach(a=>{a.className=a.dataset.page===page?'text-sm font-bold cursor-pointer nav-link text-primary border-b-2 border-primary pb-1':'text-sm font-semibold cursor-pointer nav-link text-secondary hover:text-primary transition-colors';});
   const mnMap={home:'mn-home',browse:'mn-browse',cart:'mn-cart',orders:'mn-orders',profile:'mn-profile'};
-  Object.entries(mnMap).forEach(([pg,id])=>{const el=document.getElementById(id);if(!el)return;el.querySelectorAll('span').forEach(s=>{if(s.classList.contains('material-symbols-outlined')){s.style.color=pg===page?'#176b35':'#6e7771';if(pg===page)s.classList.add('fill-icon');else s.classList.remove('fill-icon');}else{s.style.color=pg===page?'#176b35':'#6e7771';}});});
+  Object.entries(mnMap).forEach(([pg,id])=>{const el=document.getElementById(id);if(!el)return;const isActive=pg===page;el.querySelectorAll('span').forEach(s=>{if(s.classList.contains('material-symbols-outlined')){s.style.color=isActive?'#f5a623':'rgba(255,255,255,0.55)';if(isActive)s.classList.add('fill-icon');else s.classList.remove('fill-icon');}else if(!s.id){s.style.color=isActive?'#f5a623':'rgba(255,255,255,0.55)';}});});
   if(page==='home')renderHomeProducts();
   if(page==='browse')renderProducts();
   if(page==='cart'){renderCart();fillCartDelivery();updatePickupModeUI();}
