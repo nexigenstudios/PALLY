@@ -3385,8 +3385,7 @@ function addToCart(p) {
   updateCartBadge(); renderCart();
   if(currentPage==='browse')renderProducts();
   if(currentPage==='home')renderHomeProducts();
-  if(currentPage==='catdetail')renderCatDetail();
-  if(currentPage==='categories')refreshCardAction(p.id);
+  if(currentPage==='catdetail'||currentPage==='categories')refreshCardAction(p.id);
   showToast((p.displayName||p.name)+' added to cart');
 }
 
@@ -3401,8 +3400,7 @@ function updateCart(id,delta) {
   updateCartBadge(); renderCart();
   if(currentPage==='browse')renderProducts();
   if(currentPage==='home')renderHomeProducts();
-  if(currentPage==='catdetail')renderCatDetail();
-  if(currentPage==='categories')refreshCardAction(id);
+  if(currentPage==='catdetail'||currentPage==='categories')refreshCardAction(id);
 }
 
 function updateCartByKey(cartKey,delta) {
@@ -3416,8 +3414,7 @@ function updateCartByKey(cartKey,delta) {
   updateCartBadge(); renderCart();
   if(currentPage==='browse')renderProducts();
   if(currentPage==='home')renderHomeProducts();
-  if(currentPage==='catdetail')renderCatDetail();
-  if(currentPage==='categories')refreshCardAction(item.id);
+  if(currentPage==='catdetail'||currentPage==='categories')refreshCardAction(item.id);
 }
 
 function updateCartBadge() {
