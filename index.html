@@ -3376,6 +3376,7 @@ function addToCart(p) {
   if(currentPage==='browse')renderProducts();
   if(currentPage==='home')renderHomeProducts();
   if(currentPage==='catdetail')renderCatDetail();
+  if(currentPage==='categories')renderCategoriesPage();
   showToast((p.displayName||p.name)+' added to cart');
 }
 
@@ -3391,6 +3392,7 @@ function updateCart(id,delta) {
   if(currentPage==='browse')renderProducts();
   if(currentPage==='home')renderHomeProducts();
   if(currentPage==='catdetail')renderCatDetail();
+  if(currentPage==='categories')renderCategoriesPage();
 }
 
 function updateCartByKey(cartKey,delta) {
@@ -3405,6 +3407,7 @@ function updateCartByKey(cartKey,delta) {
   if(currentPage==='browse')renderProducts();
   if(currentPage==='home')renderHomeProducts();
   if(currentPage==='catdetail')renderCatDetail();
+  if(currentPage==='categories')renderCategoriesPage();
 }
 
 function updateCartBadge() {
@@ -4050,6 +4053,11 @@ function renderOrderAgain() {
 }
 
 // ─────────────── CATEGORIES PAGE ───────────────
+// Safe registry so we never embed JSON arrays in onclick attributes
+const _catGroupRegistry = {};
+function _registerCatGroup(key, names) { _catGroupRegistry[key] = names; }
+function _openCatDetailGroupByKey(key) { openCatDetailGroup(_catGroupRegistry[key] || []); }
+
 function _catGroupOf(name) {
   const n = (name || '').toLowerCase();
   if (['fresh','vegetable','fruit','dairy','meat','egg','seafood','organic'].some(k => n.includes(k))) return 'Fresh Items';
@@ -4100,13 +4108,16 @@ function renderCategoriesPage() {
   sortedGroups.forEach(groupName => {
     const groupCats = groups[groupName];
     const groupCatNames = groupCats.map(c => c.name);
+    // Register names in safe registry; use a key derived from the group name
+    const regKey = 'grp_' + groupName.replace(/[^a-zA-Z0-9]/g, '_');
+    _registerCatGroup(regKey, groupCatNames);
     const groupProducts = customProducts.filter(p => groupCatNames.includes(p.category)).slice(0, 10);
 
     const popularStrip = groupProducts.length > 0 ? `
       <div class="cats-popular-strip">
         <div class="cats-popular-head">
           <span class="cats-popular-label">Popular in ${escapeHtml(groupName)}</span>
-          <button class="cats-see-all-btn btn" style="font-size:11px;padding:4px 11px;" onclick="openCatDetailGroup(${JSON.stringify(groupCatNames)})">See All →</button>
+          <button class="cats-see-all-btn btn" style="font-size:11px;padding:4px 11px;" onclick="_openCatDetailGroupByKey('${regKey}')">See All →</button>
         </div>
         <div class="cats-popular-row">${groupProducts.map(p => productCard(p)).join('')}</div>
       </div>` : '';
@@ -4114,7 +4125,7 @@ function renderCategoriesPage() {
     html += `<div class="cats-group" data-group="${escapeHtml(groupName)}">
       <div class="cats-group-head">
         <span class="cats-section-label">${escapeHtml(groupName)}</span>
-        <button class="cats-see-all-btn btn" onclick="openCatDetailGroup(${JSON.stringify(groupCatNames)})">See All →</button>
+        <button class="cats-see-all-btn btn" onclick="_openCatDetailGroupByKey('${regKey}')">See All →</button>
       </div>
       <div class="cats-group-grid">${groupCats.map(_catTileHtml).join('')}</div>
       ${popularStrip}
