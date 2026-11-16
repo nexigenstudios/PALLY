@@ -2,7 +2,7 @@
 <html lang="en" class="scroll-smooth">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
 <meta name="theme-color" content="#f7f9f4">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -832,7 +832,8 @@ body{background:var(--cream);color:var(--ink);}
   max-width:960px;margin:0 auto;
   /* header = 64px content + safe-area-inset-top (handled by .page).
      Add 24px gap so content sits comfortably below the header. */
-  padding:88px 14px calc(env(safe-area-inset-bottom,0px) + 80px);
+  padding:88px clamp(10px,3vw,16px) calc(env(safe-area-inset-bottom,0px) + 80px);
+  overflow-x:hidden;
 }
 
 /* Search bar */
@@ -863,35 +864,39 @@ body{background:var(--cream);color:var(--ink);}
 }
 .cats-see-all-btn:active{background:rgba(10,94,48,.08);}
 
-/* 4-column category tiles */
+/* Responsive category tiles — auto-fit so cards never go below ~80px */
 .cats-group-grid{
   display:grid;
-  grid-template-columns:repeat(4,1fr);
+  grid-template-columns:repeat(auto-fill,minmax(80px,1fr));
   gap:9px;margin-bottom:16px;
 }
+/* Clamp to 2 cols on truly tiny viewports, 4 on tablet */
+@media(max-width:359px){.cats-group-grid{grid-template-columns:repeat(2,1fr);gap:7px;}}
+@media(min-width:480px){.cats-group-grid{grid-template-columns:repeat(4,1fr);gap:10px;}}
+@media(min-width:768px){.cats-group-grid{grid-template-columns:repeat(6,1fr);gap:12px;}}
 .cats-tile{
   background:#fff;border-radius:16px;
   border:1px solid rgba(0,0,0,.07);
   box-shadow:0 2px 8px rgba(0,0,0,.06);
-  padding:11px 5px 10px;text-align:center;
+  padding:clamp(8px,2.5vw,13px) clamp(3px,1.5vw,6px) clamp(8px,2.5vw,12px);text-align:center;
   cursor:pointer;
   transition:transform .2s cubic-bezier(.16,1,.3,1),box-shadow .2s;
-  display:flex;flex-direction:column;align-items:center;
+  display:flex;flex-direction:column;align-items:center;min-width:0;
 }
 .cats-tile:active{transform:scale(.96);}
 .cats-tile-img{
-  width:52px;height:52px;border-radius:14px;
-  object-fit:cover;margin-bottom:7px;
+  width:clamp(44px,13vw,56px);height:clamp(44px,13vw,56px);border-radius:14px;
+  object-fit:cover;margin-bottom:6px;
   background:#f5f9f6;
 }
 .cats-tile-emoji{
-  width:52px;height:52px;border-radius:14px;
+  width:clamp(44px,13vw,56px);height:clamp(44px,13vw,56px);border-radius:14px;
   background:linear-gradient(135deg,#c8f0d6,#aae3bf);display:flex;align-items:center;
-  justify-content:center;font-size:20px;font-weight:800;color:#0a5e30;margin-bottom:7px;
+  justify-content:center;font-size:clamp(18px,5vw,24px);font-weight:800;color:#0a5e30;margin-bottom:6px;
   font-family:'Plus Jakarta Sans',sans-serif;
 }
 .cats-tile-name{
-  font-size:10px;font-weight:700;color:#0d0f0e;
+  font-size:clamp(9px,2.4vw,11px);font-weight:700;color:#0d0f0e;
   line-height:1.3;
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
 }
@@ -917,7 +922,7 @@ body{background:var(--cream);color:var(--ink);}
 .cats-popular-row::-webkit-scrollbar{display:none;}
 /* Force product cards inside a horizontal strip to be a fixed width and snap */
 .cats-popular-row .ss-product{
-  flex:0 0 160px !important;
+  flex:0 0 clamp(140px,42vw,175px) !important;
   scroll-snap-align:start;
   min-width:0;
 }
@@ -1070,19 +1075,43 @@ body{background:var(--cream);color:var(--ink);}
 
 /* Compact add/qty buttons for narrow cards inside the sidebar layout */
 .catdetail-products .ss-add-btn{
-  padding:7px 9px;
-  font-size:10.5px;
-  min-width:0;
+  padding:9px 10px !important;
+  font-size:12px !important;
+  min-width:0 !important;
+  min-height:40px !important;
+  width:100% !important;
 }
 .catdetail-products .ss-product-bottom{
-  gap:3px;
+  gap:4px !important;
+  flex-direction:column !important;
+  align-items:stretch !important;
+}
+.catdetail-products .ss-card-action{
+  width:100% !important;
 }
 .catdetail-products .ss-qty{
-  padding:4px 6px;
-  gap:3px;
+  padding:5px 8px !important;
+  gap:4px !important;
+  width:100% !important;
+  justify-content:center !important;
+}
+/* Keep icons legible but not oversized in narrow cards */
+.catdetail-products .ss-qty .material-symbols-outlined{
+  font-size:18px !important;
+}
+.catdetail-products .ss-qty button{
+  min-height:28px !important;
+  min-width:28px !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+}
+.catdetail-products .ss-qty span.ss-q{
+  font-size:14px !important;
+  min-width:18px !important;
 }
 .catdetail-products .ss-price{
-  font-size:14px;
+  font-size:15px !important;
 }
 
 </style>
@@ -1441,7 +1470,7 @@ body { background: var(--prem-bg) !important; }
   justify-content: center !important;
 }
 .ss-qty .material-symbols-outlined {
-  font-size: 22px !important;
+  font-size: clamp(18px, 5vw, 22px) !important;
 }
 .ss-qty span.ss-q {
   font-size: 16px !important;
@@ -1621,6 +1650,94 @@ body { background: var(--prem-bg) !important; }
   box-shadow: 0 -8px 50px rgba(0,0,0,.18) !important;
 }
 @media(min-width:768px){ #auth-sheet { border-radius: 32px !important; } }
+
+/* ═══════════════════════════════════════════
+   MOBILE POLISH — categories page & cards
+   Applies to all phones ≤ 430px
+═══════════════════════════════════════════ */
+@media(max-width:430px){
+
+  /* --- Categories page tiles --- */
+  .cats-group-head {
+    font-size: 13px !important;
+  }
+  .cats-page-search {
+    font-size: 14px !important;
+    padding: 13px 42px 13px 42px !important;
+  }
+
+  /* --- Product card — tighten on small phones --- */
+  .ss-product {
+    padding: 8px 8px 11px !important;
+    border-radius: 16px !important;
+  }
+  .ss-product-image {
+    height: 130px !important;
+    border-radius: 12px !important;
+  }
+  .ss-product h3 {
+    font-size: 13px !important;
+    margin: 8px 0 5px !important;
+  }
+  .ss-price {
+    font-size: 16px !important;
+  }
+  .ss-add-btn {
+    font-size: 12px !important;
+    padding: 9px 10px !important;
+    min-height: 40px !important;
+  }
+  /* Qty stepper — make sure +/- are always visible */
+  .ss-qty {
+    padding: 5px 8px !important;
+    gap: 6px !important;
+  }
+  .ss-qty button {
+    min-height: 30px !important;
+    min-width: 30px !important;
+  }
+  .ss-qty .material-symbols-outlined {
+    font-size: 18px !important;
+  }
+  .ss-qty span.ss-q {
+    font-size: 14px !important;
+    min-width: 18px !important;
+  }
+
+  /* --- Home category pills --- */
+  .ss-categories {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 7px !important;
+  }
+  .ss-category {
+    padding: 10px 4px 8px !important;
+    border-radius: 16px !important;
+  }
+  .ss-category .ss-emoji {
+    height: 34px !important;
+    font-size: 26px !important;
+  }
+  .ss-category div:last-child {
+    font-size: 10px !important;
+  }
+
+  /* --- Catdetail sidebar layout --- */
+  .catdetail-side-btn {
+    padding: 8px 6px !important;
+  }
+  .catdetail-side-label {
+    font-size: 11px !important;
+  }
+}
+
+/* Extra tiny phones — 360px and below */
+@media(max-width:360px){
+  .ss-product-image { height: 115px !important; }
+  .ss-product h3 { font-size: 12px !important; }
+  .ss-price { font-size: 15px !important; }
+  .ss-add-btn { font-size: 11.5px !important; padding: 8px 8px !important; }
+  .cats-group-grid { grid-template-columns: repeat(3, 1fr) !important; gap: 6px !important; }
+}
 
 </style>
 
@@ -2942,18 +3059,18 @@ function cardActionHtml(p,selW){
     const qty=ex?ex.qty:0;
     if(oos) return `<button disabled class="ss-add-btn">Unavailable</button>`;
     if(qty>0) return `<div class="ss-qty">
-      <button class="btn" onclick="event.stopPropagation();updateCartByKey('${cartKey}',-1);renderProducts();renderHomeProducts();" aria-label="Decrease"><span class="material-symbols-outlined" style="font-size:15px;color:white;">remove</span></button>
+      <button class="btn" onclick="event.stopPropagation();updateCartByKey('${cartKey}',-1);renderProducts();renderHomeProducts();" aria-label="Decrease"><span class="material-symbols-outlined">remove</span></button>
       <span class="ss-q">${qty}</span>
-      <button class="btn" onclick="event.stopPropagation();updateCartByKey('${cartKey}',1);renderProducts();renderHomeProducts();" aria-label="Increase"><span class="material-symbols-outlined" style="font-size:15px;color:white;">add</span></button>
+      <button class="btn" onclick="event.stopPropagation();updateCartByKey('${cartKey}',1);renderProducts();renderHomeProducts();" aria-label="Increase"><span class="material-symbols-outlined">add</span></button>
     </div>`;
     return `<button onclick="cardAddWeighted('${p.id}',event)" class="ss-add-btn btn">+ Add</button>`;
   }
   const inCart=cart.find(c=>c.id===p.id&&!c.selectedWeight); const qty=inCart?inCart.qty:0;
   if(oos) return `<button disabled class="ss-add-btn">Unavailable</button>`;
   if(qty>0) return `<div class="ss-qty">
-    <button class="btn" onclick="event.stopPropagation();updateCart('${p.id}',-1)" aria-label="Decrease"><span class="material-symbols-outlined" style="font-size:15px;color:white;">remove</span></button>
+    <button class="btn" onclick="event.stopPropagation();updateCart('${p.id}',-1)" aria-label="Decrease"><span class="material-symbols-outlined">remove</span></button>
     <span class="ss-q">${qty}</span>
-    <button class="btn" onclick="event.stopPropagation();updateCart('${p.id}',1)" aria-label="Increase"><span class="material-symbols-outlined" style="font-size:15px;color:white;">add</span></button>
+    <button class="btn" onclick="event.stopPropagation();updateCart('${p.id}',1)" aria-label="Increase"><span class="material-symbols-outlined">add</span></button>
   </div>`;
   return `<button onclick="event.stopPropagation();addToCart(customProducts.find(x=>x.id==='${p.id}'))" class="ss-add-btn btn">+ Add</button>`;
 }
