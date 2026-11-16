@@ -667,14 +667,62 @@ body{background:var(--cream);color:var(--ink);}
 .ss-sunday-status{margin-left:auto;padding-left:14px;border-left:1px solid rgba(15,110,56,.15);color:var(--green);font-size:10px;font-weight:800;max-width:92px;}
 @media(min-width:760px){.ss-sunday{gap:16px;padding:18px;}.ss-sunday-status{font-size:12px;max-width:130px;}}
 
-/* Floating cart bar */
+/* Floating cart bar — liquid glass light green */
 #floating-cart-bar button{
-  background: linear-gradient(135deg,#1a7a3c 0%,#176b35 100%);
-  box-shadow: 0 4px 20px rgba(23,107,53,0.45), 0 2px 8px rgba(0,0,0,0.18);
+  position: relative;
+  background:
+    linear-gradient(135deg, rgba(200,245,218,.72) 0%, rgba(160,230,190,.48) 40%, rgba(200,245,218,.60) 100%);
+  -webkit-backdrop-filter: blur(36px) saturate(220%) brightness(1.14) contrast(1.03);
+  backdrop-filter: blur(36px) saturate(220%) brightness(1.14) contrast(1.03);
+  border: none !important;
+  box-shadow:
+    0 2px 0 0 rgba(255,255,255,.80) inset,
+    0 -1px 0 0 rgba(255,255,255,.18) inset,
+    1px 0 0 0 rgba(255,255,255,.50) inset,
+    -1px 0 0 0 rgba(255,255,255,.50) inset,
+    0 10px 36px rgba(10,80,35,.22),
+    0 4px 12px rgba(10,80,35,.14),
+    0 1px 3px rgba(10,80,35,.10) !important;
+  color: #0d4020 !important;
+  overflow: hidden;
+}
+#floating-cart-bar button::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  border-radius:inherit;
+  background:linear-gradient(
+    110deg,
+    rgba(255,255,255,0) 0%,
+    rgba(255,255,255,.60) 38%,
+    rgba(255,255,255,.12) 52%,
+    rgba(255,255,255,0) 100%
+  );
+  background-size:200% 100%;
+  animation:liqShimmer 3.6s ease-in-out infinite;
+  pointer-events:none;
+  z-index:1;
+}
+#floating-cart-bar button::after{
+  content:'';
+  position:absolute;
+  inset:0;
+  border-radius:inherit;
+  border:1.5px solid transparent;
+  background:
+    linear-gradient(rgba(255,255,255,0),rgba(255,255,255,0)) padding-box,
+    linear-gradient(135deg,rgba(255,255,255,.95) 0%,rgba(255,255,255,.25) 35%,rgba(255,255,255,0) 60%,rgba(255,255,255,.40) 100%) border-box;
+  pointer-events:none;
+  z-index:2;
+}
+#floating-cart-bar button > *{ position:relative; z-index:3; }
+#floating-cart-bar #fcb-qty{
+  background: rgba(10,80,35,.18) !important;
+  color: #0d4020 !important;
 }
 #floating-cart-bar #fcb-thumbs img{
   width:28px; height:28px; border-radius:8px; object-fit:cover;
-  border:1.5px solid rgba(255,255,255,0.4);
+  border:1.5px solid rgba(255,255,255,0.5);
   margin-left:-6px;
 }
 #floating-cart-bar #fcb-thumbs img:first-child{ margin-left:0; }
@@ -2274,6 +2322,7 @@ body { background: var(--prem-bg) !important; }
         </div>
         <div class="space-y-1">
           <button onclick="nav('orders')" class="w-full flex items-center justify-between py-3 px-4 hover:bg-surface-container-low rounded-xl transition-colors btn group"><div class="flex items-center gap-3"><span class="material-symbols-outlined text-primary" style="font-size:20px">receipt_long</span><span class="font-semibold text-sm">My Orders</span></div><span class="material-symbols-outlined text-outline" style="font-size:18px">chevron_right</span></button>
+          <button onclick="openChat()" class="w-full flex items-center justify-between py-3 px-4 hover:bg-surface-container-low rounded-xl transition-colors btn group"><div class="flex items-center gap-3"><span class="material-symbols-outlined text-primary" style="font-size:20px">support_agent</span><span class="font-semibold text-sm">Support Chat</span></div><span class="material-symbols-outlined text-outline" style="font-size:18px">chevron_right</span></button>
           <button onclick="handleSignOut()" class="w-full flex items-center justify-between py-3 px-4 hover:bg-error/5 rounded-xl transition-colors btn group"><div class="flex items-center gap-3"><span class="material-symbols-outlined text-error" style="font-size:20px">logout</span><span class="font-semibold text-sm text-error">Sign Out</span></div><span class="material-symbols-outlined text-error/40" style="font-size:18px">chevron_right</span></button>
         </div>
       </div>
@@ -2294,9 +2343,9 @@ body { background: var(--prem-bg) !important; }
 
 <!-- FLOATING CART BAR -->
 <div id="floating-cart-bar" class="fixed left-1/2 -translate-x-1/2 z-[60] hidden" style="bottom:calc(72px + var(--safe-b, 0px)); width:calc(100% - 32px); max-width:400px;">
-  <button onclick="nav('cart')" class="w-full flex items-center justify-between px-4 py-3 rounded-2xl text-white font-bold shadow-xl active:scale-[0.98] transition-transform" style="background:#1a7a3c; min-height:52px;">
+  <button onclick="nav('cart')" class="w-full flex items-center justify-between px-4 py-3 rounded-[30px] font-bold active:scale-[0.98] transition-transform" style="min-height:52px;">
     <div class="flex items-center gap-2.5">
-      <span class="bg-white/20 rounded-lg px-2 py-0.5 text-sm font-extrabold" id="fcb-qty">0 items</span>
+      <span class="rounded-lg px-2 py-0.5 text-sm font-extrabold" id="fcb-qty">0 items</span>
       <div id="fcb-thumbs" class="flex gap-1"></div>
     </div>
     <div class="flex items-center gap-2 font-extrabold text-sm">
@@ -2319,8 +2368,8 @@ body { background: var(--prem-bg) !important; }
 </div>
 
 
-<!-- ====== CHAT FAB ====== -->
-<button id="chat-fab" onclick="openChat()" title="Customer Support">
+<!-- CHAT FAB — moved to Profile page; hidden here -->
+<button id="chat-fab" onclick="openChat()" title="Customer Support" style="display:none!important;">
   <span class="material-symbols-outlined fill-icon" style="color:white;font-size:24px;">support_agent</span>
   <div id="chat-fab-dot">0</div>
 </button>
