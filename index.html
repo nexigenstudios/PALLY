@@ -853,7 +853,7 @@ body{background:var(--cream);color:var(--ink);}
   max-width:960px;margin:0 auto;
   /* header = 64px content + safe-area-inset-top (handled by .page).
      Add 24px gap so content sits comfortably below the header. */
-  padding:calc(env(safe-area-inset-top,0px) + 16px) clamp(10px,3vw,16px) calc(env(safe-area-inset-bottom,0px) + 24px);
+  padding:calc(env(safe-area-inset-top,0px) + 80px) clamp(10px,3vw,16px) calc(env(safe-area-inset-bottom,0px) + 80px);
   overflow-x:hidden;
 }
 
@@ -4387,8 +4387,7 @@ function nav(page) {
   }
 
   // Hide nav bars on full-screen pages, restore on others
-  const fullScreenPages = ['catdetail', 'categories'];
-  const hideNav = fullScreenPages.includes(page);
+  const hideNav = page === 'catdetail';
   const mainHeader = document.getElementById('main-header');
   const mobileNav = document.getElementById('mobile-nav');
   if (mainHeader) mainHeader.style.transform = hideNav ? 'translateY(-110%)' : '';
