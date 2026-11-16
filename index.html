@@ -3059,9 +3059,9 @@ function cardActionHtml(p,selW){
     const qty=ex?ex.qty:0;
     if(oos) return `<button disabled class="ss-add-btn">Unavailable</button>`;
     if(qty>0) return `<div class="ss-qty">
-      <button class="btn" onclick="event.stopPropagation();updateCartByKey('${cartKey}',-1);renderProducts();renderHomeProducts();" aria-label="Decrease"><span class="material-symbols-outlined">remove</span></button>
+      <button class="btn" onclick="event.stopPropagation();updateCartByKey('${cartKey}',-1);" aria-label="Decrease"><span class="material-symbols-outlined">remove</span></button>
       <span class="ss-q">${qty}</span>
-      <button class="btn" onclick="event.stopPropagation();updateCartByKey('${cartKey}',1);renderProducts();renderHomeProducts();" aria-label="Increase"><span class="material-symbols-outlined">add</span></button>
+      <button class="btn" onclick="event.stopPropagation();updateCartByKey('${cartKey}',1);" aria-label="Increase"><span class="material-symbols-outlined">add</span></button>
     </div>`;
     return `<button onclick="cardAddWeighted('${p.id}',event)" class="ss-add-btn btn">+ Add</button>`;
   }
@@ -3342,6 +3342,7 @@ function addToCart(p) {
   updateCartBadge(); renderCart();
   if(currentPage==='browse')renderProducts();
   if(currentPage==='home')renderHomeProducts();
+  if(currentPage==='catdetail')renderCatDetail();
   showToast((p.displayName||p.name)+' added to cart');
 }
 
@@ -3356,6 +3357,7 @@ function updateCart(id,delta) {
   updateCartBadge(); renderCart();
   if(currentPage==='browse')renderProducts();
   if(currentPage==='home')renderHomeProducts();
+  if(currentPage==='catdetail')renderCatDetail();
 }
 
 function updateCartByKey(cartKey,delta) {
@@ -3369,6 +3371,7 @@ function updateCartByKey(cartKey,delta) {
   updateCartBadge(); renderCart();
   if(currentPage==='browse')renderProducts();
   if(currentPage==='home')renderHomeProducts();
+  if(currentPage==='catdetail')renderCatDetail();
 }
 
 function updateCartBadge() {
