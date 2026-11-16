@@ -667,47 +667,65 @@ body{background:var(--cream);color:var(--ink);}
 .ss-sunday-status{margin-left:auto;padding-left:14px;border-left:1px solid rgba(15,110,56,.15);color:var(--green);font-size:10px;font-weight:800;max-width:92px;}
 @media(min-width:760px){.ss-sunday{gap:16px;padding:18px;}.ss-sunday-status{font-size:12px;max-width:130px;}}
 
-/* Floating cart bar — Swiggy-style solid green transparent pill */
+/* Floating cart bar — liquid glass light green */
 #floating-cart-bar button{
   position: relative;
-  background: rgba(15, 110, 56, 0.82);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  backdrop-filter: blur(20px) saturate(180%);
-  border: 1.5px solid rgba(255,255,255,0.18) !important;
+  background:
+    linear-gradient(135deg, rgba(200,245,218,.72) 0%, rgba(160,230,190,.48) 40%, rgba(200,245,218,.60) 100%);
+  -webkit-backdrop-filter: blur(36px) saturate(220%) brightness(1.14) contrast(1.03);
+  backdrop-filter: blur(36px) saturate(220%) brightness(1.14) contrast(1.03);
+  border: none !important;
   box-shadow:
-    0 8px 32px rgba(10,80,35,.35),
-    0 2px 8px rgba(10,80,35,.20);
-  color: #ffffff !important;
+    0 2px 0 0 rgba(255,255,255,.80) inset,
+    0 -1px 0 0 rgba(255,255,255,.18) inset,
+    1px 0 0 0 rgba(255,255,255,.50) inset,
+    -1px 0 0 0 rgba(255,255,255,.50) inset,
+    0 10px 36px rgba(10,80,35,.22),
+    0 4px 12px rgba(10,80,35,.14),
+    0 1px 3px rgba(10,80,35,.10) !important;
+  color: #0d4020 !important;
   overflow: hidden;
 }
-#floating-cart-bar button::before{ display:none; }
-#floating-cart-bar button::after{ display:none; }
+#floating-cart-bar button::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  border-radius:inherit;
+  background:linear-gradient(
+    110deg,
+    rgba(255,255,255,0) 0%,
+    rgba(255,255,255,.60) 38%,
+    rgba(255,255,255,.12) 52%,
+    rgba(255,255,255,0) 100%
+  );
+  background-size:200% 100%;
+  animation:liqShimmer 3.6s ease-in-out infinite;
+  pointer-events:none;
+  z-index:1;
+}
+#floating-cart-bar button::after{
+  content:'';
+  position:absolute;
+  inset:0;
+  border-radius:inherit;
+  border:1.5px solid transparent;
+  background:
+    linear-gradient(rgba(255,255,255,0),rgba(255,255,255,0)) padding-box,
+    linear-gradient(135deg,rgba(255,255,255,.95) 0%,rgba(255,255,255,.25) 35%,rgba(255,255,255,0) 60%,rgba(255,255,255,.40) 100%) border-box;
+  pointer-events:none;
+  z-index:2;
+}
 #floating-cart-bar button > *{ position:relative; z-index:3; }
 #floating-cart-bar #fcb-qty{
-  background: rgba(255,255,255,0.18) !important;
-  color: #ffffff !important;
-  font-size:11px !important;
-  letter-spacing:0.03em;
-}
-#floating-cart-bar #fcb-label{
-  font-size:15px;
-  font-weight:800;
-  color:#fff;
-  letter-spacing:0.04em;
-  text-transform:uppercase;
+  background: rgba(10,80,35,.18) !important;
+  color: #0d4020 !important;
 }
 #floating-cart-bar #fcb-thumbs img{
-  width:30px; height:30px; border-radius:7px; object-fit:cover;
-  border:1.5px solid rgba(255,255,255,0.45);
-  margin-left:-7px;
+  width:28px; height:28px; border-radius:8px; object-fit:cover;
+  border:1.5px solid rgba(255,255,255,0.5);
+  margin-left:-6px;
 }
 #floating-cart-bar #fcb-thumbs img:first-child{ margin-left:0; }
-#floating-cart-bar #fcb-arrow{
-  background: rgba(255,255,255,0.22);
-  border-radius:50%;
-  width:28px; height:28px;
-  display:flex; align-items:center; justify-content:center;
-}
 #floating-cart-bar.above-nav{
   bottom: calc(80px + var(--safe-b, 0px));
 }
@@ -2324,17 +2342,15 @@ body { background: var(--prem-bg) !important; }
 </div>
 
 <!-- FLOATING CART BAR -->
-<div id="floating-cart-bar" class="fixed left-1/2 -translate-x-1/2 z-[60] hidden" style="bottom:calc(72px + var(--safe-b, 0px)); width:calc(100% - 32px); max-width:420px;">
-  <button onclick="nav('cart')" class="w-full flex items-center justify-between px-5 rounded-[30px] font-bold active:scale-[0.98] transition-transform" style="min-height:58px;">
-    <div class="flex items-center gap-3">
-      <div class="flex flex-col items-start leading-tight">
-        <span id="fcb-label" style="font-size:15px;font-weight:800;color:#fff;letter-spacing:0.06em;">CART</span>
-        <span class="rounded-md px-1.5 py-0 text-xs font-bold" id="fcb-qty" style="background:rgba(255,255,255,0.18);color:#fff;margin-top:1px;">0 items</span>
-      </div>
-      <div id="fcb-thumbs" class="flex" style="margin-left:4px;"></div>
+<div id="floating-cart-bar" class="fixed left-1/2 -translate-x-1/2 z-[60] hidden" style="bottom:calc(72px + var(--safe-b, 0px)); width:calc(100% - 32px); max-width:400px;">
+  <button onclick="nav('cart')" class="w-full flex items-center justify-between px-4 py-3 rounded-[30px] font-bold active:scale-[0.98] transition-transform" style="min-height:52px;">
+    <div class="flex items-center gap-2.5">
+      <span class="rounded-lg px-2 py-0.5 text-sm font-extrabold" id="fcb-qty">0 items</span>
+      <div id="fcb-thumbs" class="flex gap-1"></div>
     </div>
-    <div id="fcb-arrow" style="background:rgba(255,255,255,0.22);border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;">
-      <span class="material-symbols-outlined" style="font-size:18px;color:#fff;">arrow_forward_ios</span>
+    <div class="flex items-center gap-2 font-extrabold text-sm">
+      <span>View Cart</span>
+      <span class="material-symbols-outlined" style="font-size:18px">arrow_forward_ios</span>
     </div>
   </button>
 </div>
@@ -3477,7 +3493,7 @@ function addToCart(p) {
   if(currentPage==='browse')renderProducts();
   if(currentPage==='home')renderHomeProducts();
   if(currentPage==='catdetail'||currentPage==='categories')refreshCardAction(p.id);
-  // toast removed: no popup on add to cart
+  showToast((p.displayName||p.name)+' added to cart');
 }
 
 function updateCart(id,delta) {
