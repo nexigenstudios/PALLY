@@ -3074,6 +3074,16 @@ function cardEffectivePrice(p,w){
   if(!selW)return p.price;
   return Math.round((p.pricePerKg*woptToGrams(selW)/1000)*100)/100;
 }
+// Surgically refresh only the action button(s) for a product card — no page re-render, no scroll jump
+function refreshCardAction(id) {
+  const p = customProducts.find(x => x.id === id); if (!p) return;
+  document.querySelectorAll(`.ss-product[data-id="${id}"]`).forEach(card => {
+    const actWrap = card.querySelector('.ss-card-action'); if (!actWrap) return;
+    const selW = _cardWeightSel[id] || (p.weightBased && p.weightOptions && p.weightOptions[0]) || null;
+    actWrap.innerHTML = cardActionHtml(p, selW);
+  });
+}
+
 // Safe card-level add: avoids inlining JSON in onclick attributes
 function cardAddWeighted(id, event) {
   if(event) event.stopPropagation();
@@ -3376,7 +3386,7 @@ function addToCart(p) {
   if(currentPage==='browse')renderProducts();
   if(currentPage==='home')renderHomeProducts();
   if(currentPage==='catdetail')renderCatDetail();
-  if(currentPage==='categories')renderCategoriesPage();
+  if(currentPage==='categories')refreshCardAction(p.id);
   showToast((p.displayName||p.name)+' added to cart');
 }
 
@@ -3392,7 +3402,7 @@ function updateCart(id,delta) {
   if(currentPage==='browse')renderProducts();
   if(currentPage==='home')renderHomeProducts();
   if(currentPage==='catdetail')renderCatDetail();
-  if(currentPage==='categories')renderCategoriesPage();
+  if(currentPage==='categories')refreshCardAction(id);
 }
 
 function updateCartByKey(cartKey,delta) {
@@ -3407,7 +3417,7 @@ function updateCartByKey(cartKey,delta) {
   if(currentPage==='browse')renderProducts();
   if(currentPage==='home')renderHomeProducts();
   if(currentPage==='catdetail')renderCatDetail();
-  if(currentPage==='categories')renderCategoriesPage();
+  if(currentPage==='categories')refreshCardAction(item.id);
 }
 
 function updateCartBadge() {
