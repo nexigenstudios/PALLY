@@ -2727,7 +2727,32 @@ function subscribeProducts() {
         if(currentPage==='home')renderHomeProducts();
         if(currentPage==='browse')renderProducts();
         if(currentPage==='cart')renderCart(); // refresh cart if stock changed
+        if(currentPage==='categories')renderCategoriesPage();
+        if(currentPage==='catdetail')renderCatDetail();
+        // Refresh open PDP with latest price/stock without closing it
         if(window.pdpRefresh)pdpRefresh();
+        // Surgically patch every visible card in-place (home + category strips)
+        // so price/stock/badge updates appear without a full page re-render.
+        document.querySelectorAll('.ss-product[data-id]').forEach(card=>{
+          const pid=card.dataset.id;
+          const p=customProducts.find(x=>x.id===pid); if(!p)return;
+          // Badge (Fresh / Out of Stock)
+          const badge=card.querySelector('.ss-fresh');
+          const oos=(p.stock??0)<=0;
+          if(badge){badge.className='ss-fresh'+(oos?' ss-fresh-oos':'');badge.textContent=oos?'Out of Stock':'✓ '+(p.badge||'Fresh');}
+          card.classList.toggle('ss-oos',oos);
+          // Price
+          const priceEl=card.querySelector('.ss-price');
+          if(priceEl){
+            const selW=_cardWeightSel[pid]||(p.weightBased&&p.weightOptions&&p.weightOptions[0])||null;
+            const price=cardEffectivePrice(p,selW);
+            const unit=selW||p.unit;
+            const low=(p.stock??0)<=5&&(p.stock??0)>0&&!oos;
+            priceEl.innerHTML=`₹${price}${unit?` <small>/ ${unit}</small>`:''}${low?`<div class="ss-low">${p.stock} left!</div>`:''}`;
+          }
+          // Action button
+          refreshCardAction(pid);
+        });
       },
       e=>{console.error('Products listener:',e);}
     );
@@ -2989,6 +3014,8 @@ function subscribeCategories() {
         const cnt=document.getElementById('home-product-count'); if(cnt)cnt.textContent=customProducts.length+'+';
         if(currentPage==='home')renderHomeProducts();
         if(currentPage==='browse')renderProducts();
+        if(currentPage==='categories')renderCategoriesPage();
+        if(currentPage==='catdetail')renderCatDetail();
       },
       e=>{
         console.error('Categories listener:',e);
