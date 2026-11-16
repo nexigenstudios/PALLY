@@ -3013,8 +3013,8 @@ function renderCategories() {
   const pills=document.getElementById('home-cat-pills');
   if(pills){
     const allChips=[
-      {label:'All',img:'',fn:"filterAndBrowse('All')"},
-      ...cats.map(c=>({label:c.name,img:c.imageUrl||'',fn:`filterAndBrowseEnc('${catArg(c.name)}')`}))
+      {label:'All',img:'',fn:"openCatDetailAll()"},
+      ...cats.map(c=>({label:c.name,img:c.imageUrl||'',fn:`openCatDetail('${catArg(c.name)}')`}))
     ];
     pills.innerHTML=allChips.map(ch=>{
       const inner=ch.img
@@ -4173,7 +4173,7 @@ function openCatDetail(encName) {
   _catDetailGroupNames = null;
   _navStack.push(currentPage);
   document.getElementById('catdetail-title').textContent = _catDetailName;
-  document.getElementById('catdetail-back-label').textContent = currentPage === 'categories' ? 'Categories' : 'Back';
+  document.getElementById('catdetail-back-label').textContent = currentPage === 'categories' ? 'Categories' : currentPage === 'home' ? 'Home' : 'Back';
   const toggle = document.getElementById('catdetail-seeall-toggle');
   if (toggle) toggle.textContent = 'See All';
   nav('catdetail');
@@ -4201,7 +4201,7 @@ function openCatDetailAll() {
   _catDetailAllMode = true;
   _navStack.push(currentPage);
   document.getElementById('catdetail-title').textContent = 'All Products';
-  document.getElementById('catdetail-back-label').textContent = 'Categories';
+  document.getElementById('catdetail-back-label').textContent = currentPage === 'home' ? 'Home' : 'Categories';
   const toggle = document.getElementById('catdetail-seeall-toggle');
   if (toggle) toggle.textContent = 'Show by Category';
   nav('catdetail');
