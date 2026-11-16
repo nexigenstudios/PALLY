@@ -667,6 +667,21 @@ body{background:var(--cream);color:var(--ink);}
 .ss-sunday-status{margin-left:auto;padding-left:14px;border-left:1px solid rgba(15,110,56,.15);color:var(--green);font-size:10px;font-weight:800;max-width:92px;}
 @media(min-width:760px){.ss-sunday{gap:16px;padding:18px;}.ss-sunday-status{font-size:12px;max-width:130px;}}
 
+/* Floating cart bar */
+#floating-cart-bar button{
+  background: linear-gradient(135deg,#1a7a3c 0%,#176b35 100%);
+  box-shadow: 0 4px 20px rgba(23,107,53,0.45), 0 2px 8px rgba(0,0,0,0.18);
+}
+#floating-cart-bar #fcb-thumbs img{
+  width:28px; height:28px; border-radius:8px; object-fit:cover;
+  border:1.5px solid rgba(255,255,255,0.4);
+  margin-left:-6px;
+}
+#floating-cart-bar #fcb-thumbs img:first-child{ margin-left:0; }
+#floating-cart-bar.above-nav{
+  bottom: calc(80px + var(--safe-b, 0px));
+}
+
 /* Bottom nav — liquid glass */
 #mobile-nav > div{
   position:relative !important;
@@ -2272,10 +2287,23 @@ body { background: var(--prem-bg) !important; }
   <div class="flex justify-around items-center">
     <button class="flex flex-col items-center gap-0.5 btn min-w-[44px]" onclick="nav('home')" id="mn-home"><span class="material-symbols-outlined fill-icon" style="font-size:22px;color:#176b35">home</span><span class="text-[9px] font-bold" style="color:#176b35">Home</span></button>
     <button class="flex flex-col items-center gap-0.5 btn min-w-[44px]" onclick="nav('categories')" id="mn-browse"><span class="material-symbols-outlined" style="font-size:22px;color:#6e7771">grid_view</span><span class="text-[9px] font-bold" style="color:#6e7771">Categories</span></button>
-    <button class="flex flex-col items-center gap-0.5 btn relative min-w-[44px]" onclick="nav('cart')" id="mn-cart"><span class="material-symbols-outlined" style="font-size:22px;color:#6e7771">shopping_cart</span><span class="text-[9px] font-bold" style="color:#6e7771">Cart</span><span style="background:#e34b43" id="mn-cart-badge" class="absolute -top-1 right-1 w-4 h-4 text-white text-[9px] font-bold rounded-full flex items-center justify-center hidden">0</span></button>
     <button class="flex flex-col items-center gap-0.5 btn min-w-[44px]" onclick="nav('orders')" id="mn-orders"><span class="material-symbols-outlined" style="font-size:22px;color:#6e7771">package_2</span><span class="text-[9px] font-bold" style="color:#6e7771">My Orders</span></button>
     <button class="flex flex-col items-center gap-0.5 btn min-w-[44px]" onclick="nav('profile')" id="mn-profile"><span class="material-symbols-outlined" style="font-size:22px;color:#6e7771">person</span><span class="text-[9px] font-bold" style="color:#6e7771">Profile</span></button>
   </div>
+</div>
+
+<!-- FLOATING CART BAR -->
+<div id="floating-cart-bar" class="fixed left-1/2 -translate-x-1/2 z-[60] hidden" style="bottom:calc(72px + var(--safe-b, 0px)); width:calc(100% - 32px); max-width:400px;">
+  <button onclick="nav('cart')" class="w-full flex items-center justify-between px-4 py-3 rounded-2xl text-white font-bold shadow-xl active:scale-[0.98] transition-transform" style="background:#1a7a3c; min-height:52px;">
+    <div class="flex items-center gap-2.5">
+      <span class="bg-white/20 rounded-lg px-2 py-0.5 text-sm font-extrabold" id="fcb-qty">0 items</span>
+      <div id="fcb-thumbs" class="flex gap-1"></div>
+    </div>
+    <div class="flex items-center gap-2 font-extrabold text-sm">
+      <span>View Cart</span>
+      <span class="material-symbols-outlined" style="font-size:18px">arrow_forward_ios</span>
+    </div>
+  </button>
 </div>
 
 <!-- SUCCESS MODAL -->
@@ -2951,13 +2979,14 @@ function nav(page) {
   window.scrollTo({top:0,behavior:'instant'});
   currentPage=page;
   document.querySelectorAll('.nav-link').forEach(a=>{a.className=a.dataset.page===page?'text-sm font-bold cursor-pointer nav-link text-primary border-b-2 border-primary pb-1':'text-sm font-semibold cursor-pointer nav-link text-secondary hover:text-primary transition-colors';});
-  const mnMap={home:'mn-home',browse:'mn-browse',cart:'mn-cart',orders:'mn-orders',profile:'mn-profile'};
+  const mnMap={home:'mn-home',browse:'mn-browse',orders:'mn-orders',profile:'mn-profile'};
   Object.entries(mnMap).forEach(([pg,id])=>{const el=document.getElementById(id);if(!el)return;const isActive=pg===page;el.querySelectorAll('span').forEach(s=>{if(s.classList.contains('material-symbols-outlined')){s.style.color=isActive?'#176b35':'#6e7771';if(isActive)s.classList.add('fill-icon');else s.classList.remove('fill-icon');}else if(!s.id){s.style.color=isActive?'#176b35':'#6e7771';}});});
   if(page==='home')renderHomeProducts();
   if(page==='browse')renderProducts();
   if(page==='cart'){renderCart();fillCartDelivery();updatePickupModeUI();}
   if(page==='orders')renderOrders();
   if(page==='profile')renderProfile();
+  if(typeof updateFloatingCart==='function')updateFloatingCart();
 }
 
 function filterAndBrowse(cat) { currentFilter=cat; nav('browse'); }
@@ -3449,7 +3478,35 @@ function updateCartByKey(cartKey,delta) {
 function updateCartBadge() {
   try{localStorage.setItem(CART_KEY,JSON.stringify(cart.map(({createdAt,updatedAt,...r})=>r)));}catch(e){}
   const total=cart.reduce((s,c)=>s+c.qty,0);
-  ['cart-badge','mn-cart-badge'].forEach(id=>{const el=document.getElementById(id);if(!el)return;el.textContent=total;el.classList.toggle('hidden',total===0);});
+  ['cart-badge'].forEach(id=>{const el=document.getElementById(id);if(!el)return;el.textContent=total;el.classList.toggle('hidden',total===0);});
+  updateFloatingCart();
+}
+
+function updateFloatingCart() {
+  const bar = document.getElementById('floating-cart-bar');
+  if (!bar) return;
+  const total = cart.reduce((s,c)=>s+c.qty,0);
+  const hiddenPages = ['cart','profile','orders'];
+  const shouldShow = total > 0 && !hiddenPages.includes(currentPage);
+  bar.classList.toggle('hidden', !shouldShow);
+  if (!shouldShow) return;
+  // qty label
+  const qtyEl = document.getElementById('fcb-qty');
+  if (qtyEl) qtyEl.textContent = total + (total===1?' item':' items');
+  // thumbnails — show up to 3 unique product images
+  const thumbsEl = document.getElementById('fcb-thumbs');
+  if (thumbsEl) {
+    const imgs = cart.slice(0,3).map(item=>{
+      const src = item.imageUrl || catFallback(item.category);
+      return `<img src="${src}" onerror="this.onerror=null;this.src='${catFallback(item.category)}'" alt="">`;
+    }).join('');
+    thumbsEl.innerHTML = imgs;
+  }
+  // Position: above nav bar on pages that show nav, flush lower on catdetail (nav hidden)
+  const navHidden = currentPage === 'catdetail';
+  bar.style.bottom = navHidden
+    ? 'calc(16px + var(--safe-b, 0px))'
+    : 'calc(80px + var(--safe-b, 0px))';
 }
 
 function renderCart() {
@@ -4393,7 +4450,7 @@ function nav(page) {
 
   // Bottom mobile nav — categories/catdetail both highlight the grid_view button
   const browsePages = ['browse','categories','catdetail'];
-  const mnMap = { home:'mn-home', cart:'mn-cart', orders:'mn-orders', profile:'mn-profile' };
+  const mnMap = { home:'mn-home', orders:'mn-orders', profile:'mn-profile' };
   // reset all first
   ['mn-home','mn-browse','mn-cart','mn-orders','mn-profile'].forEach(id => {
     const el = document.getElementById(id); if (!el) return;
@@ -4419,6 +4476,8 @@ function nav(page) {
   const mobileNav = document.getElementById('mobile-nav');
   if (mainHeader) mainHeader.style.transform = hideNav ? 'translateY(-110%)' : '';
   if (mobileNav)  mobileNav.style.transform  = hideNav ? 'translateY(200%)'  : '';
+
+  updateFloatingCart();
 
   // Page-specific render
   if (page === 'home')       { renderHomeProducts(); renderOrderAgain(); }
