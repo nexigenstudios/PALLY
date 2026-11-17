@@ -2055,8 +2055,9 @@ body { background: var(--prem-bg) !important; }
       <div class="ss-search-wrap">
         <svg class="ss-search-icon" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35" stroke-linecap="round"/></svg>
         <input id="hero-search" class="ss-search" type="text" placeholder="Search for tomatoes, rice, eggs..." aria-label="Search products"
-          onkeydown="if(event.key==='Enter'){currentFilter='All';nav('browse')}">
-        <button class="ss-filter-icon" aria-label="Browse all" onclick="nav('browse')">
+          oninput="(function(v){var bi=document.getElementById('search-input');if(bi)bi.value=v;})(this.value)"
+          onkeydown="if(event.key==='Enter'){var bi=document.getElementById('search-input');if(bi){bi.value=this.value;bi.dispatchEvent(new Event('input',{bubbles:true}));}currentFilter='All';nav('browse');}">
+        <button class="ss-filter-icon" aria-label="Search" onclick="(function(){var hs=document.getElementById('hero-search');var bi=document.getElementById('search-input');if(hs&&bi){bi.value=hs.value;bi.dispatchEvent(new Event('input',{bubbles:true}));}currentFilter='All';nav('browse');})()">
           <svg style="width:20px;height:20px;" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2.2" viewBox="0 0 24 24">
             <line x1="4" x2="20" y1="7" y2="7"/><circle cx="8" cy="7" fill="white" r="2.5"/>
             <line x1="4" x2="20" y1="17" y2="17"/><circle cx="16" cy="17" fill="white" r="2.5"/>
@@ -2836,12 +2837,24 @@ function renderHeader() {
   const avatar=document.getElementById('user-avatar');
   const icon=document.getElementById('user-icon');
   if(user){
-    const i=(user.displayName||user.email||'U').split(' ').map(n=>n[0]).join('').toUpperCase().substring(0,2);
-    avatar.textContent=i;
+    if(user.photoURL){
+      // Google / social sign-in: show actual profile photo
+      avatar.textContent='';
+      avatar.style.backgroundImage='url('+user.photoURL+')';
+      avatar.style.backgroundSize='cover';
+      avatar.style.backgroundPosition='center';
+    } else {
+      avatar.style.backgroundImage='';
+      avatar.style.backgroundSize='';
+      avatar.style.backgroundPosition='';
+      const i=(user.displayName||user.email||'U').split(' ').map(n=>n[0]).join('').toUpperCase().substring(0,2);
+      avatar.textContent=i;
+    }
     avatar.classList.remove('hidden');
     if(icon) icon.style.display='none';
   } else {
     avatar.classList.add('hidden');
+    avatar.style.backgroundImage='';
     if(icon) icon.style.display='';
   }
 }
@@ -4420,7 +4433,7 @@ function renderCategoriesPage() {
     <div class="cats-group" data-group="__all__">
       <div class="cats-group-head">
         <span class="cats-section-label">All Products</span>
-        <button class="cats-see-all-btn btn" onclick="openCatDetailAll()">See All →</button>
+        <button class="cats-see-all-btn btn" onclick="openCatDetailAllByCategory()">See All →</button>
       </div>
       <div class="cats-popular-strip">
         <div class="cats-popular-row">${allProducts.map(p => productCard(p)).join('')}</div>
@@ -4526,6 +4539,21 @@ function openCatDetailAll() {
   document.getElementById('catdetail-back-label').textContent = currentPage === 'home' ? 'Home' : 'Categories';
   const toggle = document.getElementById('catdetail-seeall-toggle');
   if (toggle) toggle.textContent = 'Show by Category';
+  nav('catdetail');
+}
+
+// Open catdetail showing ALL categories in sidebar (by-category view, not flat all-products)
+function openCatDetailAllByCategory() {
+  const cats = (storeCategories || []).filter(c => preorderOpen() || !isPreorderCat(c.name));
+  _catDetailGroupNames = cats.map(c => c.name); // show every category in sidebar
+  _catDetailName = cats.length ? cats[0].name : '';
+  _catDetailFilter = 'All';
+  _catDetailAllMode = false;
+  _navStack.push(currentPage);
+  document.getElementById('catdetail-title').textContent = _catDetailName || 'All Products';
+  document.getElementById('catdetail-back-label').textContent = 'Categories';
+  const toggle = document.getElementById('catdetail-seeall-toggle');
+  if (toggle) toggle.textContent = 'See All';
   nav('catdetail');
 }
 
