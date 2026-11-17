@@ -3143,6 +3143,7 @@ function nav(page) {
   document.getElementById('page-'+page)?.classList.add('active');
   window.scrollTo({top:0,behavior:'instant'});
   currentPage=page;
+  if(history.state?.snackyPage!==page){history.pushState({snackyPage:page},'','#'+page);}
   document.querySelectorAll('.nav-link').forEach(a=>{a.className=a.dataset.page===page?'text-sm font-bold cursor-pointer nav-link text-primary border-b-2 border-primary pb-1':'text-sm font-semibold cursor-pointer nav-link text-secondary hover:text-primary transition-colors';});
   const mnMap={home:'mn-home',browse:'mn-browse'};
   Object.entries(mnMap).forEach(([pg,id])=>{const el=document.getElementById(id);if(!el)return;const isActive=pg===page;el.querySelectorAll('span').forEach(s=>{if(s.classList.contains('material-symbols-outlined')){s.style.color=isActive?'#176b35':'#6e7771';if(isActive)s.classList.add('fill-icon');else s.classList.remove('fill-icon');}else if(!s.id){s.style.color=isActive?'#176b35':'#6e7771';}});});
@@ -4536,6 +4537,65 @@ function navBack() {
   nav(prev);
 }
 
+// ── Hardware / gesture back button interception ──
+// Seed initial history entry so there is always one entry to pop back to
+// without exiting the site.
+(function seedHistory() {
+  if (!history.state?.snackyPage) {
+    history.replaceState({ snackyPage: 'home' }, '', '#home');
+  }
+})();
+
+window.addEventListener('popstate', function(e) {
+  // If the browser popped to a state we own, do in-app navigation
+  if (e.state && e.state.snackyPage) {
+    const target = e.state.snackyPage;
+    // Don't re-push; just switch the view
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    const pg = document.getElementById('page-' + target);
+    if (pg) pg.classList.add('active');
+    if (target !== 'catdetail') window.scrollTo({ top: 0, behavior: 'instant' });
+    currentPage = target;
+    // Keep a fresh entry ahead so the next back press doesn't exit
+    history.pushState({ snackyPage: target }, '', '#' + target);
+    // Trigger page-specific renders
+    if (target === 'home')       { renderHomeProducts(); renderOrderAgain(); }
+    if (target === 'browse')     renderProducts();
+    if (target === 'categories') renderCategoriesPage();
+    if (target === 'catdetail')  renderCatDetail();
+    if (target === 'cart')       { renderCart(); fillCartDelivery(); updatePickupModeUI(); }
+    if (target === 'orders')     renderOrders();
+    if (target === 'profile')    renderProfile();
+    if (typeof updateFloatingCart === 'function') updateFloatingCart();
+    // Sync nav bar highlights
+    const browsePages = ['browse','categories','catdetail'];
+    ['mn-home','mn-browse'].forEach(id => {
+      const el = document.getElementById(id); if (!el) return;
+      el.querySelectorAll('span').forEach(s => {
+        if (s.classList.contains('material-symbols-outlined')) { s.style.color='#6e7771'; s.classList.remove('fill-icon'); }
+        else if (!s.id) { s.style.color='#6e7771'; }
+      });
+    });
+    const activeId = browsePages.includes(target) ? 'mn-browse' : (target === 'home' ? 'mn-home' : null);
+    if (activeId) {
+      const el = document.getElementById(activeId); if (el) {
+        el.querySelectorAll('span').forEach(s => {
+          if (s.classList.contains('material-symbols-outlined')) { s.style.color='#176b35'; s.classList.add('fill-icon'); }
+          else if (!s.id) { s.style.color='#176b35'; }
+        });
+      }
+    }
+    const hideNav = target === 'catdetail';
+    const mainHeader = document.getElementById('main-header');
+    const mobileNav  = document.getElementById('mobile-nav');
+    if (mainHeader) mainHeader.style.transform = hideNav ? 'translateY(-110%)' : '';
+    if (mobileNav)  mobileNav.style.transform  = hideNav ? 'translateY(200%)'  : '';
+  } else {
+    // No owned state — push home to prevent exit
+    history.pushState({ snackyPage: currentPage || 'home' }, '', '#' + (currentPage || 'home'));
+  }
+});
+
 function renderCatDetail() {
   const layout = document.getElementById('catdetail-layout');
   const filtersEl = document.getElementById('catdetail-filters');
@@ -4666,6 +4726,10 @@ function nav(page) {
   // Only reset scroll for non-catdetail pages (catdetail manages its own scroll panes)
   if (page !== 'catdetail') window.scrollTo({ top: 0, behavior: 'instant' });
   currentPage = page;
+  // Push a history entry so the mobile back button stays in-app
+  if (history.state?.snackyPage !== page) {
+    history.pushState({ snackyPage: page }, '', '#' + page);
+  }
 
   // Top nav links
   document.querySelectorAll('.nav-link').forEach(a => {
