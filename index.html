@@ -2331,13 +2331,12 @@ body { background: var(--prem-bg) !important; }
         thumb.style.cursor='grab';
         var prog=curX/getMax();
         if(prog>=0.85){
-          // success — trigger order immediately (no delay)
+          // success — trigger order immediately; keep "Placing Order…" visible
+          // until placeOrder() itself calls window._resetSlideToOrder() on success or error
           setX(getMax());
           success.style.opacity='1';
           success.style.pointerEvents='auto';
           placeOrder();
-          // reset after 2.5s in case placeOrder navigates away
-          setTimeout(function(){ resetSlider(); },2500);
         } else {
           // snap back
           thumb.style.transition='left .3s cubic-bezier(.4,0,.2,1)';
@@ -3939,16 +3938,19 @@ async function placeOrder() {
   orders = [_optimisticOrder, ...orders.filter(o => o.firestoreId !== orderRef.id)];
   prevOrderStatuses.set(orderRef.id, 'Pending');
 
+  // Show the success popup immediately
+  document.getElementById('success-order-id').textContent=orderId;
+  document.getElementById('success-modal').classList.add('open');
+  confettiBurst();
+
+  // Reset slider, cart and UI after popup is visible
   if(window._resetSlideToOrder)window._resetSlideToOrder();
+  if(placeBtn){placeBtn.disabled=false;placeBtn.textContent='Place Order';}
   cart=[];activePromo=null;updateCartBadge();renderCart();
   document.getElementById('delivery-autofill-badge')?.classList.add('hidden');
   const pmsg=document.getElementById('promo-msg');if(pmsg)pmsg.classList.add('hidden');
   const pi=document.getElementById('promo-input');if(pi)pi.value='';
-  renderOrders(); // paint the optimistic order immediately
-  document.getElementById('success-order-id').textContent=orderId;
-  document.getElementById('success-modal').classList.add('open');
-  if(placeBtn){placeBtn.disabled=false;placeBtn.textContent='Place Order';}
-  confettiBurst();
+  renderOrders();
 }
 
 // ─────────────── ORDERS ───────────────
