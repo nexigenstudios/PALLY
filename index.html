@@ -4796,6 +4796,13 @@ function nav(page) {
   if (page === 'cart')       { renderCart(); fillCartDelivery(); updatePickupModeUI(); }
   if (page === 'orders')     renderOrders();
   if (page === 'profile')    renderProfile();
+
+  // Show footer only on home page
+  const footer = document.getElementById('site-footer');
+  if (footer) {
+    footer.style.display = (page === 'home') ? '' : 'none';
+    footer.style.visibility = (page === 'home') ? '' : 'hidden';
+  }
 }
 
 // Also re-render order again whenever orders update
