@@ -303,7 +303,7 @@ img,video,svg{max-width:100%;}
 .modal-overlay > div{margin-top:auto;margin-bottom:auto;max-width:100%;}
 #hostel-picker-list{-webkit-overflow-scrolling:touch;}
 /* bottom nav always fits the screen width, even at 320px */
-#mobile-nav{max-width:min(400px,calc(100vw - 32px));}
+#mobile-nav{max-width:min(280px,calc(100vw - 48px));}
 #mobile-nav > div{padding-left:8px !important;padding-right:8px !important;gap:0;}
 #mobile-nav button{flex:1 1 0;min-width:0 !important;}
 #mobile-nav button span:last-of-type{white-space:nowrap;}
@@ -667,67 +667,10 @@ body{background:var(--cream);color:var(--ink);}
 .ss-sunday-status{margin-left:auto;padding-left:14px;border-left:1px solid rgba(15,110,56,.15);color:var(--green);font-size:10px;font-weight:800;max-width:92px;}
 @media(min-width:760px){.ss-sunday{gap:16px;padding:18px;}.ss-sunday-status{font-size:12px;max-width:130px;}}
 
-/* Floating cart bar — liquid glass light green */
+/* Floating cart bar — matches slide-to-order dark green pill */
 #floating-cart-bar button{
-  position: relative;
-  background:
-    linear-gradient(135deg, rgba(200,245,218,.72) 0%, rgba(160,230,190,.48) 40%, rgba(200,245,218,.60) 100%);
-  -webkit-backdrop-filter: blur(36px) saturate(220%) brightness(1.14) contrast(1.03);
-  backdrop-filter: blur(36px) saturate(220%) brightness(1.14) contrast(1.03);
-  border: none !important;
-  box-shadow:
-    0 2px 0 0 rgba(255,255,255,.80) inset,
-    0 -1px 0 0 rgba(255,255,255,.18) inset,
-    1px 0 0 0 rgba(255,255,255,.50) inset,
-    -1px 0 0 0 rgba(255,255,255,.50) inset,
-    0 10px 36px rgba(10,80,35,.22),
-    0 4px 12px rgba(10,80,35,.14),
-    0 1px 3px rgba(10,80,35,.10) !important;
-  color: #0d4020 !important;
-  overflow: hidden;
-}
-#floating-cart-bar button::before{
-  content:'';
-  position:absolute;
-  inset:0;
-  border-radius:inherit;
-  background:linear-gradient(
-    110deg,
-    rgba(255,255,255,0) 0%,
-    rgba(255,255,255,.60) 38%,
-    rgba(255,255,255,.12) 52%,
-    rgba(255,255,255,0) 100%
-  );
-  background-size:200% 100%;
-  animation:liqShimmer 3.6s ease-in-out infinite;
-  pointer-events:none;
-  z-index:1;
-}
-#floating-cart-bar button::after{
-  content:'';
-  position:absolute;
-  inset:0;
-  border-radius:inherit;
-  border:1.5px solid transparent;
-  background:
-    linear-gradient(rgba(255,255,255,0),rgba(255,255,255,0)) padding-box,
-    linear-gradient(135deg,rgba(255,255,255,.95) 0%,rgba(255,255,255,.25) 35%,rgba(255,255,255,0) 60%,rgba(255,255,255,.40) 100%) border-box;
-  pointer-events:none;
-  z-index:2;
-}
-#floating-cart-bar button > *{ position:relative; z-index:3; }
-#floating-cart-bar #fcb-qty{
-  background: rgba(10,80,35,.18) !important;
-  color: #0d4020 !important;
-}
-#floating-cart-bar #fcb-thumbs img{
-  width:28px; height:28px; border-radius:8px; object-fit:cover;
-  border:1.5px solid rgba(255,255,255,0.5);
-  margin-left:-6px;
-}
-#floating-cart-bar #fcb-thumbs img:first-child{ margin-left:0; }
-#floating-cart-bar.above-nav{
-  bottom: calc(80px + var(--safe-b, 0px));
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
 }
 
 /* Bottom nav — liquid glass */
@@ -2218,7 +2161,7 @@ body { background: var(--prem-bg) !important; }
 </div>
 
 <!-- PAGE: CART -->
-<div id="page-cart" class="page" style="background:#f2f2f2;padding-top:calc(env(safe-area-inset-top,0px) + 80px);">
+<div id="page-cart" class="page" style="background:#f2f2f2;padding-top:calc(env(safe-area-inset-top,0px) + 64px);">
   <!-- Cart sub-header — sticky, sits right below the fixed main-header -->
   <div style="position:sticky;top:calc(env(safe-area-inset-top,0px) + 64px);z-index:30;background:#fff;border-bottom:1px solid #e8e8e8;padding:14px 16px 12px;">
     <div style="display:flex;align-items:center;gap:10px;">
@@ -2388,11 +2331,11 @@ body { background: var(--prem-bg) !important; }
         thumb.style.cursor='grab';
         var prog=curX/getMax();
         if(prog>=0.85){
-          // success — trigger order
+          // success — trigger order immediately (no delay)
           setX(getMax());
           success.style.opacity='1';
           success.style.pointerEvents='auto';
-          setTimeout(function(){ placeOrder(); },300);
+          placeOrder();
           // reset after 2.5s in case placeOrder navigates away
           setTimeout(function(){ resetSlider(); },2500);
         } else {
@@ -2503,25 +2446,30 @@ body { background: var(--prem-bg) !important; }
 </div>
 
 <!-- MOBILE BOTTOM NAV -->
-<div id="mobile-nav" class="md:hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-50" style="width:calc(100% - 32px); max-width:400px">
+<div id="mobile-nav" class="md:hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-50" style="width:calc(100% - 48px); max-width:280px">
   <div class="flex justify-around items-center">
     <button class="flex flex-col items-center gap-0.5 btn min-w-[44px]" onclick="nav('home')" id="mn-home"><span class="material-symbols-outlined fill-icon" style="font-size:22px;color:#176b35">home</span><span class="text-[9px] font-bold" style="color:#176b35">Home</span></button>
     <button class="flex flex-col items-center gap-0.5 btn min-w-[44px]" onclick="nav('categories')" id="mn-browse"><span class="material-symbols-outlined" style="font-size:22px;color:#6e7771">grid_view</span><span class="text-[9px] font-bold" style="color:#6e7771">Categories</span></button>
-    <button class="flex flex-col items-center gap-0.5 btn min-w-[44px]" onclick="nav('orders')" id="mn-orders"><span class="material-symbols-outlined" style="font-size:22px;color:#6e7771">package_2</span><span class="text-[9px] font-bold" style="color:#6e7771">My Orders</span></button>
-    <button class="flex flex-col items-center gap-0.5 btn min-w-[44px]" onclick="nav('profile')" id="mn-profile"><span class="material-symbols-outlined" style="font-size:22px;color:#6e7771">person</span><span class="text-[9px] font-bold" style="color:#6e7771">Profile</span></button>
   </div>
 </div>
 
 <!-- FLOATING CART BAR -->
-<div id="floating-cart-bar" class="fixed left-1/2 -translate-x-1/2 z-[60] hidden" style="bottom:calc(72px + var(--safe-b, 0px)); width:calc(100% - 32px); max-width:400px;">
-  <button onclick="nav('cart')" class="w-full flex items-center justify-between px-4 py-3 rounded-[30px] font-bold active:scale-[0.98] transition-transform" style="min-height:52px;">
-    <div class="flex items-center gap-2.5">
-      <span class="rounded-lg px-2 py-0.5 text-sm font-extrabold" id="fcb-qty">0 items</span>
-      <div id="fcb-thumbs" class="flex gap-1"></div>
+<div id="floating-cart-bar" class="fixed left-1/2 -translate-x-1/2 z-[60] hidden" style="bottom:calc(80px + var(--safe-b, 0px)); width:calc(100% - 48px); max-width:340px;">
+  <button onclick="nav('cart')" class="w-full flex items-center justify-between rounded-[50px] font-bold active:scale-[0.97] transition-transform" style="min-height:56px; padding:4px 16px 4px 4px; position:relative; overflow:hidden; background:linear-gradient(135deg,rgba(10,94,48,.92) 0%,rgba(18,147,74,.88) 100%); border:1.5px solid rgba(255,255,255,.18); box-shadow:0 4px 20px rgba(10,94,48,.40),inset 0 1px 0 rgba(255,255,255,.22);">
+    <!-- shimmer sweep -->
+    <div style="position:absolute;inset:0;border-radius:50px;background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,.15) 50%,transparent 100%);background-size:200% 100%;animation:slideShimmer 2.4s ease-in-out infinite;pointer-events:none;z-index:1;"></div>
+    <!-- last product image circle -->
+    <div id="fcb-lead-img" style="position:relative;z-index:2;width:48px;height:48px;border-radius:50%;overflow:hidden;border:2px solid rgba(255,255,255,.5);flex-shrink:0;background:rgba(255,255,255,.12);">
+      <img id="fcb-lead-src" src="" alt="" style="width:100%;height:100%;object-fit:cover;display:block;">
     </div>
-    <div class="flex items-center gap-2 font-extrabold text-sm">
-      <span>View Cart</span>
-      <span class="material-symbols-outlined" style="font-size:18px">arrow_forward_ios</span>
+    <!-- label + qty -->
+    <div style="position:relative;z-index:2;flex:1;display:flex;flex-direction:column;align-items:flex-start;padding-left:10px;gap:1px;">
+      <span style="font-size:13px;font-weight:800;color:#fff;font-family:'Plus Jakarta Sans',sans-serif;letter-spacing:.2px;" id="fcb-qty">0 items</span>
+      <span style="font-size:10px;font-weight:600;color:rgba(255,255,255,.75);">View Cart</span>
+    </div>
+    <!-- arrow -->
+    <div style="position:relative;z-index:2;width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+      <span class="material-symbols-outlined" style="font-size:18px;color:#fff;">arrow_forward_ios</span>
     </div>
   </button>
 </div>
@@ -2566,7 +2514,7 @@ body { background: var(--prem-bg) !important; }
       <div style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#4aad62,#1a5c2a);display:flex;align-items:center;justify-content:center;margin:0 auto 10px;">
         <span class="material-symbols-outlined fill-icon" style="color:white;font-size:24px;">support_agent</span>
       </div>
-      <p style="font-size:13px;color:#555f6f;font-weight:600;line-height:1.5;">Hi there! 👋<br>How can we help you today?</p>
+      <p style="font-size:13px;color:#555f6f;font-weight:600;line-height:1.5;">Hi there! How can we help you today?</p>
     </div>
   </div>
   <!-- Input -->
@@ -3199,7 +3147,7 @@ function nav(page) {
   window.scrollTo({top:0,behavior:'instant'});
   currentPage=page;
   document.querySelectorAll('.nav-link').forEach(a=>{a.className=a.dataset.page===page?'text-sm font-bold cursor-pointer nav-link text-primary border-b-2 border-primary pb-1':'text-sm font-semibold cursor-pointer nav-link text-secondary hover:text-primary transition-colors';});
-  const mnMap={home:'mn-home',browse:'mn-browse',orders:'mn-orders',profile:'mn-profile'};
+  const mnMap={home:'mn-home',browse:'mn-browse'};
   Object.entries(mnMap).forEach(([pg,id])=>{const el=document.getElementById(id);if(!el)return;const isActive=pg===page;el.querySelectorAll('span').forEach(s=>{if(s.classList.contains('material-symbols-outlined')){s.style.color=isActive?'#176b35':'#6e7771';if(isActive)s.classList.add('fill-icon');else s.classList.remove('fill-icon');}else if(!s.id){s.style.color=isActive?'#176b35':'#6e7771';}});});
   if(page==='home')renderHomeProducts();
   if(page==='browse')renderProducts();
@@ -3712,14 +3660,15 @@ function updateFloatingCart() {
   // qty label
   const qtyEl = document.getElementById('fcb-qty');
   if (qtyEl) qtyEl.textContent = total + (total===1?' item':' items');
-  // thumbnails — show up to 3 unique product images
-  const thumbsEl = document.getElementById('fcb-thumbs');
-  if (thumbsEl) {
-    const imgs = cart.slice(0,3).map(item=>{
-      const src = item.imageUrl || catFallback(item.category);
-      return `<img src="${src}" onerror="this.onerror=null;this.src='${catFallback(item.category)}'" alt="">`;
-    }).join('');
-    thumbsEl.innerHTML = imgs;
+  // Last-added product photo (last item in cart = most recently added)
+  const leadImg = document.getElementById('fcb-lead-src');
+  if (leadImg && cart.length > 0) {
+    const lastItem = cart[cart.length - 1];
+    const src = lastItem.imageUrl || catFallback(lastItem.category);
+    if (leadImg.src !== src) {
+      leadImg.src = src;
+      leadImg.onerror = function(){ this.onerror=null; this.src=catFallback(lastItem.category); };
+    }
   }
   // Position: above nav bar on pages that show nav, flush lower on catdetail (nav hidden)
   const navHidden = currentPage === 'catdetail';
@@ -3748,7 +3697,7 @@ function renderCart() {
     // Group items by category for section headers
     list.innerHTML=`<div style="background:#fff;margin-bottom:8px;">
       <div style="padding:12px 16px 0;display:flex;align-items:center;gap:8px;">
-        <span style="font-size:12px;font-weight:700;color:#0a5e30;background:#f0faf4;border:1px solid #c8ecd5;border-radius:20px;padding:3px 10px;">⚡ ${totalItems} item${totalItems===1?'':'s'}</span>
+        <span style="font-size:12px;font-weight:700;color:#0a5e30;background:#f0faf4;border:1px solid #c8ecd5;border-radius:20px;padding:3px 10px;display:inline-flex;align-items:center;gap:3px;"><span class="material-symbols-outlined fill-icon" style="font-size:12px;">shopping_bag</span> ${totalItems} item${totalItems===1?'':'s'}</span>
       </div>
       ${cart.map(item=>{
         const fallback=catFallback(item.category); const src=item.imageUrl||fallback;
@@ -3968,11 +3917,30 @@ async function placeOrder() {
   }
 
   // ── SUCCESS ──
+  // Optimistically insert the new order into the local array so "My Orders"
+  // shows it instantly — the real onSnapshot will overwrite this with the
+  // server copy (including the resolved createdAt timestamp) moments later.
+  const _now = new Date();
+  const _optimisticOrder = {
+    firestoreId: orderRef.id,
+    orderId, userId: user.uid, userEmail: user.email,
+    items: cart.map((i,k) => ({id:i.id,name:i.name,price:i.price,qty:i.qty,unit:i.selectedWeight||i.unit||'',category:i.category||'',imageUrl:i.imageUrl||''})),
+    total, status:'Pending', name, phone, notes, payment,
+    deliveryMode:'pickup', pickupLocation: pickupLocationName, pickupPointId,
+    promoUsed: activePromo?.code||null, discountAmount: disc,
+    createdAt: { toDate: () => _now },
+    time: _now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}),
+    date: _now.toLocaleDateString('en-IN'),
+  };
+  orders = [_optimisticOrder, ...orders.filter(o => o.firestoreId !== orderRef.id)];
+  prevOrderStatuses.set(orderRef.id, 'Pending');
+
   if(window._resetSlideToOrder)window._resetSlideToOrder();
   cart=[];activePromo=null;updateCartBadge();renderCart();
   document.getElementById('delivery-autofill-badge')?.classList.add('hidden');
   const pmsg=document.getElementById('promo-msg');if(pmsg)pmsg.classList.add('hidden');
   const pi=document.getElementById('promo-input');if(pi)pi.value='';
+  renderOrders(); // paint the optimistic order immediately
   document.getElementById('success-order-id').textContent=orderId;
   document.getElementById('success-modal').classList.add('open');
   if(placeBtn){placeBtn.disabled=false;placeBtn.textContent='Place Order';}
@@ -4016,7 +3984,7 @@ function renderActiveCard(o) {
   const itemNames=(o.items||[]).map(i=>i.name).join(', ');
   return`<div class="glass-heavy rounded-2xl p-5 border border-white/40 space-y-4">
     <div class="flex items-start justify-between gap-3">
-      <div class="min-w-0"><div class="flex items-center gap-2 mb-1"><span class="inline-flex items-center gap-1.5 text-xs font-bold text-primary-container"><span class="w-2 h-2 bg-primary-container rounded-full" style="animation:pulse-dot 1.5s ease-in-out infinite"></span>LIVE TRACKING</span>${isPickup?'<span class="badge bg-green-100 text-green-700" style="font-size:9px">🏃 PICKUP</span>':''}</div>
+      <div class="min-w-0"><div class="flex items-center gap-2 mb-1"><span class="inline-flex items-center gap-1.5 text-xs font-bold text-primary-container"><span class="w-2 h-2 bg-primary-container rounded-full" style="animation:pulse-dot 1.5s ease-in-out infinite"></span>LIVE TRACKING</span>${isPickup?'<span class="badge bg-green-100 text-green-700" style="font-size:9px;display:inline-flex;align-items:center;gap:2px;"><span class="material-symbols-outlined fill-icon" style="font-size:11px;">storefront</span> PICKUP</span>':''}</div>
         <h3 class="font-extrabold text-base text-on-surface">${o.orderId}</h3><p class="text-xs text-secondary mt-0.5">${o.date} · ${o.time}</p><p class="text-xs text-secondary truncate">${itemNames}</p></div>
       <div class="text-right flex-shrink-0"><div class="text-lg font-extrabold text-primary-container">₹${(o.total||0).toFixed(2)}</div><span class="badge ${statusColors[o.status]||'bg-surface-container text-secondary'} mt-1" style="font-size:9px">${displayStatus(o).toUpperCase()}</span></div>
     </div>
@@ -4304,7 +4272,7 @@ function renderChatMessages(msgs) {
     <div style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#4aad62,#1a5c2a);display:flex;align-items:center;justify-content:center;margin:0 auto 10px;">
       <span class="material-symbols-outlined fill-icon" style="color:white;font-size:24px;">support_agent</span>
     </div>
-    <p style="font-size:13px;color:#555f6f;font-weight:600;line-height:1.5;">Hi there! 👋<br>How can we help you today?</p>
+    <p style="font-size:13px;color:#555f6f;font-weight:600;line-height:1.5;">Hi there! How can we help you today?</p>
   </div>`;
   const bubbles = msgs.map(m => {
     const isAdmin = m.sender === 'admin';
@@ -4702,9 +4670,9 @@ function nav(page) {
 
   // Bottom mobile nav — categories/catdetail both highlight the grid_view button
   const browsePages = ['browse','categories','catdetail'];
-  const mnMap = { home:'mn-home', orders:'mn-orders', profile:'mn-profile' };
+  const mnMap = { home:'mn-home' };
   // reset all first
-  ['mn-home','mn-browse','mn-cart','mn-orders','mn-profile'].forEach(id => {
+  ['mn-home','mn-browse'].forEach(id => {
     const el = document.getElementById(id); if (!el) return;
     el.querySelectorAll('span').forEach(s => {
       if (s.classList.contains('material-symbols-outlined')) { s.style.color='#6e7771'; s.classList.remove('fill-icon'); }
