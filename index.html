@@ -2458,10 +2458,8 @@ body { background: var(--prem-bg) !important; }
   <button onclick="nav('cart')" class="w-full flex items-center justify-between rounded-[50px] font-bold active:scale-[0.97] transition-transform" style="min-height:56px; padding:4px 16px 4px 4px; position:relative; overflow:hidden; background:linear-gradient(135deg,rgba(10,94,48,.92) 0%,rgba(18,147,74,.88) 100%); border:1.5px solid rgba(255,255,255,.18); box-shadow:0 4px 20px rgba(10,94,48,.40),inset 0 1px 0 rgba(255,255,255,.22);">
     <!-- shimmer sweep -->
     <div style="position:absolute;inset:0;border-radius:50px;background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,.15) 50%,transparent 100%);background-size:200% 100%;animation:slideShimmer 2.4s ease-in-out infinite;pointer-events:none;z-index:1;"></div>
-    <!-- last product image circle -->
-    <div id="fcb-lead-img" style="position:relative;z-index:2;width:48px;height:48px;border-radius:50%;overflow:hidden;border:2px solid rgba(255,255,255,.5);flex-shrink:0;background:rgba(255,255,255,.12);">
-      <img id="fcb-lead-src" src="" alt="" style="width:100%;height:100%;object-fit:cover;display:block;">
-    </div>
+    <!-- product thumbs — last added first, up to 4, overlapping circles -->
+    <div id="fcb-thumbs" style="position:relative;z-index:2;display:flex;align-items:center;flex-shrink:0;height:48px;padding-left:4px;"></div>
     <!-- label + qty -->
     <div style="position:relative;z-index:2;flex:1;display:flex;flex-direction:column;align-items:flex-start;padding-left:10px;gap:1px;">
       <span style="font-size:13px;font-weight:800;color:#fff;font-family:'Plus Jakarta Sans',sans-serif;letter-spacing:.2px;" id="fcb-qty">0 items</span>
@@ -3660,15 +3658,21 @@ function updateFloatingCart() {
   // qty label
   const qtyEl = document.getElementById('fcb-qty');
   if (qtyEl) qtyEl.textContent = total + (total===1?' item':' items');
-  // Last-added product photo (last item in cart = most recently added)
-  const leadImg = document.getElementById('fcb-lead-src');
-  if (leadImg && cart.length > 0) {
-    const lastItem = cart[cart.length - 1];
-    const src = lastItem.imageUrl || catFallback(lastItem.category);
-    if (leadImg.src !== src) {
-      leadImg.src = src;
-      leadImg.onerror = function(){ this.onerror=null; this.src=catFallback(lastItem.category); };
-    }
+  // Thumbs: last-added first, up to 4, overlapping circles
+  const thumbsEl = document.getElementById('fcb-thumbs');
+  if (thumbsEl && cart.length > 0) {
+    const items = [...cart].reverse().slice(0, 4); // last added = first
+    thumbsEl.innerHTML = items.map((item, i) => {
+      const src = item.imageUrl || catFallback(item.category);
+      const fb  = catFallback(item.category);
+      return `<img src="${src}" onerror="this.onerror=null;this.src='${fb}'" alt=""
+        style="width:38px;height:38px;border-radius:50%;object-fit:cover;
+               border:2px solid rgba(255,255,255,.65);
+               margin-left:${i===0?'0':'-10px'};
+               z-index:${4-i};position:relative;
+               box-shadow:0 2px 6px rgba(0,0,0,.18);
+               background:rgba(255,255,255,.15);">`;
+    }).join('');
   }
   // Position: above nav bar on pages that show nav, flush lower on catdetail (nav hidden)
   const navHidden = currentPage === 'catdetail';
