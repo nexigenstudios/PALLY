@@ -2456,20 +2456,20 @@ body { background: var(--prem-bg) !important; }
 </div>
 
 <!-- FLOATING CART BAR -->
-<div id="floating-cart-bar" class="fixed left-1/2 -translate-x-1/2 z-[60] hidden" style="bottom:calc(80px + var(--safe-b, 0px)); width:calc(100% - 48px); max-width:340px;">
-  <button onclick="nav('cart')" class="w-full flex items-center justify-between rounded-[50px] font-bold active:scale-[0.97] transition-transform" style="min-height:56px; padding:4px 16px 4px 4px; position:relative; overflow:hidden; background:linear-gradient(135deg,rgba(10,94,48,.92) 0%,rgba(18,147,74,.88) 100%); border:1.5px solid rgba(255,255,255,.18); box-shadow:0 4px 20px rgba(10,94,48,.40),inset 0 1px 0 rgba(255,255,255,.22);">
+<div id="floating-cart-bar" class="fixed left-1/2 -translate-x-1/2 z-[60] hidden" style="bottom:calc(80px + var(--safe-b, 0px)); width:calc(100% - 64px); max-width:280px;">
+  <button onclick="nav('cart')" class="w-full flex items-center justify-between rounded-[50px] font-bold active:scale-[0.97] transition-transform" style="min-height:44px; padding:3px 10px 3px 3px; position:relative; overflow:hidden; background:linear-gradient(135deg,rgba(10,94,48,.92) 0%,rgba(18,147,74,.88) 100%); border:1.5px solid rgba(255,255,255,.18); box-shadow:0 4px 20px rgba(10,94,48,.40),inset 0 1px 0 rgba(255,255,255,.22);">
     <!-- shimmer sweep -->
     <div style="position:absolute;inset:0;border-radius:50px;background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,.15) 50%,transparent 100%);background-size:200% 100%;animation:slideShimmer 2.4s ease-in-out infinite;pointer-events:none;z-index:1;"></div>
     <!-- product thumbs — last added first, up to 4, overlapping circles -->
-    <div id="fcb-thumbs" style="position:relative;z-index:2;display:flex;align-items:center;flex-shrink:0;height:48px;padding-left:4px;"></div>
+    <div id="fcb-thumbs" style="position:relative;z-index:2;display:flex;align-items:center;flex-shrink:0;height:38px;padding-left:3px;"></div>
     <!-- label + qty -->
-    <div style="position:relative;z-index:2;flex:1;display:flex;flex-direction:column;align-items:flex-start;padding-left:10px;gap:1px;">
-      <span style="font-size:13px;font-weight:800;color:#fff;font-family:'Plus Jakarta Sans',sans-serif;letter-spacing:.2px;" id="fcb-qty">0 items</span>
-      <span style="font-size:10px;font-weight:600;color:rgba(255,255,255,.75);">View Cart</span>
+    <div style="position:relative;z-index:2;flex:1;display:flex;flex-direction:column;align-items:flex-start;padding-left:8px;gap:1px;">
+      <span style="font-size:12px;font-weight:800;color:#fff;font-family:'Plus Jakarta Sans',sans-serif;letter-spacing:.2px;" id="fcb-qty">0 items</span>
+      <span style="font-size:9px;font-weight:600;color:rgba(255,255,255,.75);">View Cart</span>
     </div>
     <!-- arrow -->
-    <div style="position:relative;z-index:2;width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-      <span class="material-symbols-outlined" style="font-size:18px;color:#fff;">arrow_forward_ios</span>
+    <div style="position:relative;z-index:2;width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+      <span class="material-symbols-outlined" style="font-size:14px;color:#fff;">arrow_forward_ios</span>
     </div>
   </button>
 </div>
@@ -2541,7 +2541,7 @@ body { background: var(--prem-bg) !important; }
   <div id="cms-page-body"></div>
 </div>
 
-<footer id="site-footer" class="bg-white border-t border-outline-variant/15 py-6 pb-28 md:pb-6" style="display:none;">
+<footer id="site-footer" class="bg-white border-t border-outline-variant/15 py-6 pb-28 md:pb-6" style="display:none;visibility:hidden;">
   <div class="max-w-[1200px] mx-auto px-5 md:px-10 flex flex-col md:flex-row md:justify-between md:items-center gap-4">
     <div><div class="brand-word text-lg"><span class="b-navy">Santhom </span><span class="b-navy">Store</span></div><div class="text-xs text-secondary mt-0.5">© 2026 Santhom Store · Thomasleeha Pally Church Store</div></div>
     <div class="flex flex-wrap gap-x-5 gap-y-3 text-xs text-secondary">
@@ -3158,7 +3158,7 @@ function nav(page) {
   if(typeof updateFloatingCart==='function')updateFloatingCart();
   // Show footer only on home page
   const footer=document.getElementById('site-footer');
-  if(footer)footer.style.display=(page==='home')?'':'none';
+  if(footer){footer.style.display=(page==='home')?'':'none';footer.style.visibility=(page==='home')?'':'hidden';}
 }
 
 function filterAndBrowse(cat) { currentFilter=cat; nav('browse'); }
@@ -3672,9 +3672,9 @@ function updateFloatingCart() {
       const src = item.imageUrl || catFallback(item.category);
       const fb  = catFallback(item.category);
       return `<img src="${src}" onerror="this.onerror=null;this.src='${fb}'" alt=""
-        style="width:38px;height:38px;border-radius:50%;object-fit:cover;
+        style="width:30px;height:30px;border-radius:50%;object-fit:cover;
                border:2px solid rgba(255,255,255,.65);
-               margin-left:${i===0?'0':'-10px'};
+               margin-left:${i===0?'0':'-8px'};
                z-index:${4-i};position:relative;
                box-shadow:0 2px 6px rgba(0,0,0,.18);
                background:rgba(255,255,255,.15);">`;
@@ -3686,16 +3686,8 @@ function updateFloatingCart() {
     ? 'calc(16px + var(--safe-b, 0px))'
     : 'calc(80px + var(--safe-b, 0px))';
 
-  // On catdetail, add extra padding-bottom so the floating cart never covers the last ADD button
-  const catProds = document.querySelector('.catdetail-products');
-  if (catProds) {
-    if (shouldShow && currentPage === 'catdetail') {
-      // floating cart is ~56px tall + 16px gap + safe area
-      catProds.style.paddingBottom = 'calc(env(safe-area-inset-bottom, 0px) + 90px)';
-    } else if (currentPage === 'catdetail') {
-      catProds.style.paddingBottom = 'calc(env(safe-area-inset-bottom, 0px) + 20px)';
-    }
-  }
+  // On catdetail, padding-bottom is handled entirely by CSS (.catdetail-products).
+  // Do not override with inline styles here — the CSS already accounts for the floating cart.
 }
 
 function renderCart() {
@@ -4566,6 +4558,7 @@ function navBack() {
   if (footer) {
     var initPage = (history.state && history.state.snackyPage) || 'home';
     footer.style.display = (initPage === 'home') ? '' : 'none';
+    footer.style.visibility = (initPage === 'home') ? '' : 'hidden';
   }
 })();
 
@@ -4592,7 +4585,7 @@ window.addEventListener('popstate', function(e) {
     if (typeof updateFloatingCart === 'function') updateFloatingCart();
     // Show footer only on home page
     const footer = document.getElementById('site-footer');
-    if (footer) footer.style.display = (target === 'home') ? '' : 'none';
+    if (footer) { footer.style.display = (target === 'home') ? '' : 'none'; footer.style.visibility = (target === 'home') ? '' : 'hidden'; }
     // Sync nav bar highlights
     const browsePages = ['browse','categories','catdetail'];
     ['mn-home','mn-browse'].forEach(id => {
