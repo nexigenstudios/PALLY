@@ -799,6 +799,31 @@ body{background:var(--cream);color:var(--ink);}
   box-shadow:0 6px 22px rgba(10,60,25,.35),0 2px 8px rgba(0,0,0,.12);
 }
 #toast{background:#0f1f14;font-family:'Plus Jakarta Sans',sans-serif;border:1px solid rgba(255,255,255,.08);box-shadow:0 8px 28px rgba(0,0,0,.3);}
+
+/* ── Cart page: Swiggy/Blinkit style ── */
+#page-cart { background:#f2f2f2 !important; }
+#slide-pay-btn {
+  background: linear-gradient(135deg, #1a56db 0%, #1565c0 100%) !important;
+  box-shadow: 0 4px 20px rgba(21,101,192,.4);
+}
+#slide-pay-btn:active { transform: scale(.98); }
+#slide-pay-btn::before {
+  content:'';
+  position:absolute;
+  top:0;left:-100%;width:60%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.18),transparent);
+  animation:slideShimmer 2.4s ease-in-out infinite;
+  pointer-events:none;
+}
+@keyframes slideShimmer {
+  0%  { background-position:200% 0; }
+  60% { background-position:-40% 0; }
+  100%{ background-position:-40% 0; }
+}
+@keyframes arrowPulse {
+  0%,100% { transform:translateX(0); opacity:.7; }
+  50%      { transform:translateX(5px); opacity:1; }
+}
 .msg-bubble.customer{background:linear-gradient(135deg,var(--green-bright),var(--green));}
 
 /* ───── Product detail sheet (swipe between products) ───── */
@@ -2193,78 +2218,224 @@ body { background: var(--prem-bg) !important; }
 </div>
 
 <!-- PAGE: CART -->
-<div id="page-cart" class="page">
-  <div class="pt-20 md:pt-24 pb-4 max-w-[1200px] mx-auto px-4 md:px-10">
-    <h1 class="text-xl md:text-2xl font-bold text-primary mb-5">Your Cart</h1>
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-      <div class="lg:col-span-8 space-y-5">
-        <div id="cart-items-list" class="space-y-3"></div>
-        <div id="cart-empty" class="text-center py-14 text-secondary hidden">
-          <span class="material-symbols-outlined text-5xl block mb-3 text-outline">shopping_cart</span>
-          <div class="font-semibold text-base">Your cart is empty</div>
-          <div class="text-sm mt-1">Add some products to get started!</div>
-          <button class="mt-4 px-6 py-3 bg-primary-container text-white rounded-full font-semibold btn" onclick="nav('browse')">Browse Products</button>
-        </div>
-        <!-- Order Details form -->
-        <div class="glass-heavy rounded-2xl p-5 md:p-6 space-y-4 border border-white/40">
-          <div class="flex items-center justify-between mb-1">
-            <h2 class="text-lg font-bold text-primary">Your Details</h2>
-            <span id="delivery-autofill-badge" class="hidden items-center gap-1 px-2.5 py-1 bg-green-50 text-green-700 rounded-full text-xs font-bold border border-green-200">
-              <span class="material-symbols-outlined fill-icon" style="font-size:12px">check_circle</span> Saved info
-            </span>
-          </div>
-          <!-- Store pickup notice (always shown) -->
-          <div id="pickup-mode-notice" class="flex items-start gap-2.5 p-3.5 bg-green-50 border border-green-200 rounded-xl">
-            <span class="material-symbols-outlined fill-icon text-green-600 flex-shrink-0" style="font-size:20px">storefront</span>
-            <div class="flex-1">
-              <p class="text-sm font-bold text-green-800">Store Pickup</p>
-              <p class="text-xs text-green-700 mt-0.5">Your order will be ready for pickup at <strong id="pickup-mode-location">the store counter</strong> — we'll notify you when it's ready.</p>
-            </div>
-          </div>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div><label class="block text-[10px] font-bold text-on-surface-variant tracking-widest uppercase mb-1">Full Name *</label><input id="d-name" type="text" placeholder="Your name" class="w-full bg-surface-container-low rounded-xl px-4 py-3 text-sm border-none focus:ring-2 focus:ring-primary-container/40 transition-all"></div>
-            <div><label class="block text-[10px] font-bold text-on-surface-variant tracking-widest uppercase mb-1">Phone *</label><input id="d-phone" type="tel" placeholder="+91 98765 43210" class="w-full bg-surface-container-low rounded-xl px-4 py-3 text-sm border-none focus:ring-2 focus:ring-primary-container/40 transition-all"></div>
-            <!-- Hidden fields to keep placeOrder() happy without hostel/room logic -->
-            <div id="room-delivery-fields" class="hidden"></div>
-            <input id="d-hostel" type="hidden" value="store">
-            <input id="d-block" type="hidden" value="">
-            <input id="d-room" type="hidden" value="">
-            <div class="sm:col-span-2"><label class="block text-[10px] font-bold text-on-surface-variant tracking-widest uppercase mb-1">Notes (optional)</label><input id="d-notes" type="text" placeholder="Any special instructions..." class="w-full bg-surface-container-low rounded-xl px-4 py-3 text-sm border-none focus:ring-2 focus:ring-primary-container/40 transition-all"></div>
-          </div>
-        </div>
-      </div>
-      <!-- Summary sidebar -->
-      <div class="lg:col-span-4">
-        <div class="sticky top-24 space-y-4">
-          <div class="glass-heavy rounded-2xl p-5 md:p-6 border border-white/40">
-            <h2 class="text-lg font-bold text-primary mb-4">Order Summary</h2>
-            <div class="space-y-2.5 pb-4 border-b border-outline-variant/20">
-              <div class="flex justify-between text-sm"><span class="text-on-surface-variant">Subtotal</span><span class="font-bold" id="summary-sub">₹0</span></div>
-              <div class="flex justify-between text-sm"><span class="text-on-surface-variant">Pickup</span><span class="font-bold text-primary">Store</span></div>
-              <div class="justify-between text-sm text-primary" id="discount-row" style="display:none"><span>Discount</span><span class="font-bold" id="summary-disc">-₹0</span></div>
-            </div>
-            <!-- Promo Code -->
-            <div class="py-4 space-y-2">
-              <label class="text-[10px] font-bold text-on-surface-variant tracking-widest uppercase">Promo Code</label>
-              <div class="flex gap-2">
-                <input id="promo-input" type="text" placeholder="Enter code..." class="flex-1 bg-surface-container-low rounded-xl px-4 py-2.5 text-sm border-none focus:ring-2 focus:ring-primary-container/40 transition-all uppercase" oninput="this.value=this.value.toUpperCase()">
-                <button onclick="applyPromoFromInput()" class="bg-secondary text-white px-4 py-2.5 rounded-xl text-xs font-bold hover:bg-primary btn">APPLY</button>
-              </div>
-              <p id="promo-msg" class="text-xs font-semibold hidden"></p>
-            </div>
-            <div class="pt-4 border-t border-outline-variant/20 space-y-4">
-              <div class="flex justify-between items-center">
-                <span class="font-semibold">Total</span>
-                <span class="text-2xl font-extrabold text-primary-container" id="summary-total">₹0.00</span>
-              </div>
-              <button onclick="placeOrder()" class="w-full bg-primary-container text-white py-4 rounded-full font-bold text-base shadow-lg shadow-green-200/50 hover:scale-[1.02] btn">Place Order</button>
-              <p class="text-center text-xs text-on-surface-variant opacity-60"><span class="material-symbols-outlined text-xs align-middle mr-1">verified_user</span>Secure checkout</p>
-            </div>
-          </div>
-        </div>
+<div id="page-cart" class="page" style="background:#f2f2f2;padding-top:calc(env(safe-area-inset-top,0px) + 80px);">
+  <!-- Cart sub-header — sticky, sits right below the fixed main-header -->
+  <div style="position:sticky;top:calc(env(safe-area-inset-top,0px) + 64px);z-index:30;background:#fff;border-bottom:1px solid #e8e8e8;padding:14px 16px 12px;">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <button onclick="navBack()" style="width:36px;height:36px;border-radius:50%;background:#f5f5f5;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;">
+        <span class="material-symbols-outlined" style="font-size:20px;color:#333;">arrow_back_ios</span>
+      </button>
+      <div>
+        <h1 style="font-size:18px;font-weight:800;color:#0d0f0e;margin:0;line-height:1.2;">Your Cart</h1>
+        <p id="cart-header-sub" style="font-size:12px;color:#6b7570;margin:0;font-weight:500;"></p>
       </div>
     </div>
   </div>
+
+  <div style="max-width:600px;margin:0 auto;padding-bottom:120px;">
+
+    <!-- Empty state -->
+    <div id="cart-empty" class="text-center hidden" style="padding:60px 20px;">
+      <span class="material-symbols-outlined" style="font-size:64px;display:block;margin-bottom:12px;color:#ccc;">shopping_cart</span>
+      <div style="font-size:18px;font-weight:700;color:#333;margin-bottom:6px;">Your cart is empty</div>
+      <div style="font-size:14px;color:#888;margin-bottom:20px;">Add items to get started</div>
+      <button onclick="nav('browse')" style="padding:12px 28px;background:#0a5e30;color:#fff;border-radius:50px;font-size:14px;font-weight:700;border:none;cursor:pointer;">Browse Products</button>
+    </div>
+
+    <!-- Items list -->
+    <div id="cart-items-list" style="margin:0;"></div>
+
+    <!-- Delivery details card -->
+    <div id="cart-details-section" style="margin:8px 0 0;">
+      <div style="background:#fff;padding:16px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+          <h2 style="font-size:15px;font-weight:800;color:#0d0f0e;margin:0;">Your Details</h2>
+          <span id="delivery-autofill-badge" class="hidden" style="display:none;align-items:center;gap:4px;padding:4px 10px;background:#f0faf4;color:#0a5e30;border-radius:20px;font-size:11px;font-weight:700;border:1px solid #c8ecd5;">
+            <span class="material-symbols-outlined fill-icon" style="font-size:12px">check_circle</span> Saved
+          </span>
+        </div>
+        <!-- Pickup notice -->
+        <div id="pickup-mode-notice" style="display:flex;align-items:flex-start;gap:10px;padding:12px;background:#f0faf4;border:1px solid #c8ecd5;border-radius:12px;margin-bottom:14px;">
+          <span class="material-symbols-outlined fill-icon" style="font-size:20px;color:#0a5e30;flex-shrink:0;margin-top:1px;">storefront</span>
+          <div>
+            <p style="font-size:13px;font-weight:700;color:#0a5e30;margin:0 0 2px;">Store Pickup</p>
+            <p style="font-size:12px;color:#3d6b4f;margin:0;">Ready for pickup at <strong id="pickup-mode-location">the store counter</strong></p>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div>
+            <label style="display:block;font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px;">Full Name *</label>
+            <input id="d-name" type="text" placeholder="Your name" style="width:100%;background:#f7f7f7;border:1.5px solid #e8e8e8;border-radius:10px;padding:11px 13px;font-size:14px;box-sizing:border-box;outline:none;font-family:inherit;" onfocus="this.style.borderColor='#0a5e30'" onblur="this.style.borderColor='#e8e8e8'">
+          </div>
+          <div>
+            <label style="display:block;font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px;">Phone *</label>
+            <input id="d-phone" type="tel" placeholder="+91 98765 43210" style="width:100%;background:#f7f7f7;border:1.5px solid #e8e8e8;border-radius:10px;padding:11px 13px;font-size:14px;box-sizing:border-box;outline:none;font-family:inherit;" onfocus="this.style.borderColor='#0a5e30'" onblur="this.style.borderColor='#e8e8e8'">
+          </div>
+          <div style="grid-column:1/-1;">
+            <label style="display:block;font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px;">Notes (optional)</label>
+            <input id="d-notes" type="text" placeholder="Any special instructions..." style="width:100%;background:#f7f7f7;border:1.5px solid #e8e8e8;border-radius:10px;padding:11px 13px;font-size:14px;box-sizing:border-box;outline:none;font-family:inherit;" onfocus="this.style.borderColor='#0a5e30'" onblur="this.style.borderColor='#e8e8e8'">
+          </div>
+        </div>
+        <!-- Hidden fields -->
+        <div id="room-delivery-fields" class="hidden"></div>
+        <input id="d-hostel" type="hidden" value="store">
+        <input id="d-block" type="hidden" value="">
+        <input id="d-room" type="hidden" value="">
+      </div>
+    </div>
+
+    <!-- Promo code card -->
+    <div style="background:#fff;margin-top:8px;padding:16px;">
+      <div style="display:flex;gap:8px;">
+        <input id="promo-input" type="text" placeholder="Enter promo code..." style="flex:1;background:#f7f7f7;border:1.5px solid #e8e8e8;border-radius:10px;padding:11px 13px;font-size:14px;outline:none;font-family:inherit;text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()" onfocus="this.style.borderColor='#0a5e30'" onblur="this.style.borderColor='#e8e8e8'">
+        <button onclick="applyPromoFromInput()" style="background:#0a5e30;color:#fff;border:none;border-radius:10px;padding:11px 20px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;">APPLY</button>
+      </div>
+      <p id="promo-msg" class="hidden" style="font-size:12px;font-weight:600;margin-top:8px;"></p>
+    </div>
+
+    <!-- Bill details card -->
+    <div style="background:#fff;margin-top:8px;padding:16px;">
+      <h3 style="font-size:13px;font-weight:800;color:#888;text-transform:uppercase;letter-spacing:.6px;margin:0 0 14px;">Bill Details</h3>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <span style="font-size:14px;color:#333;">Item Total</span>
+        <span style="font-size:14px;font-weight:700;color:#0d0f0e;" id="summary-sub">₹0.00</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <span style="font-size:14px;color:#333;">Pickup</span>
+        <span style="font-size:14px;font-weight:700;color:#0a5e30;">FREE</span>
+      </div>
+      <div id="discount-row" style="display:none;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <span style="font-size:14px;color:#333;">Discount</span>
+        <span style="font-size:14px;font-weight:700;color:#0a5e30;" id="summary-disc">-₹0.00</span>
+      </div>
+      <div style="border-top:1px dashed #e0e0e0;margin:12px 0;"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-size:16px;font-weight:800;color:#0d0f0e;">To Pay</span>
+        <span style="font-size:18px;font-weight:900;color:#0d0f0e;" id="summary-total">₹0.00</span>
+      </div>
+    </div>
+
+    <!-- Note -->
+    <div style="background:#fff;margin-top:8px;padding:14px 16px;">
+      <p style="font-size:12px;color:#888;margin:0;line-height:1.6;"><span style="color:#e53935;font-weight:700;">NOTE:</span> Orders cannot be cancelled and are non-refundable once packed for pickup.</p>
+    </div>
+
+  </div>
+
+  <!-- Fixed Slide to Order bar -->
+  <div id="cart-slide-pay" style="position:fixed;bottom:0;left:0;right:0;z-index:100;background:rgba(255,255,255,.85);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px));border-top:1px solid rgba(10,94,48,.12);box-shadow:0 -4px 24px rgba(10,94,48,.12);display:none;">
+    <!-- Slide-to-order track -->
+    <div id="sto-track" style="position:relative;height:58px;background:linear-gradient(135deg,rgba(10,94,48,.92) 0%,rgba(18,147,74,.88) 100%);border-radius:50px;overflow:hidden;user-select:none;touch-action:none;border:1.5px solid rgba(255,255,255,.18);box-shadow:0 4px 20px rgba(10,94,48,.35),inset 0 1px 0 rgba(255,255,255,.2);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);">
+      <!-- shimmer sweep -->
+      <div style="position:absolute;inset:0;border-radius:50px;background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,.18) 50%,transparent 100%);background-size:200% 100%;animation:slideShimmer 2.4s ease-in-out infinite;pointer-events:none;"></div>
+      <!-- label -->
+      <div id="sto-label" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:6px;pointer-events:none;">
+        <span class="material-symbols-outlined" style="font-size:17px;color:rgba(255,255,255,.6);animation:arrowPulse 1.2s ease-in-out infinite;">chevron_right</span>
+        <span class="material-symbols-outlined" style="font-size:17px;color:rgba(255,255,255,.8);animation:arrowPulse 1.2s ease-in-out infinite;animation-delay:.15s;">chevron_right</span>
+        <span style="font-size:15px;font-weight:800;color:#fff;letter-spacing:.3px;font-family:'Plus Jakarta Sans',sans-serif;">Slide to Order &nbsp;·&nbsp; <span id="slide-pay-total">₹0</span></span>
+        <span class="material-symbols-outlined" style="font-size:17px;color:rgba(255,255,255,.8);animation:arrowPulse 1.2s ease-in-out infinite;animation-delay:.3s;">chevron_right</span>
+        <span class="material-symbols-outlined" style="font-size:17px;color:rgba(255,255,255,.6);animation:arrowPulse 1.2s ease-in-out infinite;animation-delay:.45s;">chevron_right</span>
+      </div>
+      <!-- thumb handle -->
+      <div id="sto-thumb" style="position:absolute;top:4px;left:4px;width:50px;height:50px;background:rgba(255,255,255,.95);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 12px rgba(0,0,0,.2),inset 0 1px 0 rgba(255,255,255,1);cursor:grab;transition:box-shadow .15s;z-index:2;">
+        <span class="material-symbols-outlined" style="font-size:22px;color:#0a5e30;">double_arrow</span>
+      </div>
+      <!-- success overlay -->
+      <div id="sto-success" style="position:absolute;inset:0;background:linear-gradient(135deg,#0a5e30,#12934a);border-radius:50px;display:flex;align-items:center;justify-content:center;gap:8px;opacity:0;pointer-events:none;transition:opacity .25s;">
+        <span class="material-symbols-outlined fill-icon" style="font-size:22px;color:#fff;">check_circle</span>
+        <span style="font-size:15px;font-weight:800;color:#fff;font-family:'Plus Jakarta Sans',sans-serif;">Placing Order…</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  (function initSlideToOrder(){
+    function setup(){
+      var track=document.getElementById('sto-track');
+      var thumb=document.getElementById('sto-thumb');
+      var success=document.getElementById('sto-success');
+      var label=document.getElementById('sto-label');
+      if(!track||!thumb)return;
+      var dragging=false, startX=0, curX=0, maxX=0;
+
+      function getMax(){ return track.offsetWidth - thumb.offsetWidth - 8; }
+
+      function setX(x){
+        x=Math.max(0,Math.min(x,getMax()));
+        curX=x;
+        thumb.style.left=(4+x)+'px';
+        // fade label as thumb advances
+        var prog=x/getMax();
+        label.style.opacity=Math.max(0,1-prog*2);
+      }
+
+      function onStart(e){
+        dragging=true;
+        startX=(e.touches?e.touches[0].clientX:e.clientX)-curX;
+        thumb.style.cursor='grabbing';
+        thumb.style.transition='none';
+        e.preventDefault();
+      }
+      function onMove(e){
+        if(!dragging)return;
+        var cx=(e.touches?e.touches[0].clientX:e.clientX)-startX;
+        setX(cx);
+        e.preventDefault();
+      }
+      function onEnd(e){
+        if(!dragging)return;
+        dragging=false;
+        thumb.style.cursor='grab';
+        var prog=curX/getMax();
+        if(prog>=0.85){
+          // success — trigger order
+          setX(getMax());
+          success.style.opacity='1';
+          success.style.pointerEvents='auto';
+          setTimeout(function(){ placeOrder(); },300);
+          // reset after 2.5s in case placeOrder navigates away
+          setTimeout(function(){ resetSlider(); },2500);
+        } else {
+          // snap back
+          thumb.style.transition='left .3s cubic-bezier(.4,0,.2,1)';
+          label.style.transition='opacity .3s';
+          setX(0);
+          setTimeout(function(){
+            thumb.style.transition='none';
+            label.style.transition='none';
+          },320);
+        }
+      }
+
+      function resetSlider(){
+        success.style.opacity='0';
+        success.style.pointerEvents='none';
+        thumb.style.transition='left .3s cubic-bezier(.4,0,.2,1)';
+        label.style.transition='opacity .3s';
+        setX(0);
+        label.style.opacity='1';
+        setTimeout(function(){
+          thumb.style.transition='none';
+          label.style.transition='none';
+        },320);
+      }
+
+      thumb.addEventListener('mousedown',onStart);
+      thumb.addEventListener('touchstart',onStart,{passive:false});
+      document.addEventListener('mousemove',onMove);
+      document.addEventListener('touchmove',onMove,{passive:false});
+      document.addEventListener('mouseup',onEnd);
+      document.addEventListener('touchend',onEnd);
+
+      // expose reset for after order placed
+      window._resetSlideToOrder=resetSlider;
+    }
+    // wait for DOM
+    if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',setup);
+    else setup();
+  })();
+  </script>
+
   <div class="bottom-spacer md:hidden"></div>
 </div>
 
@@ -2693,7 +2864,7 @@ function fillCartDelivery(force) {
     const el=document.getElementById(id);
     if(el&&v&&(force||!el.value)){el.value=v;el.dispatchEvent(new Event('input',{bubbles:true}));}
   });
-  if(phone)document.getElementById('delivery-autofill-badge')?.classList.remove('hidden');
+  if(phone){const b=document.getElementById('delivery-autofill-badge');if(b){b.classList.remove('hidden');b.style.display='inline-flex';}}
 }
 
 // ─────────────── AUTH STATE (does NOT block browsing) ───────────────
@@ -3493,7 +3664,6 @@ function addToCart(p) {
   if(currentPage==='browse')renderProducts();
   if(currentPage==='home')renderHomeProducts();
   if(currentPage==='catdetail'||currentPage==='categories')refreshCardAction(p.id);
-  showToast((p.displayName||p.name)+' added to cart');
 }
 
 function updateCart(id,delta) {
@@ -3560,24 +3730,53 @@ function updateFloatingCart() {
 
 function renderCart() {
   const list=document.getElementById('cart-items-list'), empty=document.getElementById('cart-empty'); if(!list)return;
-  if(cart.length===0){list.innerHTML='';empty.classList.remove('hidden');}
-  else{
+  const detailsSec=document.getElementById('cart-details-section');
+  const slidePay=document.getElementById('cart-slide-pay');
+  const headerSub=document.getElementById('cart-header-sub');
+  if(cart.length===0){
+    list.innerHTML='';
+    empty.classList.remove('hidden');
+    if(detailsSec)detailsSec.style.display='none';
+    if(slidePay)slidePay.style.display='none';
+    if(headerSub)headerSub.textContent='';
+  } else {
     empty.classList.add('hidden');
-    list.innerHTML=cart.map(item=>{
-      const fallback=catFallback(item.category); const src=item.imageUrl||fallback;
-      const ck=item.cartKey||item.id;
-      const weightLabel=item.selectedWeight?` · ${item.selectedWeight}`:item.unit?` · ${item.unit}`:'';
-      const updateFn=item.selectedWeight?`updateCartByKey('${ck}',`:`updateCart('${item.id}',`;
-      return `<div class="glass-heavy rounded-xl p-4 border border-white/40 flex items-center gap-3">
-        <div class="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 bg-surface-container-low"><img src="${src}" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='${fallback}'"></div>
-        <div class="flex-1 min-w-0"><h3 class="font-semibold text-sm truncate">${item.name}</h3><p class="text-secondary text-xs">${item.category}${weightLabel}</p>
-          <div class="flex items-center justify-between mt-2"><span class="font-bold text-primary-container text-sm">₹${(item.price*item.qty).toFixed(2)}<span class="font-normal text-secondary text-xs ml-1">(₹${item.price} each)</span></span>
-            <div class="flex items-center gap-2 bg-surface-container rounded-full px-2.5 py-1"><button onclick="${updateFn}-1)" class="btn text-primary-container"><span class="material-symbols-outlined" style="font-size:14px">remove</span></button><span class="font-bold text-xs">${item.qty}</span><button onclick="${updateFn}1)" class="btn text-primary-container"><span class="material-symbols-outlined" style="font-size:14px">add</span></button></div>
+    if(detailsSec)detailsSec.style.display='';
+    if(slidePay)slidePay.style.display='';
+    const totalItems=cart.reduce((s,c)=>s+c.qty,0);
+    if(headerSub)headerSub.textContent=totalItems+' item'+(totalItems===1?'':'s')+' in cart';
+    // Group items by category for section headers
+    list.innerHTML=`<div style="background:#fff;margin-bottom:8px;">
+      <div style="padding:12px 16px 0;display:flex;align-items:center;gap:8px;">
+        <span style="font-size:12px;font-weight:700;color:#0a5e30;background:#f0faf4;border:1px solid #c8ecd5;border-radius:20px;padding:3px 10px;">⚡ ${totalItems} item${totalItems===1?'':'s'}</span>
+      </div>
+      ${cart.map(item=>{
+        const fallback=catFallback(item.category); const src=item.imageUrl||fallback;
+        const ck=item.cartKey||item.id;
+        const weightLabel=item.selectedWeight?` · ${item.selectedWeight}`:item.unit?` · ${item.unit}`:'';
+        const updateFn=item.selectedWeight?`updateCartByKey('${ck}',`:`updateCart('${item.id}',`;
+        return `<div style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid #f5f5f5;">
+          <div style="width:72px;height:72px;border-radius:12px;overflow:hidden;flex-shrink:0;background:#f7f9f7;border:1px solid #eee;">
+            <img src="${src}" style="width:100%;height:100%;object-fit:contain;mix-blend-mode:multiply;" onerror="this.onerror=null;this.src='${fallback}'">
           </div>
-        </div>
-        <button onclick="cart=cart.filter(c=>(c.cartKey||c.id)!=='${ck}');updateCartBadge();renderCart()" class="p-1.5 text-secondary hover:text-error btn flex-shrink-0"><span class="material-symbols-outlined" style="font-size:18px">delete</span></button>
-      </div>`;
-    }).join('');
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:14px;font-weight:700;color:#0d0f0e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${item.name}</div>
+            <div style="font-size:12px;color:#888;margin-top:2px;">${item.category}${weightLabel}</div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;">
+              <div style="font-size:15px;font-weight:800;color:#0d0f0e;">₹${(item.price*item.qty).toFixed(2)}<span style="font-size:11px;font-weight:500;color:#888;margin-left:4px;">(₹${item.price})</span></div>
+              <div style="display:flex;align-items:center;border:1.5px solid #e0e0e0;border-radius:8px;overflow:hidden;">
+                <button onclick="${updateFn}-1)" style="width:32px;height:32px;background:#fff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#0a5e30;font-size:18px;font-weight:700;">−</button>
+                <span style="min-width:28px;text-align:center;font-size:14px;font-weight:800;color:#0d0f0e;border-left:1px solid #e0e0e0;border-right:1px solid #e0e0e0;height:32px;display:flex;align-items:center;justify-content:center;">${item.qty}</span>
+                <button onclick="${updateFn}1)" style="width:32px;height:32px;background:#fff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#0a5e30;font-size:18px;font-weight:700;">+</button>
+              </div>
+            </div>
+          </div>
+          <button onclick="cart=cart.filter(c=>(c.cartKey||c.id)!=='${ck}');updateCartBadge();renderCart()" style="padding:4px;background:none;border:none;cursor:pointer;flex-shrink:0;color:#ccc;">
+            <span class="material-symbols-outlined" style="font-size:18px;">delete</span>
+          </button>
+        </div>`;
+      }).join('')}
+    </div>`;
   }
   updateSummary();
 }
@@ -3596,6 +3795,8 @@ function updateSummary() {
   const total=Math.max(0,sub-disc);
   document.getElementById('summary-sub').textContent='₹'+sub.toFixed(2);
   document.getElementById('summary-total').textContent='₹'+total.toFixed(2);
+  const slideTotal=document.getElementById('slide-pay-total');
+  if(slideTotal)slideTotal.textContent='₹'+Math.round(total);
   const dr=document.getElementById('discount-row');
   if(dr){dr.style.display=disc>0?'flex':'none';document.getElementById('summary-disc').textContent='-Rs.'+disc.toFixed(2);}
 }
@@ -3762,10 +3963,12 @@ async function placeOrder() {
     // Show the specific stock error to customer (e.g. "Lays is now out of stock.")
     showToast(e.message||'Error placing order. Please try again.');
     if(placeBtn){placeBtn.disabled=false;placeBtn.textContent='Place Order';}
+    if(window._resetSlideToOrder)window._resetSlideToOrder();
     return;
   }
 
   // ── SUCCESS ──
+  if(window._resetSlideToOrder)window._resetSlideToOrder();
   cart=[];activePromo=null;updateCartBadge();renderCart();
   document.getElementById('delivery-autofill-badge')?.classList.add('hidden');
   const pmsg=document.getElementById('promo-msg');if(pmsg)pmsg.classList.add('hidden');
