@@ -2538,7 +2538,7 @@ body { background: var(--prem-bg) !important; }
   <div id="cms-page-body"></div>
 </div>
 
-<footer class="bg-white border-t border-outline-variant/15 py-6 pb-28 md:pb-6">
+<footer id="site-footer" class="bg-white border-t border-outline-variant/15 py-6 pb-28 md:pb-6" style="display:none;">
   <div class="max-w-[1200px] mx-auto px-5 md:px-10 flex flex-col md:flex-row md:justify-between md:items-center gap-4">
     <div><div class="brand-word text-lg"><span class="b-navy">Santhom </span><span class="b-navy">Store</span></div><div class="text-xs text-secondary mt-0.5">© 2026 Santhom Store · Thomasleeha Pally Church Store</div></div>
     <div class="flex flex-wrap gap-x-5 gap-y-3 text-xs text-secondary">
@@ -3153,6 +3153,9 @@ function nav(page) {
   if(page==='orders')renderOrders();
   if(page==='profile')renderProfile();
   if(typeof updateFloatingCart==='function')updateFloatingCart();
+  // Show footer only on home page
+  const footer=document.getElementById('site-footer');
+  if(footer)footer.style.display=(page==='home')?'':'none';
 }
 
 function filterAndBrowse(cat) { currentFilter=cat; nav('browse'); }
@@ -3679,6 +3682,17 @@ function updateFloatingCart() {
   bar.style.bottom = navHidden
     ? 'calc(16px + var(--safe-b, 0px))'
     : 'calc(80px + var(--safe-b, 0px))';
+
+  // On catdetail, add extra padding-bottom so the floating cart never covers the last ADD button
+  const catProds = document.querySelector('.catdetail-products');
+  if (catProds) {
+    if (shouldShow && currentPage === 'catdetail') {
+      // floating cart is ~56px tall + 16px gap + safe area
+      catProds.style.paddingBottom = 'calc(env(safe-area-inset-bottom, 0px) + 90px)';
+    } else if (currentPage === 'catdetail') {
+      catProds.style.paddingBottom = 'calc(env(safe-area-inset-bottom, 0px) + 20px)';
+    }
+  }
 }
 
 function renderCart() {
@@ -4544,6 +4558,12 @@ function navBack() {
   if (!history.state?.snackyPage) {
     history.replaceState({ snackyPage: 'home' }, '', '#home');
   }
+  // Show footer only on home page on first load
+  var footer = document.getElementById('site-footer');
+  if (footer) {
+    var initPage = (history.state && history.state.snackyPage) || 'home';
+    footer.style.display = (initPage === 'home') ? '' : 'none';
+  }
 })();
 
 window.addEventListener('popstate', function(e) {
@@ -4567,6 +4587,9 @@ window.addEventListener('popstate', function(e) {
     if (target === 'orders')     renderOrders();
     if (target === 'profile')    renderProfile();
     if (typeof updateFloatingCart === 'function') updateFloatingCart();
+    // Show footer only on home page
+    const footer = document.getElementById('site-footer');
+    if (footer) footer.style.display = (target === 'home') ? '' : 'none';
     // Sync nav bar highlights
     const browsePages = ['browse','categories','catdetail'];
     ['mn-home','mn-browse'].forEach(id => {
