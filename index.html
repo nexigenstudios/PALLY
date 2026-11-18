@@ -3424,7 +3424,9 @@ function renderHomeProducts() {
   const el=document.getElementById('home-products'); if(!el)return;
   if(customProducts.length===0&&!productsLoaded){el.innerHTML=skeletonCards(4);return;}
   if(customProducts.length===0){el.innerHTML='<div class="col-span-2 text-center py-8 text-secondary text-sm">No products yet — check back soon!</div>';return;}
-  el.innerHTML=customProducts.slice(0,4).map(p=>productCard(p,true)).join('');
+  const featured=customProducts.filter(p=>p.featuredHome&&!p.hidden);
+  const toShow=featured.length>0?featured:customProducts.slice(0,4);
+  el.innerHTML=toShow.map(p=>productCard(p,true)).join('');
 }
 
 function sortProducts(by) {
