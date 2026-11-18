@@ -4454,7 +4454,7 @@ function renderCategoriesPage() {
   }
 
   // All-products section at the very top
-  const allProducts = customProducts.slice(0, 10);
+  const allProducts = customProducts.slice().sort((a, b) => (b.rating || 0) - (a.rating || 0)).slice(0, 10);
   const allStripHtml = allProducts.length > 0 ? `
     <div class="cats-group" data-group="__all__">
       <div class="cats-group-head">
