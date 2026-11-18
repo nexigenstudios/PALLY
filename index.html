@@ -4479,7 +4479,7 @@ function renderCategoriesPage() {
     // Register names in safe registry; use a key derived from the group name
     const regKey = 'grp_' + groupName.replace(/[^a-zA-Z0-9]/g, '_');
     _registerCatGroup(regKey, groupCatNames);
-    const groupProducts = customProducts.filter(p => groupCatNames.includes(p.category)).slice(0, 10);
+    const groupProducts = customProducts.filter(p => groupCatNames.includes(p.category)).sort((a, b) => (b.rating || 0) - (a.rating || 0)).slice(0, 10);
 
     const popularStrip = groupProducts.length > 0 ? `
       <div class="cats-popular-strip">
