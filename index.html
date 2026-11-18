@@ -769,6 +769,16 @@ body{background:var(--cream);color:var(--ink);}
 }
 .msg-bubble.customer{background:linear-gradient(135deg,var(--green-bright),var(--green));}
 
+/* ── Place Order: tablet/laptop gets a plain button, mobile gets the slide ── */
+#cart-slide-pay-desktop{display:none;}
+@media(min-width:768px){
+  #cart-slide-pay{display:none !important;}
+  #cart-slide-pay-desktop{display:block;position:fixed;bottom:0;left:0;right:0;z-index:100;background:rgba(255,255,255,.9);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);padding:14px 24px calc(14px + env(safe-area-inset-bottom,0px));border-top:1px solid rgba(10,94,48,.12);box-shadow:0 -4px 24px rgba(10,94,48,.12);}
+  #cart-desktop-btn{width:100%;max-width:480px;margin:0 auto;display:flex;align-items:center;justify-content:center;gap:10px;background:linear-gradient(135deg,#0a5e30 0%,#12934a 100%);color:#fff;border:none;border-radius:50px;height:58px;font-size:16px;font-weight:800;font-family:'Plus Jakarta Sans',sans-serif;letter-spacing:.3px;cursor:pointer;box-shadow:0 4px 20px rgba(10,94,48,.35);transition:transform .15s,box-shadow .15s;}
+  #cart-desktop-btn:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(10,94,48,.4);}
+  #cart-desktop-btn:active{transform:scale(.97);}
+}
+
 /* ───── Product detail sheet (swipe between products) ───── */
 .ss-product{cursor:pointer;}
 #pdp{position:fixed;inset:0;z-index:450;display:none;flex-direction:column;background:rgba(20,28,22,.62);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);padding-top:calc(env(safe-area-inset-top,0px) + 10px);opacity:0;transition:opacity .2s;}
@@ -2295,6 +2305,14 @@ body { background: var(--prem-bg) !important; }
     </div>
   </div>
 
+  <!-- Desktop / tablet Place Order button (shown on ≥768 px) -->
+  <div id="cart-slide-pay-desktop">
+    <button id="cart-desktop-btn" onclick="placeOrder()">
+      <span class="material-symbols-outlined" style="font-size:22px;">shopping_bag</span>
+      Place Order &nbsp;·&nbsp; <span id="desktop-pay-total">₹0</span>
+    </button>
+  </div>
+
   <script>
   (function initSlideToOrder(){
     function setup(){
@@ -3708,17 +3726,20 @@ function renderCart() {
   const list=document.getElementById('cart-items-list'), empty=document.getElementById('cart-empty'); if(!list)return;
   const detailsSec=document.getElementById('cart-details-section');
   const slidePay=document.getElementById('cart-slide-pay');
+  const deskPay=document.getElementById('cart-slide-pay-desktop');
   const headerSub=document.getElementById('cart-header-sub');
   if(cart.length===0){
     list.innerHTML='';
     empty.classList.remove('hidden');
     if(detailsSec)detailsSec.style.display='none';
     if(slidePay)slidePay.style.display='none';
+    if(deskPay)deskPay.style.display='none';
     if(headerSub)headerSub.textContent='';
   } else {
     empty.classList.add('hidden');
     if(detailsSec)detailsSec.style.display='';
     if(slidePay)slidePay.style.display='';
+    if(deskPay)deskPay.style.display='';
     const totalItems=cart.reduce((s,c)=>s+c.qty,0);
     if(headerSub)headerSub.textContent=totalItems+' item'+(totalItems===1?'':'s')+' in cart';
     // Group items by category for section headers
@@ -3773,6 +3794,8 @@ function updateSummary() {
   document.getElementById('summary-total').textContent='₹'+total.toFixed(2);
   const slideTotal=document.getElementById('slide-pay-total');
   if(slideTotal)slideTotal.textContent='₹'+Math.round(total);
+  const deskTotal=document.getElementById('desktop-pay-total');
+  if(deskTotal)deskTotal.textContent='₹'+Math.round(total);
   const dr=document.getElementById('discount-row');
   if(dr){dr.style.display=disc>0?'flex':'none';document.getElementById('summary-disc').textContent='-Rs.'+disc.toFixed(2);}
 }
