@@ -2347,17 +2347,23 @@ body { background: var(--prem-bg) !important; }
         setX(cx);
         e.preventDefault();
       }
+      var fired=false;
+
       function onEnd(e){
         if(!dragging)return;
         dragging=false;
         thumb.style.cursor='grab';
         var prog=curX/getMax();
         if(prog>=0.85){
+          if(fired)return; // already swiped — block any second trigger
+          fired=true;
           // success — trigger order immediately; keep "Placing Order…" visible
           // until placeOrder() itself calls window._resetSlideToOrder() on success or error
           setX(getMax());
           success.style.opacity='1';
-          success.style.pointerEvents='auto';
+          success.style.pointerEvents='none'; // keep overlay non-interactive so it can't be tapped again
+          track.style.pointerEvents='none';   // freeze entire track until reset
+          showToast('Placing your order…');
           placeOrder();
         } else {
           // snap back
@@ -2372,6 +2378,8 @@ body { background: var(--prem-bg) !important; }
       }
 
       function resetSlider(){
+        fired=false;
+        track.style.pointerEvents='';
         success.style.opacity='0';
         success.style.pointerEvents='none';
         thumb.style.transition='left .3s cubic-bezier(.4,0,.2,1)';
@@ -3847,9 +3855,12 @@ async function applyPromo(code) {
 }
 
 // ─────────────── PLACE ORDER ───────────────
+let _orderInFlight = false;
 async function placeOrder() {
+  if(_orderInFlight){return;}
   if(cart.length===0){showToast('Add items to cart first!');return;}
   if(!window._currentUser){pendingAction=placeOrder;openAuth('Sign in to place your order');return;}
+  _orderInFlight = true;
 
   const name=document.getElementById('d-name')?.value.trim();
   const phone=document.getElementById('d-phone')?.value.trim();
@@ -3963,6 +3974,7 @@ async function placeOrder() {
     console.error('placeOrder transaction:', e);
     // Show the specific stock error to customer (e.g. "Lays is now out of stock.")
     showToast(e.message||'Error placing order. Please try again.');
+    _orderInFlight = false;
     if(placeBtn){placeBtn.disabled=false;placeBtn.textContent='Place Order';}
     if(window._resetSlideToOrder)window._resetSlideToOrder();
     return;
@@ -3993,6 +4005,7 @@ async function placeOrder() {
   confettiBurst();
 
   // Reset slider, cart and UI after popup is visible
+  _orderInFlight = false;
   if(window._resetSlideToOrder)window._resetSlideToOrder();
   if(placeBtn){placeBtn.disabled=false;placeBtn.textContent='Place Order';}
   cart=[];activePromo=null;updateCartBadge();renderCart();
