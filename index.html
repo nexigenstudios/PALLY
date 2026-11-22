@@ -82,6 +82,8 @@
   onAuthStateChanged(auth, user => {
     window._currentUser = user;
     if (window._onAuthChange) window._onAuthChange(user);
+    // Refresh lucky draw header badge on login/logout
+    if (window._updateLdHeaderBadge) window._updateLdHeaderBadge();
   });
 </script>
 
@@ -2127,6 +2129,12 @@ body { background: var(--prem-bg) !important; }
         <span id="hostel-switch-label" class="text-xs font-bold text-primary max-w-[110px] truncate">Choose branch</span>
       </button>
 
+      <!-- Lucky Draw enrolled indicator (shown when campaign active + user enrolled) -->
+      <div id="ld-header-badge" style="display:none;align-items:center;gap:4px;background:linear-gradient(135deg,#ffd700,#f5a623);border-radius:50px;padding:5px 11px;cursor:default;" title="You're enrolled in the lucky draw!">
+        <span style="font-size:14px;line-height:1;">✅</span>
+        <span style="font-size:11px;font-weight:800;color:#1a0a00;white-space:nowrap;">Enrolled</span>
+      </div>
+
       <button class="ss-icon-btn btn" aria-label="Cart" onclick="nav('cart')">
         <span class="material-symbols-outlined" style="font-size:22px">shopping_cart</span>
         <span id="cart-badge" class="ss-count hidden">0</span>
@@ -4119,28 +4127,31 @@ async function placeOrder() {
   document.getElementById('success-modal').classList.add('open');
   confettiBurst();
 
-  // ── Lucky Draw enrollment: fire if campaign active & this is user's first order ──
+  // ── Lucky Draw enrollment: show popup on every order while campaign is active ──
   (async()=>{
     try{
       if(!_currentLdData||!_currentLdData.active)return;
-      const{db,collection,doc,getDoc,setDoc,serverTimestamp,query,where,getDocs,limit}=window._fb;
-      // Count user's orders including the one just placed
-      const priorQ=query(collection(db,'orders'),where('userId','==',user.uid),limit(2));
-      const priorSnap=await getDocs(priorQ);
-      if(priorSnap.size>1)return; // had orders before
-      // Check already enrolled
+      const{db,doc,getDoc,setDoc,serverTimestamp}=window._fb;
       const entryRef=doc(db,'lucky_draw_entries',user.uid);
       const entrySnap=await getDoc(entryRef);
-      if(entrySnap.exists())return;
-      // Enroll
-      await setDoc(entryRef,{name,phone,userId:user.uid,userEmail:user.email,enrolledAt:serverTimestamp()});
-      // Show popup
+      const alreadyEnrolled=entrySnap.exists();
+      if(!alreadyEnrolled){
+        // First order — enroll now
+        await setDoc(entryRef,{name,phone,userId:user.uid,userEmail:user.email,enrolledAt:serverTimestamp()});
+      }
+      // Show enrolled popup on every order during the campaign
       const pill=document.getElementById('ld-enroll-name-pill');
       if(pill)pill.textContent=`🎁  ${name}`;
       const subEl=document.getElementById('ld-enroll-sub-text');
-      if(subEl&&_currentLdData.subtitle)subEl.textContent=`Your first order has entered you into "${_currentLdData.title||'the lucky draw'}". Good luck!`;
+      if(subEl){
+        subEl.textContent=alreadyEnrolled
+          ?`You're already enrolled in "${_currentLdData.title||'the lucky draw'}". Good luck — fingers crossed! 🤞`
+          :`Your order has entered you into "${_currentLdData.title||'the lucky draw'}". Good luck!`;
+      }
       const modal=document.getElementById('ld-enrolled-modal');
       if(modal){setTimeout(()=>modal.classList.add('open'),700);}
+      // Reflect enrolled state in header badge
+      _updateLdHeaderBadge(true);
     }catch(e){console.error('Lucky draw enroll:',e);}
   })();
 
@@ -5105,6 +5116,26 @@ function closeLdEnroll(){
   document.getElementById('ld-enrolled-modal')?.classList.remove('open');
 }
 
+// Show/hide the header "✅ Enrolled" badge.
+// Pass enrolled=true to force-show (e.g. right after enrollment).
+// When called with no arg it checks Firestore live.
+async function _updateLdHeaderBadge(enrolled){
+  const badge=document.getElementById('ld-header-badge');
+  if(!badge)return;
+  // If campaign is off, always hide
+  if(!_currentLdData||!_currentLdData.active){badge.style.display='none';return;}
+  if(enrolled===true){badge.style.display='flex';return;}
+  // Check Firestore for existing enrollment
+  try{
+    const uid=window._currentUser?.uid;
+    if(!uid){badge.style.display='none';return;}
+    const{db,doc,getDoc}=window._fb;
+    const snap=await getDoc(doc(db,'lucky_draw_entries',uid));
+    badge.style.display=snap.exists()?'flex':'none';
+  }catch(e){badge.style.display='none';}
+}
+window._updateLdHeaderBadge=_updateLdHeaderBadge;
+
 function loadLuckyDraw(){
   if(!window._fb)return;
   if(_luckyDrawUnsub){_luckyDrawUnsub();_luckyDrawUnsub=null;}
@@ -5114,6 +5145,8 @@ function loadLuckyDraw(){
       if(snap.exists()&&snap.data().active){
         _currentLdData=snap.data();
         renderLuckyDraw(_currentLdData);
+        // Check if user is already enrolled and show header badge accordingly
+        _updateLdHeaderBadge();
         // snowfall
         if(_currentLdData.snowfall){if(window.startSnow)window.startSnow();}
         else{if(window.stopSnow)window.stopSnow();}
@@ -5123,6 +5156,9 @@ function loadLuckyDraw(){
         _currentLdData=null;
         const sec=document.getElementById('lucky-draw-section');
         if(sec){sec.style.display='none';sec.innerHTML='';}
+        // Hide header badge when campaign ends
+        const badge=document.getElementById('ld-header-badge');
+        if(badge)badge.style.display='none';
         if(window.stopSnow)window.stopSnow();
       }
     },()=>{});
