@@ -1818,6 +1818,123 @@ body { background: var(--prem-bg) !important; }
   .cats-group-grid { grid-template-columns: repeat(3, 1fr) !important; gap: 6px !important; }
 }
 
+/* ═══════════════════════════════════════════════════════════
+   CHRISTMAS THEME & LUCKY DRAW — Santhom Store 2025
+═══════════════════════════════════════════════════════════ */
+
+/* ── Snowfall ── */
+#xmas-snow-canvas{
+  position:fixed;inset:0;pointer-events:none;z-index:9999;
+  opacity:.85;display:none;
+}
+
+/* ── Lucky Draw Banner ── */
+.ss-lucky-draw{
+  position:relative;overflow:hidden;border-radius:24px;
+  background:linear-gradient(135deg,#c0392b 0%,#962d22 40%,#1a5c2a 100%);
+  padding:22px 20px 20px;
+  display:flex;flex-direction:column;gap:14px;
+  margin-bottom:28px;
+  box-shadow:0 8px 32px rgba(192,57,43,.35),0 2px 8px rgba(0,0,0,.18);
+  border:1.5px solid rgba(255,255,255,.12);
+  isolation:isolate;
+}
+/* Polka-dot festive texture */
+.ss-lucky-draw::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background-image:radial-gradient(rgba(255,255,255,.07) 1.5px,transparent 1.5px);
+  background-size:22px 22px;
+  z-index:0;
+}
+/* Gold shimmer sweep */
+.ss-lucky-draw::after{
+  content:"";position:absolute;inset:0;pointer-events:none;z-index:1;
+  background:linear-gradient(105deg,transparent 0%,rgba(255,215,0,.08) 50%,transparent 100%);
+  background-size:200% 100%;
+  animation:xmasShimmer 3s ease-in-out infinite;
+}
+@keyframes xmasShimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+.ss-lucky-draw-inner{position:relative;z-index:2;display:flex;align-items:center;gap:14px;}
+.ss-lucky-draw-icon{
+  flex-shrink:0;width:62px;height:62px;border-radius:50%;
+  background:rgba(255,215,0,.18);border:2px solid rgba(255,215,0,.35);
+  display:flex;align-items:center;justify-content:center;
+  font-size:34px;line-height:1;
+  box-shadow:0 0 20px rgba(255,215,0,.25);
+  animation:xmasBounce 2.4s ease-in-out infinite;
+}
+@keyframes xmasBounce{0%,100%{transform:translateY(0) rotate(-5deg)}50%{transform:translateY(-5px) rotate(5deg)}}
+.ss-lucky-draw-copy{flex:1;min-width:0;}
+.ss-lucky-draw-eyebrow{
+  font-size:9.5px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;
+  color:rgba(255,215,0,.85);margin-bottom:5px;
+}
+.ss-lucky-draw-title{
+  font-size:clamp(17px,4.5vw,24px);font-weight:900;color:#fff;
+  line-height:1.15;letter-spacing:-.5px;margin-bottom:4px;
+  font-family:'Plus Jakarta Sans',sans-serif;
+}
+.ss-lucky-draw-sub{font-size:12px;color:rgba(255,255,255,.75);line-height:1.5;}
+.ss-lucky-draw-actions{
+  position:relative;z-index:2;
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+}
+.ss-lucky-draw-btn{
+  display:inline-flex;align-items:center;gap:7px;
+  background:linear-gradient(135deg,#ffd700,#f5a623);
+  color:#1a0a00;font-size:13px;font-weight:800;
+  border:0;border-radius:50px;padding:12px 22px;cursor:pointer;
+  box-shadow:0 4px 16px rgba(255,215,0,.4);
+  font-family:'Plus Jakarta Sans',sans-serif;letter-spacing:-.1px;
+  transition:all .2s cubic-bezier(.16,1,.3,1);
+  white-space:nowrap;
+}
+.ss-lucky-draw-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(255,215,0,.5);}
+.ss-lucky-draw-badge{
+  font-size:10px;font-weight:700;padding:5px 11px;border-radius:50px;
+  background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.2);
+  backdrop-filter:blur(6px);white-space:nowrap;
+}
+/* Countdown */
+.ss-lucky-countdown{
+  position:relative;z-index:2;
+  display:flex;gap:8px;align-items:center;
+}
+.ss-lucky-countdown-label{font-size:10px;font-weight:700;color:rgba(255,255,255,.65);text-transform:uppercase;letter-spacing:.7px;}
+.ss-lucky-countdown-unit{
+  display:flex;flex-direction:column;align-items:center;
+  background:rgba(0,0,0,.25);border-radius:8px;
+  padding:5px 8px;min-width:38px;border:1px solid rgba(255,255,255,.1);
+}
+.ss-lucky-countdown-num{font-size:16px;font-weight:900;color:#ffd700;line-height:1;font-family:'Plus Jakarta Sans',sans-serif;}
+.ss-lucky-countdown-unit span:last-child{font-size:8px;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:.5px;margin-top:1px;}
+
+/* ── Lucky Draw Enrollment Popup ── */
+#ld-enrolled-modal{display:none;position:fixed;inset:0;z-index:10001;align-items:center;justify-content:center;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);}
+#ld-enrolled-modal.open{display:flex;}
+.ld-enroll-card{background:#fff;border-radius:24px;padding:32px 28px 28px;max-width:340px;width:90%;text-align:center;box-shadow:0 24px 64px rgba(0,0,0,.18);animation:slideUp .35s cubic-bezier(.16,1,.3,1);}
+.ld-enroll-burst{font-size:52px;margin-bottom:8px;line-height:1;}
+.ld-enroll-hl{font-size:20px;font-weight:900;color:#1a1a1a;margin-bottom:6px;}
+.ld-enroll-sub{font-size:14px;color:#6b7280;line-height:1.5;margin-bottom:20px;}
+.ld-enroll-pill{display:inline-block;background:linear-gradient(135deg,#ffd700,#f5a623);color:#1a0a00;font-size:13px;font-weight:800;border-radius:50px;padding:8px 22px;margin-bottom:20px;}
+.ld-enroll-close{width:100%;padding:12px;border:none;border-radius:12px;background:#f3f4f6;color:#374151;font-size:14px;font-weight:700;cursor:pointer;}
+
+/* Theme-aware header when bg image active */
+#main-header.ss-bg-active .ss-brand-name,
+#main-header.ss-bg-active .b-navy{color:#fff !important;}
+#main-header.ss-bg-active .b-teal{color:#a3ffce !important;}
+#main-header.ss-bg-active .ss-brand-mark{background:rgba(255,255,255,.18) !important;box-shadow:none !important;}
+#main-header.ss-bg-active .ss-brand-sub{color:rgba(255,255,255,.7) !important;}
+#main-header.ss-bg-active .ss-icon-btn{background:rgba(255,255,255,.15) !important;border-color:rgba(255,255,255,.25) !important;color:#fff !important;}
+#main-header.ss-bg-active .ss-brand-mark svg{fill:#fff;}
+/* Semi-dark scrim on header when bg is active */
+#main-header.ss-bg-active::after{
+  content:"";position:absolute;inset:0;z-index:0;pointer-events:none;
+  background:linear-gradient(180deg,rgba(8,30,15,.55) 0%,rgba(8,30,15,.2) 100%);
+}
+#main-header.ss-bg-active > *{position:relative;z-index:1;}
+
 </style>
 
 <script>
@@ -1852,6 +1969,7 @@ body { background: var(--prem-bg) !important; }
 <body class="bg-background text-on-surface overflow-x-hidden">
 
 <div id="toast"></div>
+<canvas id="xmas-snow-canvas"></canvas>
 
 <!-- AUTH OVERLAY -->
 <div id="auth-overlay">
@@ -2078,6 +2196,20 @@ body { background: var(--prem-bg) !important; }
       <!-- ── CATEGORIES ── -->
       <div id="preorder-banner" style="display:none;margin:0 0 12px"></div>
       <section class="ss-categories" id="home-cat-pills" aria-label="Product categories"></section>
+
+      <!-- Lucky Draw Enrollment Modal -->
+<div id="ld-enrolled-modal" onclick="if(event.target===this)closeLdEnroll()">
+  <div class="ld-enroll-card">
+    <div class="ld-enroll-burst">🎉</div>
+    <div class="ld-enroll-hl">You're in the Lucky Draw!</div>
+    <div class="ld-enroll-sub" id="ld-enroll-sub-text">Your first order has entered you into our lucky draw. Good luck!</div>
+    <div class="ld-enroll-pill" id="ld-enroll-name-pill">🎁 &nbsp;—</div>
+    <button class="ld-enroll-close" onclick="closeLdEnroll()">Got it, thanks! 🤞</button>
+  </div>
+</div>
+
+      <!-- ── LUCKY DRAW BANNER (set from Admin › CMS › Lucky Draw) ── -->
+      <div id="lucky-draw-section" style="display:none;margin-bottom:16px;"></div>
 
       <!-- ── PROMO ── (replaced by CMS banner when set) -->
       <div id="home-banner-section" style="margin-bottom:30px;">
@@ -3160,26 +3292,9 @@ function subscribeToUserOrders(uid) {
 
 // ─────────────── NAVIGATION ───────────────
 // ─── HOMEPAGE BACKGROUND (set from Admin → Settings) ───
-function applyHomeBg(cfg){
-  const el=document.getElementById('home-hero');if(!el)return;
-  const base='linear-gradient(135deg,#fff5ed 0%,#fff9f5 50%,#fafbf6 100%)';
-  const url=((cfg&&cfg.bgUrl)||'').trim();
-  if(!url||!(/^https?:\/\//i.test(url)||/^data:image\//i.test(url))){el.style.background='';el.classList.remove('ss-hero-custom');return;}
-  el.classList.add('ss-hero-custom');
-  const n=Math.min(Math.max(Number(cfg.overlay),0),90);const a=(isNaN(n)?45:n)/100;
-  const safe=url.replace(/["'()\\\s]/g,c=>encodeURIComponent(c));
-  el.style.background=`linear-gradient(90deg,rgba(247,250,235,${Math.min(a+.45,.98)}) 0%,rgba(247,250,235,${a}) 55%,rgba(247,250,235,${a*.3}) 100%), url("${safe}") center/cover no-repeat`;
-}
-async function loadHomeBg(){
-  try{
-    const{db,doc,getDoc}=window._fb;
-    const s=await getDoc(doc(db,'settings','homepage'));
-    const cfg=s.exists()?s.data():{};
-    applyHomeBg(cfg);
-    try{localStorage.setItem('homeBgCfg',JSON.stringify(cfg));}catch(_){}
-  }catch(e){}
-}
-try{applyHomeBg(JSON.parse(localStorage.getItem('homeBgCfg')||'null'));}catch(_){}
+// Background photo feature removed — stubs kept so references don't crash
+function applyHomeBg(){}
+async function loadHomeBg(){}
 
 function nav(page) {
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
@@ -4003,6 +4118,31 @@ async function placeOrder() {
   document.getElementById('success-order-id').textContent=orderId;
   document.getElementById('success-modal').classList.add('open');
   confettiBurst();
+
+  // ── Lucky Draw enrollment: fire if campaign active & this is user's first order ──
+  (async()=>{
+    try{
+      if(!_currentLdData||!_currentLdData.active)return;
+      const{db,collection,doc,getDoc,setDoc,serverTimestamp,query,where,getDocs,limit}=window._fb;
+      // Count user's orders including the one just placed
+      const priorQ=query(collection(db,'orders'),where('userId','==',user.uid),limit(2));
+      const priorSnap=await getDocs(priorQ);
+      if(priorSnap.size>1)return; // had orders before
+      // Check already enrolled
+      const entryRef=doc(db,'lucky_draw_entries',user.uid);
+      const entrySnap=await getDoc(entryRef);
+      if(entrySnap.exists())return;
+      // Enroll
+      await setDoc(entryRef,{name,phone,userId:user.uid,userEmail:user.email,enrolledAt:serverTimestamp()});
+      // Show popup
+      const pill=document.getElementById('ld-enroll-name-pill');
+      if(pill)pill.textContent=`🎁  ${name}`;
+      const subEl=document.getElementById('ld-enroll-sub-text');
+      if(subEl&&_currentLdData.subtitle)subEl.textContent=`Your first order has entered you into "${_currentLdData.title||'the lucky draw'}". Good luck!`;
+      const modal=document.getElementById('ld-enrolled-modal');
+      if(modal){setTimeout(()=>modal.classList.add('open'),700);}
+    }catch(e){console.error('Lucky draw enroll:',e);}
+  })();
 
   // Reset slider, cart and UI after popup is visible
   _orderInFlight = false;
@@ -4882,10 +5022,173 @@ window.renderProfile = function() {
   if (currentPage === 'home') renderOrderAgain();
 };
 
+// ═══════════════════════════════════════════════════════════
+// SNOWFALL — controlled by cms/lucky_draw.snowfall toggle
+// ═══════════════════════════════════════════════════════════
+(function initSnow(){
+  var c=document.getElementById('xmas-snow-canvas');if(!c)return;
+  var ctx=c.getContext('2d');
+  var W,H,flakes=[],rafId=null;
+  function resize(){W=c.width=window.innerWidth;H=c.height=window.innerHeight;}
+  resize();
+  window.addEventListener('resize',resize);
+  for(var i=0;i<80;i++){flakes.push({x:Math.random()*window.innerWidth,y:Math.random()*window.innerHeight,r:1+Math.random()*3.5,sp:0.3+Math.random()*1.1,d:Math.random()*Math.PI*2,sw:0.3+Math.random()*0.5});}
+  var frame=0;
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle='rgba(255,255,255,0.88)';
+    ctx.beginPath();
+    flakes.forEach(function(f){
+      ctx.moveTo(f.x,f.y);
+      ctx.arc(f.x,f.y,f.r,0,Math.PI*2);
+      f.y+=f.sp;
+      f.x+=Math.sin(f.d+frame*0.015)*f.sw;
+      if(f.y>H+10){f.y=-10;f.x=Math.random()*W;}
+      if(f.x>W+10)f.x=-10;
+      if(f.x<-10)f.x=W+10;
+    });
+    ctx.fill();
+    frame++;
+    rafId=requestAnimationFrame(draw);
+  }
+  window.startSnow=function(){
+    if(rafId)return;
+    c.style.display='block';
+    // Resize in case viewport changed since init
+    W=c.width=window.innerWidth;H=c.height=window.innerHeight;
+    draw();
+  };
+  window.stopSnow=function(){
+    if(rafId){cancelAnimationFrame(rafId);rafId=null;}
+    ctx.clearRect(0,0,W,H);
+    c.style.display='none';
+  };
+})();
+
+// ═══════════════════════════════════════════════════════════
+// STOREFRONT FESTIVE EFFECTS (santa + stars)
+function _applyStorefrontEffects(d){
+  const sec=document.getElementById('lucky-draw-section');if(!sec)return;
+  // remove existing
+  sec.querySelectorAll('.ss-santa-overlay,.ss-stars-overlay').forEach(e=>e.remove());
+  if(!d||!d.santa)return;
+  // Santa badge
+  const santaDiv=document.createElement('div');
+  santaDiv.className='ss-santa-overlay';
+  santaDiv.style.cssText='position:absolute;top:8px;right:12px;font-size:26px;z-index:10;line-height:1;pointer-events:none;';
+  santaDiv.textContent='🎅';
+  // Stars scatter
+  const starsDiv=document.createElement('div');
+  starsDiv.className='ss-stars-overlay';
+  starsDiv.style.cssText='position:absolute;inset:0;pointer-events:none;overflow:hidden;border-radius:inherit;z-index:1;';
+  const stars=['⭐','✨','🌟','💫'];
+  let html='';
+  for(let i=0;i<10;i++){
+    const s=stars[Math.floor(Math.random()*stars.length)];
+    const x=Math.random()*90;const y=Math.random()*80;
+    const sz=10+Math.random()*10;const op=0.35+Math.random()*0.5;
+    html+=`<span style="position:absolute;left:${x}%;top:${y}%;font-size:${sz}px;opacity:${op};">${s}</span>`;
+  }
+  starsDiv.innerHTML=html;
+  // parent must be relative for absolute children to work
+  const parent=sec.firstElementChild;
+  if(parent){parent.style.position='relative';parent.appendChild(santaDiv);parent.appendChild(starsDiv);}
+}
+
+// ═══════════════════════════════════════════════════════════
+// LUCKY DRAW BANNER — load from Firestore cms/lucky_draw
+// ═══════════════════════════════════════════════════════════
+let _luckyDrawUnsub=null;
+let _currentLdData=null;
+
+function closeLdEnroll(){
+  document.getElementById('ld-enrolled-modal')?.classList.remove('open');
+}
+
+function loadLuckyDraw(){
+  if(!window._fb)return;
+  if(_luckyDrawUnsub){_luckyDrawUnsub();_luckyDrawUnsub=null;}
+  try{
+    const{db,doc,onSnapshot}=window._fb;
+    _luckyDrawUnsub=onSnapshot(doc(db,'cms','lucky_draw'),snap=>{
+      if(snap.exists()&&snap.data().active){
+        _currentLdData=snap.data();
+        renderLuckyDraw(_currentLdData);
+        // snowfall
+        if(_currentLdData.snowfall){if(window.startSnow)window.startSnow();}
+        else{if(window.stopSnow)window.stopSnow();}
+        // santa + stars overlay on storefront (inject into lucky draw section)
+        _applyStorefrontEffects(_currentLdData);
+      } else {
+        _currentLdData=null;
+        const sec=document.getElementById('lucky-draw-section');
+        if(sec){sec.style.display='none';sec.innerHTML='';}
+        if(window.stopSnow)window.stopSnow();
+      }
+    },()=>{});
+  }catch(e){}
+}
+
+let _ldTimer=null;
+function renderLuckyDraw(d){
+  const sec=document.getElementById('lucky-draw-section');if(!sec)return;
+  const icon=d.icon||'🎁';
+  const title=d.title||'Lucky Draw!';
+  const sub=d.subtitle||'Every order enters you into our lucky draw. Big prizes await!';
+  const eyebrow=d.eyebrow||'';
+  const btnText=d.btnText||'Enter Now 🎁';
+  const btnAction=d.btnAction||"nav('browse')";
+  const badge=d.badge||'';
+  const expiresAt=d.expiresAt?new Date(d.expiresAt):null;
+  // Custom gradient colours stored as hex strings, fallback to red-green festive
+  const c1=d.color1||'#c0392b';
+  const c2=d.color2||'#962d22';
+  const c3=d.color3||'#1a5c2a';
+
+  function buildCountdown(){
+    if(!expiresAt)return'';
+    const diff=expiresAt-Date.now();
+    if(diff<=0)return'<div class="ss-lucky-countdown"><span class="ss-lucky-countdown-label">Draw ended</span></div>';
+    const days=Math.floor(diff/864e5);const hrs=Math.floor((diff%864e5)/36e5);const mins=Math.floor((diff%36e5)/6e4);const secs=Math.floor((diff%6e4)/1e3);
+    function u(n,l){return`<div class="ss-lucky-countdown-unit"><span class="ss-lucky-countdown-num">${String(n).padStart(2,'0')}</span><span>${l}</span></div>`;}
+    return`<div class="ss-lucky-countdown"><span class="ss-lucky-countdown-label">Ends in</span>${u(days,'days')}${u(hrs,'hrs')}${u(mins,'min')}${u(secs,'sec')}</div>`;
+  }
+
+  function paint(){
+    sec.innerHTML=`<div class="ss-lucky-draw" style="background:linear-gradient(135deg,${c1} 0%,${c2} 40%,${c3} 100%);">
+      <div class="ss-lucky-draw-inner">
+        <div class="ss-lucky-draw-icon">${icon}</div>
+        <div class="ss-lucky-draw-copy">
+          ${eyebrow?`<div class="ss-lucky-draw-eyebrow">${eyebrow}</div>`:''}
+          <div class="ss-lucky-draw-title">${title}</div>
+          <div class="ss-lucky-draw-sub">${sub}</div>
+        </div>
+      </div>
+      <div class="ss-lucky-draw-actions">
+        <button class="ss-lucky-draw-btn btn" onclick="${btnAction}">${btnText}</button>
+        ${badge?`<span class="ss-lucky-draw-badge">${badge}</span>`:''}
+      </div>
+      ${buildCountdown()}
+    </div>`;
+    sec.style.display='';
+    if(_ldTimer)clearInterval(_ldTimer);
+    if(expiresAt&&expiresAt-Date.now()>0){
+      _ldTimer=setInterval(()=>{
+        const cd=sec.querySelector('.ss-lucky-countdown');
+        if(cd)cd.outerHTML=buildCountdown();
+      },1000);
+    }
+  }
+  paint();
+}
+
+// ═══════════════════════════════════════════════════════════
+// (bg-active wrapper removed — background photo feature no longer used)
+
 // ─────────────── INIT ───────────────
 nav('home');
 hydrateProductsFromCache();          // instant paint from last visit
-function startData() { loadPickupPoints(); loadHomeBg(); loadCMSBanners(); subscribeRoomDeliverySettings(); subscribeCategories(); subscribePreorder(); subscribeProducts(); }
+function startData() { loadPickupPoints(); loadCMSBanners(); loadLuckyDraw(); subscribeRoomDeliverySettings(); subscribeCategories(); subscribePreorder(); subscribeProducts(); }
 updateCartBadge(); renderCart();
 if (window._fb) startData(); else window.addEventListener('fb-ready', startData, { once: true });
 </script>
