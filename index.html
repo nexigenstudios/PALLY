@@ -4155,19 +4155,18 @@ async function placeOrder() {
       // Check / create entry
       const entryRef=doc(db,'lucky_draw_entries',user.uid);
       const entrySnap=await getDoc(entryRef);
-      const alreadyEnrolled=entrySnap.exists();
-      if(!alreadyEnrolled){
-        await setDoc(entryRef,{name,phone,userId:user.uid,userEmail:user.email,enrolledAt:serverTimestamp()});
+      if(entrySnap.exists()){
+        // Already enrolled — just keep the header badge, no popup
+        _currentLdData=ld;
+        _updateLdHeaderBadge(true);
+        return;
       }
-      // Show enrolled popup
+      // First order during this campaign — enroll and show popup once
+      await setDoc(entryRef,{name,phone,userId:user.uid,userEmail:user.email,enrolledAt:serverTimestamp()});
       const pill=document.getElementById('ld-enroll-name-pill');
       if(pill)pill.textContent=`🎁  ${name}`;
       const subEl=document.getElementById('ld-enroll-sub-text');
-      if(subEl){
-        subEl.textContent=alreadyEnrolled
-          ?`You're already enrolled in "${ld.title||'the lucky draw'}". Good luck — fingers crossed! 🤞`
-          :`Your order has entered you into "${ld.title||'the lucky draw'}". Good luck!`;
-      }
+      if(subEl)subEl.textContent=`Your order has entered you into "${ld.title||'the lucky draw'}". Good luck!`;
       const modal=document.getElementById('ld-enrolled-modal');
       if(modal){setTimeout(()=>modal.classList.add('open'),700);}
       // Sync header badge + local cache
