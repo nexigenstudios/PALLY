@@ -328,7 +328,8 @@ input,select,textarea{min-width:0;max-width:100%;}
   #main-header > div{gap:8px;min-width:0;}
   #main-header .brand-word{font-size:20px !important;white-space:nowrap;}
   #main-header > div > div:first-child{min-width:0;flex:0 1 auto;}
-  #main-header > div > div:last-child{flex-shrink:0;gap:6px !important;}
+  #main-header > div > div:last-child{flex-shrink:0;}
+  #ld-header-badge span:last-child{font-size:9px !important;}
   #user-btn{width:40px !important;height:40px !important;padding:0 !important;}
   #hostel-switch-label{max-width:72px !important;}
   /* auth + chat bubbles */
@@ -1922,6 +1923,17 @@ body { background: var(--prem-bg) !important; }
 .ld-enroll-pill{display:inline-block;background:linear-gradient(135deg,#ffd700,#f5a623);color:#1a0a00;font-size:13px;font-weight:800;border-radius:50px;padding:8px 22px;margin-bottom:20px;}
 .ld-enroll-close{width:100%;padding:12px;border:none;border-radius:12px;background:#f3f4f6;color:#374151;font-size:14px;font-weight:700;cursor:pointer;}
 
+/* ── Lucky Draw header enrolled badge ── */
+#ld-header-badge{
+  transition:opacity .25s,transform .25s;
+  transform-origin:right center;
+}
+/* Tighten badge on very small screens */
+@media(max-width:380px){
+  #ld-header-badge{padding:2px 7px 2px 6px !important;}
+  #ld-header-badge span:last-child{font-size:9px !important;}
+}
+
 /* Theme-aware header when bg image active */
 #main-header.ss-bg-active .ss-brand-name,
 #main-header.ss-bg-active .b-navy{color:#fff !important;}
@@ -2122,28 +2134,31 @@ body { background: var(--prem-bg) !important; }
     </div>
 
     <!-- RIGHT: Cart + User avatar -->
-    <div class="flex items-center gap-2.5 flex-shrink-0 ml-auto">
-      <!-- Branch switcher (multi-branch only) -->
-      <button id="hostel-switch-btn" onclick="openHostelPicker()" class="hidden items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 hover:bg-primary/15 transition-colors btn">
-        <span class="material-symbols-outlined text-primary" style="font-size:16px">location_on</span>
-        <span id="hostel-switch-label" class="text-xs font-bold text-primary max-w-[110px] truncate">Choose branch</span>
-      </button>
+    <div class="flex flex-col items-end flex-shrink-0 ml-auto gap-0.5">
+      <!-- Icon row -->
+      <div class="flex items-center gap-2.5">
+        <!-- Branch switcher (multi-branch only) -->
+        <button id="hostel-switch-btn" onclick="openHostelPicker()" class="hidden items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 hover:bg-primary/15 transition-colors btn">
+          <span class="material-symbols-outlined text-primary" style="font-size:16px">location_on</span>
+          <span id="hostel-switch-label" class="text-xs font-bold text-primary max-w-[110px] truncate">Choose branch</span>
+        </button>
 
-      <!-- Lucky Draw enrolled indicator (shown when campaign active + user enrolled) -->
-      <div id="ld-header-badge" style="display:none;align-items:center;gap:4px;background:linear-gradient(135deg,#ffd700,#f5a623);border-radius:50px;padding:5px 11px;cursor:default;" title="You're enrolled in the lucky draw!">
-        <span style="font-size:14px;line-height:1;">✅</span>
-        <span style="font-size:11px;font-weight:800;color:#1a0a00;white-space:nowrap;">Enrolled</span>
+        <button class="ss-icon-btn btn" aria-label="Cart" onclick="nav('cart')">
+          <span class="material-symbols-outlined" style="font-size:22px">shopping_cart</span>
+          <span id="cart-badge" class="ss-count hidden">0</span>
+        </button>
+
+        <button onclick="handleUserBtn()" id="user-btn" class="btn ss-icon-btn overflow-hidden flex-shrink-0" aria-label="Profile">
+          <div id="user-avatar" class="w-full h-full rounded-full bg-primary flex items-center justify-center text-white text-xs font-bold hidden" style="background:#176b35"></div>
+          <span class="material-symbols-outlined fill-icon" style="font-size:24px;" id="user-icon">person</span>
+        </button>
       </div>
 
-      <button class="ss-icon-btn btn" aria-label="Cart" onclick="nav('cart')">
-        <span class="material-symbols-outlined" style="font-size:22px">shopping_cart</span>
-        <span id="cart-badge" class="ss-count hidden">0</span>
-      </button>
-
-      <button onclick="handleUserBtn()" id="user-btn" class="btn ss-icon-btn overflow-hidden flex-shrink-0" aria-label="Profile">
-        <div id="user-avatar" class="w-full h-full rounded-full bg-primary flex items-center justify-center text-white text-xs font-bold hidden" style="background:#176b35"></div>
-        <span class="material-symbols-outlined fill-icon" style="font-size:24px;" id="user-icon">person</span>
-      </button>
+      <!-- Lucky Draw enrolled badge — sits below icons, auto-hides when campaign off -->
+      <div id="ld-header-badge" style="display:none;align-items:center;gap:3px;background:linear-gradient(135deg,#ffd700,#f5a623);border-radius:50px;padding:2px 9px 2px 7px;cursor:default;max-width:100%;" title="You're enrolled in the lucky draw!">
+        <span style="font-size:11px;line-height:1;">🎉</span>
+        <span style="font-size:10px;font-weight:800;color:#1a0a00;white-space:nowrap;letter-spacing:.2px;">Enrolled</span>
+      </div>
     </div>
 
   </div>
@@ -4127,30 +4142,36 @@ async function placeOrder() {
   document.getElementById('success-modal').classList.add('open');
   confettiBurst();
 
-  // ── Lucky Draw enrollment: show popup on every order while campaign is active ──
+  // ── Lucky Draw enrollment: fires on every order, reads campaign directly from
+  //    Firestore so it works even if the user never saw the banner (e.g. ordered
+  //    from a category page before the cms/lucky_draw snapshot resolved).
   (async()=>{
     try{
-      if(!_currentLdData||!_currentLdData.active)return;
       const{db,doc,getDoc,setDoc,serverTimestamp}=window._fb;
+      // Always read campaign state fresh — don't rely on cached _currentLdData
+      const ldSnap=await getDoc(doc(db,'cms','lucky_draw'));
+      if(!ldSnap.exists()||!ldSnap.data().active)return;
+      const ld=ldSnap.data();
+      // Check / create entry
       const entryRef=doc(db,'lucky_draw_entries',user.uid);
       const entrySnap=await getDoc(entryRef);
       const alreadyEnrolled=entrySnap.exists();
       if(!alreadyEnrolled){
-        // First order — enroll now
         await setDoc(entryRef,{name,phone,userId:user.uid,userEmail:user.email,enrolledAt:serverTimestamp()});
       }
-      // Show enrolled popup on every order during the campaign
+      // Show enrolled popup
       const pill=document.getElementById('ld-enroll-name-pill');
       if(pill)pill.textContent=`🎁  ${name}`;
       const subEl=document.getElementById('ld-enroll-sub-text');
       if(subEl){
         subEl.textContent=alreadyEnrolled
-          ?`You're already enrolled in "${_currentLdData.title||'the lucky draw'}". Good luck — fingers crossed! 🤞`
-          :`Your order has entered you into "${_currentLdData.title||'the lucky draw'}". Good luck!`;
+          ?`You're already enrolled in "${ld.title||'the lucky draw'}". Good luck — fingers crossed! 🤞`
+          :`Your order has entered you into "${ld.title||'the lucky draw'}". Good luck!`;
       }
       const modal=document.getElementById('ld-enrolled-modal');
       if(modal){setTimeout(()=>modal.classList.add('open'),700);}
-      // Reflect enrolled state in header badge
+      // Sync header badge + local cache
+      _currentLdData=ld;
       _updateLdHeaderBadge(true);
     }catch(e){console.error('Lucky draw enroll:',e);}
   })();
