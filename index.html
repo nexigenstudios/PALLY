@@ -4152,17 +4152,19 @@ async function placeOrder() {
       const ldSnap=await getDoc(doc(db,'cms','lucky_draw'));
       if(!ldSnap.exists()||!ldSnap.data().active)return;
       const ld=ldSnap.data();
-      // Check / create entry
-      const entryRef=doc(db,'lucky_draw_entries',user.uid);
+      // Scope entry per-campaign so a new campaign re-enrolls all users.
+      // Falls back to endDate or title if no explicit campaignId is set.
+      const campaignId=ld.campaignId||(ld.endDate?String(ld.endDate):null)||ld.title||'default';
+      const entryRef=doc(db,'lucky_draw_entries',user.uid+'__'+campaignId);
       const entrySnap=await getDoc(entryRef);
       if(entrySnap.exists()){
-        // Already enrolled — just keep the header badge, no popup
+        // Already enrolled in this campaign — just keep the header badge, no popup
         _currentLdData=ld;
         _updateLdHeaderBadge(true);
         return;
       }
       // First order during this campaign — enroll and show popup once
-      await setDoc(entryRef,{name,phone,userId:user.uid,userEmail:user.email,enrolledAt:serverTimestamp()});
+      await setDoc(entryRef,{name,phone,userId:user.uid,userEmail:user.email,campaignId,enrolledAt:serverTimestamp()});
       const pill=document.getElementById('ld-enroll-name-pill');
       if(pill)pill.textContent=`🎁  ${name}`;
       const subEl=document.getElementById('ld-enroll-sub-text');
