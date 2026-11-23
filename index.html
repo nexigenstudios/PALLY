@@ -4016,8 +4016,8 @@ async function placeOrder() {
     pickupLocationName=roomDeliverySettings.pickupLocation||'Store Counter';
   }
 
-  if(!name){showToast('Please enter your name');_orderInFlight=false;return;}
-  if(!phone){showToast('Please enter your phone number');_orderInFlight=false;return;}
+  if(!name){showToast('Please enter your name');return;}
+  if(!phone){showToast('Please enter your phone number');return;}
 
   const sub=cart.reduce((s,c)=>s+c.price*c.qty,0);
   let disc=0;
@@ -4142,51 +4142,36 @@ async function placeOrder() {
   document.getElementById('success-modal').classList.add('open');
   confettiBurst();
 
-  // ── Lucky Draw enrollment ──────────────────────────────────────────────────
-  // Fires after every successful order regardless of which page it came from
-  // (home popular strip, categories, browse — all call the same placeOrder()).
-  // Reads cms/lucky_draw fresh every time so it works even if the banner never
-  // loaded (e.g. user ordered before the onSnapshot fired).
-  // Entry key is uid__campaignId so a new campaign re-enrolls everyone cleanly.
-  // Popup only shows on the very first enrollment; subsequent orders silently
-  // keep the header badge without showing the popup again.
+  // ── Lucky Draw enrollment: fires on every order, reads campaign directly from
+  //    Firestore so it works even if the user never saw the banner (e.g. ordered
+  //    from a category page before the cms/lucky_draw snapshot resolved).
   (async()=>{
     try{
       const{db,doc,getDoc,setDoc,serverTimestamp}=window._fb;
+      // Always read campaign state fresh — don't rely on cached _currentLdData
       const ldSnap=await getDoc(doc(db,'cms','lucky_draw'));
-      // If no campaign or campaign is inactive, do nothing
       if(!ldSnap.exists()||!ldSnap.data().active)return;
       const ld=ldSnap.data();
-      // Build a per-campaign doc id — add a campaignId field to cms/lucky_draw
-      // in Firebase to control this explicitly (e.g. "xmas2026").
-      // Falls back to endDate → title → "default" if campaignId is not set.
-      const campaignId=ld.campaignId||(ld.endDate?String(ld.endDate):null)||ld.title||'default';
-      const entryDocId=user.uid+'__'+campaignId;
-      const entryRef=doc(db,'lucky_draw_entries',entryDocId);
+      // Check / create entry
+      const entryRef=doc(db,'lucky_draw_entries',user.uid);
       const entrySnap=await getDoc(entryRef);
       if(entrySnap.exists()){
-        // Already enrolled in this campaign — show badge, no popup
+        // Already enrolled — just keep the header badge, no popup
         _currentLdData=ld;
-        _updateLdHeaderBadge(true,entryDocId);
+        _updateLdHeaderBadge(true);
         return;
       }
-      // First order in this campaign — write entry to Firestore first
-      await setDoc(entryRef,{
-        name, phone,
-        userId:user.uid,
-        userEmail:user.email,
-        campaignId,
-        enrolledAt:serverTimestamp()
-      });
-      // Write succeeded — now show the popup and badge
-      _currentLdData=ld;
-      _updateLdHeaderBadge(true,entryDocId);
+      // First order during this campaign — enroll and show popup once
+      await setDoc(entryRef,{name,phone,userId:user.uid,userEmail:user.email,enrolledAt:serverTimestamp()});
       const pill=document.getElementById('ld-enroll-name-pill');
       if(pill)pill.textContent=`🎁  ${name}`;
       const subEl=document.getElementById('ld-enroll-sub-text');
       if(subEl)subEl.textContent=`Your order has entered you into "${ld.title||'the lucky draw'}". Good luck!`;
       const modal=document.getElementById('ld-enrolled-modal');
       if(modal){setTimeout(()=>modal.classList.add('open'),700);}
+      // Sync header badge + local cache
+      _currentLdData=ld;
+      _updateLdHeaderBadge(true);
     }catch(e){console.error('Lucky draw enroll:',e);}
   })();
 
@@ -5152,23 +5137,20 @@ function closeLdEnroll(){
 }
 
 // Show/hide the header "✅ Enrolled" badge.
-// Pass enrolled=true + entryDocId to force-show immediately after enrollment.
-// Called with no args on page load — derives the per-campaign doc id from
-// _currentLdData and checks Firestore to decide whether to show the badge.
-async function _updateLdHeaderBadge(enrolled,entryDocId){
+// Pass enrolled=true to force-show (e.g. right after enrollment).
+// When called with no arg it checks Firestore live.
+async function _updateLdHeaderBadge(enrolled){
   const badge=document.getElementById('ld-header-badge');
   if(!badge)return;
-  // If no active campaign, always hide
+  // If campaign is off, always hide
   if(!_currentLdData||!_currentLdData.active){badge.style.display='none';return;}
   if(enrolled===true){badge.style.display='flex';return;}
-  // Check Firestore using the same per-campaign doc id used at enrollment
+  // Check Firestore for existing enrollment
   try{
     const uid=window._currentUser?.uid;
     if(!uid){badge.style.display='none';return;}
     const{db,doc,getDoc}=window._fb;
-    const campaignId=_currentLdData.campaignId||(_currentLdData.endDate?String(_currentLdData.endDate):null)||_currentLdData.title||'default';
-    const docId=entryDocId||(uid+'__'+campaignId);
-    const snap=await getDoc(doc(db,'lucky_draw_entries',docId));
+    const snap=await getDoc(doc(db,'lucky_draw_entries',uid));
     badge.style.display=snap.exists()?'flex':'none';
   }catch(e){badge.style.display='none';}
 }
